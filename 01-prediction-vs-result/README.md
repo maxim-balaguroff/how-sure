@@ -73,4 +73,4 @@ The same 32 numbers were recomputed by separate code and by an independent sprea
 
 All numbers are made up; no company data. Built with AI assistance; the geology and the checks are mine.
 
-Licence: [CC BY 4.0](../LICENSE). Maxim Balagurov, petroleum geologist · v1.0, November 2026
+Licence: [CC BY 4.0](../LICENSE). Maxim Balagurov, petroleum geologist · v1.0, November 2026 · DOI [10.5281/zenodo.24242389](https://doi.org/10.5281/zenodo.24242389)
