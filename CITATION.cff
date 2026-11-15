@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use these tools or notes, please cite them as below."
+title: "how-sure: small tools and notes from a petroleum geologist's work"
+abstract: "Small tools and notes from my work as a petroleum geologist. Each one deals with the same question: how sure are we, and what would make us surer? Tool 01 is a post-drill look-back template in Excel (prediction vs. result) with a hand-worked example and 32 checks."
+type: software
+authors:
+  - family-names: Balagurov
+    given-names: Maxim
+license: CC-BY-4.0
+repository-code: "https://github.com/maxim-balaguroff/how-sure"
+keywords:
+  - petroleum geology
+  - geoscience
+  - uncertainty
+  - look-back
+  - well planning
+  - Excel template
