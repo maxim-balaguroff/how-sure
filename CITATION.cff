@@ -3,6 +3,8 @@ message: "If you use these tools or notes, please cite them as below."
 title: "how-sure: small tools and notes from a petroleum geologist's work"
 abstract: "Small tools and notes from my work as a petroleum geologist. Each one deals with the same question: how sure are we, and what would make us surer? Tool 01 is a post-drill look-back template in Excel (prediction vs. result) with a hand-worked example and 32 checks."
 type: software
+version: "1.0"
+date-released: "2026-11-15"
 authors:
   - family-names: Balagurov
     given-names: Maxim
