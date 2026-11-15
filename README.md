@@ -1,5 +1,7 @@
 # how-sure
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24242389.svg)](https://doi.org/10.5281/zenodo.24242389)
+
 English · [Русский](README.ru.md)
 
 Small tools and notes from my work as a petroleum geologist. Each one deals with the same question: how sure are we, and what would make us surer?
@@ -24,7 +26,9 @@ If a number looks wrong, please [open an issue](https://github.com/maxim-balagur
 
 ## Licence and citation
 
-Text and templates: [CC BY 4.0](LICENSE). Use them, change them, credit the source. To cite, use the *Cite this repository* button or [CITATION.cff](CITATION.cff).
+Text and templates: [CC BY 4.0](LICENSE). Use them, change them, credit the source.
+
+To cite: Balagurov, M. (2026). *how-sure: small tools and notes from a petroleum geologist's work* (v1.0). Zenodo. [https://doi.org/10.5281/zenodo.24242389](https://doi.org/10.5281/zenodo.24242389). The DOI always points to the latest version; the *Cite this repository* button gives other formats.
 
 Built with AI assistance; the geology and the checks are mine.
 
