@@ -1,0 +1,666 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Magnetic survey check</title>
+<meta name="description" content="Before a magnetic survey is flown: will the body you need stand above the noise, will two bodies show as two, and how far apart can the lines be. A planning check for one geological question.">
+<style>
+  :root {
+    --page: #ffffff;
+    --surface: #fafaf8;
+    --card: #ffffff;
+    --ink: #111110;
+    --ink-2: #52514e;
+    --muted: #8a8882;
+    --rule: #e2e1db;
+    --grid: #ecebe6;
+    --axis: #b9b8ae;
+    --band: #efeee9;
+    --accent: #2a78d6;
+    --accent-soft: #e6f0fb;
+    --ground: #9a988f;
+    --body: #4a4a46;
+    --ok: #1f8a4c;
+    --ok-soft: #e5f4ea;
+    --warn: #b06a00;
+    --warn-soft: #fbf0dc;
+    --bad: #b3261e;
+    --bad-soft: #fbe7e5;
+    --focus: #2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #8f8d84;
+      --rule: #34332f; --grid: #2a2a27; --axis: #55544d; --band: #2b2b28; --accent: #6aa7ee; --accent-soft: #1d2b3c;
+      --ground: #8f8d84; --body: #c9c7bd; --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f;
+      --bad: #f08a80; --bad-soft: #3a1c19;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #8f8d84;
+    --rule: #34332f; --grid: #2a2a27; --axis: #55544d; --band: #2b2b28; --accent: #6aa7ee; --accent-soft: #1d2b3c;
+    --ground: #8f8d84; --body: #c9c7bd; --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f;
+    --bad: #f08a80; --bad-soft: #3a1c19;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--page); color: var(--ink); }
+  body { font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif; font-size: 15px; line-height: 1.5; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 40px; }
+  .kicker { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 6px; }
+  h1 { font-size: 32px; line-height: 1.12; margin: 0 0 10px; letter-spacing: -.015em; }
+  .lead { font-size: 17px; color: var(--ink); max-width: 760px; margin: 0 0 24px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 10px; }
+  h3 { font-size: 15px; margin: 0 0 6px; }
+  .grid { display: grid; grid-template-columns: 330px 1fr; gap: 20px; align-items: start; }
+  .grid > *, .notes > *, .answers > * { min-width: 0; }
+  .card { overflow-x: auto; }
+  .card { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; }
+  .inputs { position: sticky; top: 12px; }
+  fieldset { border: 0; padding: 0; margin: 0 0 14px; }
+  legend { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); padding: 0; margin-bottom: 8px; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg label { text-align: center; padding: 7px 4px; font-size: 14px; cursor: pointer; border-right: 1px solid var(--rule); background: var(--surface); }
+  .seg label:last-of-type { border-right: 0; }
+  .seg input:checked + label { background: var(--accent); color: #fff; }
+  .seg input:focus-visible + label { outline: 2px solid var(--focus); outline-offset: -3px; }
+  .field { display: grid; grid-template-columns: 1fr 108px; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .field label { font-size: 14px; }
+  .field .hint { grid-column: 1 / -1; font-size: 12.5px; color: var(--muted); margin-top: -4px; }
+  input[type=number] { width: 100%; font: inherit; font-variant-numeric: tabular-nums; text-align: right; padding: 6px 8px; border: 1px solid var(--rule); border-radius: 6px; background: var(--page); color: var(--ink); }
+  input[type=number]:focus { outline: 2px solid var(--focus); outline-offset: 0; border-color: transparent; }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin: -2px 0 10px; }
+  button { font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; }
+  button:hover { border-color: var(--axis); }
+  button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .reset { margin-top: 4px; }
+  .verdict { border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; border: 1px solid transparent; }
+  .verdict .v { font-size: 20px; font-weight: 700; line-height: 1.25; }
+  .verdict .s { color: var(--ink-2); margin-top: 4px; }
+  .verdict.clear { background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+  .verdict.clear .v { color: var(--ok); }
+  .verdict.marginal { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+  .verdict.marginal .v { color: var(--warn); }
+  .verdict.below { background: var(--bad-soft); border-color: color-mix(in srgb, var(--bad) 35%, transparent); }
+  .verdict.below .v { color: var(--bad); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; }
+  .stat .n { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; }
+  .stat .l { font-size: 12.5px; color: var(--ink-2); }
+  figure { margin: 0 0 14px; }
+  svg { display: block; width: 100%; height: auto; }
+  svg text { font-family: "Segoe UI", system-ui, Arial, sans-serif; }
+  .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  .answer { border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; }
+  .answer p { margin: 0; }
+  .answer .rule { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--rule); font-size: 14px; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 12.5px; color: var(--ink-2); font-weight: 600; }
+  tr.here td { background: var(--accent-soft); font-weight: 600; }
+  td .pl { color: var(--muted); font-weight: 400; font-size: 13px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 999px; }
+  .tag.clear { background: var(--ok-soft); color: var(--ok); }
+  .tag.marginal { background: var(--warn-soft); color: var(--warn); }
+  .tag.below { background: var(--bad-soft); color: var(--bad); }
+  .notes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 28px; }
+  .notes ul { margin: 0; padding-left: 18px; }
+  .notes li { margin-bottom: 6px; }
+  details { margin-top: 24px; border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; background: var(--surface); }
+  .tablewrap { overflow-x: auto; }
+  .why { font-size: 14.5px; color: var(--ink-2); max-width: 760px; margin: -12px 0 24px; }
+  .stat .n { overflow-wrap: anywhere; }
+  input[aria-invalid="true"] { border-color: var(--bad); background: var(--bad-soft); }
+  .presets button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+  #heights td:not(:first-child) { white-space: nowrap; }
+  .mini { display: none; }
+  .tablenote { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+  summary { cursor: pointer; font-weight: 700; }
+  summary .pass { color: var(--ok); }
+  summary .fail { color: var(--bad); }
+  #checks td.st { font-weight: 700; }
+  #checks td.st.ok { color: var(--ok); }
+  #checks td.st.no { color: var(--bad); }
+  #checks td.src { text-align: left; color: var(--ink-2); font-size: 13px; }
+  footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--rule); color: var(--ink-2); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  footer .ai { color: var(--ink-2); }
+  a { color: var(--accent); }
+  .warnline { color: var(--warn); font-size: 13.5px; margin: 6px 0 0; }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    .inputs { position: static; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .answers, .notes { grid-template-columns: 1fr; }
+    h1 { font-size: 26px; }
+    input[type=number] { font-size: 16px; min-height: 44px; }
+    button { min-height: 44px; }
+    .seg label { min-height: 44px; display: flex; align-items: center; justify-content: center; }
+    .presets { gap: 8px; }
+    .mini.show { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; padding: 12px 16px; background: var(--card); border-top: 1px solid var(--rule); box-shadow: 0 -2px 10px rgba(0, 0, 0, .08); font-weight: 700; font-size: 15px; cursor: pointer; }
+    .mini.clear { color: var(--ok); }
+    .mini.marginal { color: var(--warn); }
+    .mini.below { color: var(--bad); }
+    body { padding-bottom: 56px; }
+  }
+  @media (max-width: 600px) { #checks .tol, #checks .src { display: none; } }
+  @media (max-width: 420px) { th, td { padding: 6px 4px; font-size: 13.5px; } td .pl { display: block; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">how-sure · tool 02 · magnetic survey check · v1.1</p>
+  <h1>What must the survey resolve?</h1>
+  <p class="lead">A magnetic survey should be specified by the geological question, not by habit. Describe the body you need to see and the survey you have in mind. The page tells you whether the body will stand above the noise, whether two bodies will show as two, and how far apart the lines can be.</p>
+  <p class="why">Why it matters in petroleum work: where igneous intrusions cut a sedimentary basin, dolerite sills and dykes blur the seismic image, can break up reservoirs and seals, and cause trouble while drilling. Magnetic data map them cheaply, before the wells are placed.</p>
+
+  <div class="grid">
+    <form class="card inputs" id="form" autocomplete="off" onsubmit="return false">
+      <fieldset>
+        <legend>The body</legend>
+        <div class="seg" role="radiogroup" aria-label="Body type">
+          <input type="radio" name="type" id="t-dyke" value="dyke" checked><label for="t-dyke">Dyke</label>
+          <input type="radio" name="type" id="t-sill" value="sill"><label for="t-sill">Sill edge</label>
+          <input type="radio" name="type" id="t-plug" value="plug"><label for="t-plug">Plug</label>
+        </div>
+        <div class="field"><label for="depth">Depth to top below ground, m</label><input type="number" id="depth" min="0" step="10" value="300"></div>
+        <div class="field"><label for="size" id="size-label">Width, m</label><input type="number" id="size" min="0" step="1" value="20"></div>
+        <div class="field"><label for="k">Susceptibility contrast, SI</label><input type="number" id="k" min="0" step="0.001" value="0.02">
+          <div class="hint">Dolerite in a sedimentary section is often 0.01 to 0.05 SI; altered dolerite can be ten times weaker. Core or outcrop measurements beat any table.</div></div>
+        <div class="field"><label for="F">Earth's field at the site, nT</label><input type="number" id="F" min="20000" max="70000" step="500" value="55000">
+          <div class="hint">Take the site value from the IGRF model: roughly 25,000 to 65,000 nT around the world.</div></div>
+        <div class="field" id="sep-row"><label for="sep">Second body at, m (0 = none)</label><input type="number" id="sep" min="0" step="10" value="300"></div>
+      </fieldset>
+      <fieldset>
+        <legend>The survey</legend>
+        <div class="field"><label for="height">Sensor height above ground, m</label><input type="number" id="height" min="0" step="5" value="80">
+          <div class="hint">Typical heights to start from; use the figure in the survey spec.</div></div>
+        <div class="presets" aria-label="Typical sensor heights by platform">
+          <button type="button" data-h="2">Ground · 2 m</button><button type="button" data-h="30">UAV, low clearance · 30 m</button><button type="button" data-h="40">Helicopter · 40 m</button><button type="button" data-h="80">Fixed-wing · 80 m</button>
+        </div>
+        <div class="field"><label for="noise">Noise of the final data (RMS), nT</label><input type="number" id="noise" min="0.01" step="0.05" value="0.5">
+          <div class="hint">One standard deviation of what is left after processing at wavelengths like the anomaly's: levelling and diurnal residuals, geological and cultural background (pipelines, well casings). Not the sensor's own figure or the fourth-difference noise.</div></div>
+        <div class="field"><label for="lines">Line spacing, m</label><input type="number" id="lines" min="1" step="10" value="200"></div>
+      </fieldset>
+      <button type="button" class="reset" id="reset">Back to the example</button>
+    </form>
+
+    <main>
+      <div class="verdict" id="verdict" aria-live="polite"><div class="v" id="v-main"></div><div class="s" id="v-sub"></div></div>
+      <div class="stats">
+        <div class="stat"><div class="n" id="s-peak"></div><div class="l" id="s-peak-l">peak anomaly, nT</div></div>
+        <div class="stat"><div class="n" id="s-ratio"></div><div class="l">peak ÷ noise</div></div>
+        <div class="stat"><div class="n" id="s-h"></div><div class="l">sensor to top of body, m</div></div>
+        <div class="stat"><div class="n" id="s-max"></div><div class="l">highest sensor height for a clear signal, m</div></div>
+      </div>
+      <figure>
+        <svg id="chart" viewBox="0 0 680 470" role="img" aria-labelledby="chart-title chart-desc">
+          <title id="chart-title">Anomaly profile across the body, with a cross-section below</title>
+          <desc id="chart-desc">Upper panel: the magnetic anomaly along a line across the body at the chosen sensor height and on the ground, with the noise band. Lower panel: the body in cross-section and the sensor height.</desc>
+        </svg>
+      </figure>
+      <div class="answers">
+        <div class="answer" id="a-two"></div>
+        <div class="answer" id="a-lines"></div>
+      </div>
+      <div class="card">
+        <h3>The same body at other heights</h3>
+        <table id="heights" aria-label="Peak anomaly at other sensor heights">
+          <thead><tr><th>Sensor height above ground</th><th>Sensor to top</th><th>Peak, nT</th><th>÷ noise</th><th>Verdict</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p class="tablenote">Noise is held at your value in every row; ground and UAV data are often noisier, and in rugged terrain fixed-wing clearance over valleys is well above nominal.</p>
+        <p class="warnline" id="depth-note"></p>
+      </div>
+    </main>
+  </div>
+
+  <div class="notes">
+    <section>
+      <h2>How it works</h2>
+      <ul>
+        <li>For a body that runs a long way down, magnetised by a vertical field, the anomaly is proportional to the angle its top subtends at the sensor (for a plug, the solid angle; for a sill edge, the angle of its top minus the angle of its base). The page sums exactly that.</li>
+        <li>Depth and sensor height add up. What counts is the distance from the sensor to the top of the body, h.</li>
+        <li>Flying lower helps a shallow body a lot and a deep one very little. The table above shows how much.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Rules it uses</h2>
+      <ul>
+        <li><b>Visible:</b> peak at least 5 × noise is clear, 2 to 5 × is marginal, under 2 × is lost. These thresholds are my convention; if your project uses others, read the table against them. For a sill edge the verdict uses the high on one side; the swing to the low beyond the edge is twice that, so the verdict errs on the safe side.</li>
+        <li><b>Two bodies:</b> on a noise-free total-field profile that crosses both, two thin bodies only show two peaks when they are more than about 1.15 h apart; two small plugs, more than about h. A dip smaller than twice the noise is not counted. A vertical-derivative map can split them a little closer if the noise allows.</li>
+        <li><b>Lines:</b> a plug midway between lines spaced h apart keeps about 72 % of its peak; at 2 h, about 35 %. The 70 % rule for the spacing is mine. Reid (1980): up to about 2 h for a smooth total-field grid, about h for gradients, h/2 for a single point-like target.</li>
+        <li><b>Long bodies:</b> lines within about 45° of perpendicular to strike cross a dyke longer than a few line spacings on every line; the spacing then decides how well the gridded map follows it (beyond about 2 h it breaks into beads), not whether it is seen. Oblique crossings widen the anomaly by 1/sin of the angle.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Limits</h2>
+      <ul>
+        <li>Vertical field and induced magnetisation only. Outside high latitudes the raw anomaly of a long body is smaller by about sin²I + cos²I·sin²β (I inclination, β strike from magnetic north): 0.4 for a north-striking dyke at I = 40°, 0.03 at I = 10°. Reduction to the pole restores the shape but amplifies the noise by the same factor, so read the verdict as optimistic by that factor. No remanence; dolerites often carry it, and it can change the sign.</li>
+        <li>Idealised bodies running to infinite depth: a dyke infinitely long, a straight sill edge, a plug as a vertical cylinder. A thin dyke whose base is b below the sensor gives about (1 − h/b) of the value shown, a thin plug about (1 − h²/b²); bodies wider than they are deep are overstated. Flat ground, constant sensor height.</li>
+        <li>Noise is one number: diurnal, heading and levelling errors and the geological and cultural background are assumed to be inside it. Ground readings are treated as continuous along the line; the station spacing is not checked. The page frames the question for a survey design; it does not replace the contractor's design.</li>
+      </ul>
+    </section>
+  </div>
+
+  <details id="checks-box">
+    <summary>Checks against known answers: <span id="checks-sum"></span></summary>
+    <p>Each check compares the page with an answer worked out another way: by hand from textbook relations, or by an independent sum of elementary dipoles over the body (<a href="https://github.com/maxim-balaguroff/how-sure/blob/main/02-magnetic-survey-check/physics_ref.py"><code>physics_ref.py</code></a> in the repository). Change the code and break a formula, and a row turns FAIL.</p>
+    <div class="tablewrap"><table id="checks"><thead><tr><th>Check</th><th>Expected</th><th>Page</th><th class="tol">Tolerance</th><th class="src">Source</th><th></th></tr></thead><tbody></tbody></table></div>
+  </details>
+
+  <footer>
+    <span class="ai">Built with AI assistance; the geology and the checks are mine.</span>
+    <span>The example is made up; no survey data.</span>
+    <span>References: Blakely (1995), <i>Potential Theory in Gravity and Magnetic Applications</i>; Reid (1980), Aeromagnetic survey design, Geophysics 45, 973–976; Saltus (2026), Evaluation of aliasing in aeromagnetic surveys, Earth and Space Science, doi:10.1029/2025EA004336.</span>
+    <span>CC BY 4.0 · Maxim Balagurov, petroleum geologist</span>
+    <span><a href="https://github.com/maxim-balaguroff/how-sure">github.com/maxim-balaguroff/how-sure</a> · DOI <a href="https://doi.org/10.5281/zenodo.24242389">10.5281/zenodo.24242389</a></span>
+  </footer>
+</div>
+<div id="mini" class="mini" role="button" tabindex="0" aria-label="Jump to the answer"></div>
+
+<script>
+"use strict";
+const TWO_PI = 2 * Math.PI;
+const CLEAR = 5, MARGINAL = 2;
+const EXAMPLE = { type: "dyke", depth: 300, size: 20, k: 0.02, F: 55000, sep: 300, height: 80, noise: 0.5, lines: 200 };
+const PLATFORMS = [[2, "ground"], [30, "UAV, low clearance"], [40, "helicopter"], [80, "fixed-wing"], [150, ""]];
+
+/* ---------- physics: vertical field, vertical induced magnetisation, k in SI, F and result in nT ---------- */
+// 2D bodies: anomaly = k F / (2 pi) x (angle the top subtends at the sensor), minus the same for the base if any.
+function dyke(x, k, F, w, h) {
+  return k * F / TWO_PI * (Math.atan((x + w / 2) / h) - Math.atan((x - w / 2) / h));
+}
+// Horizontal sheet of thickness t, top at h, from x = 0 to +infinity (the edge is at x = 0).
+function sillEdge(x, k, F, t, h) {
+  return k * F / TWO_PI * (Math.atan(x / h) - Math.atan(x / (h + t)));
+}
+// Solid angle of a disc of radius R seen from a point at height h above the disc plane, offset r from its centre.
+function discSolidAngle(r, R, h) {
+  r = Math.abs(r);
+  if (R <= 0) return 0;
+  if (r <= R) {
+    const N = 720; let s = 0;
+    for (let i = 0; i < N; i++) {
+      const ph = (i + 0.5) * TWO_PI / N, c = Math.cos(ph), sn = Math.sin(ph);
+      const far = -r * c + Math.sqrt(Math.max(0, R * R - r * r * sn * sn));
+      s += 1 - h / Math.hypot(far, h);
+    }
+    return s * TWO_PI / N;
+  }
+  const a = Math.asin(R / r), N = 400; let s = 0;
+  for (let i = 0; i < N; i++) {
+    const th = -Math.PI / 2 + (i + 0.5) * Math.PI / N, ph = Math.PI + a * Math.sin(th);
+    const c = Math.cos(ph), sn = Math.sin(ph), q = Math.sqrt(Math.max(0, R * R - r * r * sn * sn));
+    const near = -r * c - q, far = -r * c + q;
+    s += (h / Math.hypot(near, h) - h / Math.hypot(far, h)) * a * Math.cos(th);
+  }
+  return s * Math.PI / N;
+}
+// Vertical cylinder of diameter d, top at h, running down a long way: k F / (4 pi) x solid angle of its top.
+function plug(x, k, F, d, h) {
+  return k * F / (2 * TWO_PI) * discSolidAngle(x, d / 2, h);
+}
+
+function single(x, m, h) {
+  if (m.type === "dyke") return dyke(x, m.k, m.F, m.size, h);
+  if (m.type === "sill") return sillEdge(x, m.k, m.F, m.size, h);
+  return plug(x, m.k, m.F, m.size, h);
+}
+// Sensor-to-top distance; kept above 0.1 m so a body touching the sensor does not divide by zero.
+function hOf(m, height) { return Math.max(0.1, m.depth + (height === undefined ? m.height : height)); }
+function hasSecond(m) { return m.type !== "sill" && m.sep > 0; }
+function profile(x, m, height) {
+  const h = hOf(m, height);
+  return single(x, m, h) + (hasSecond(m) ? single(x - m.sep, m, h) : 0);
+}
+function goldenMax(f, lo, hi) {
+  const g = (Math.sqrt(5) - 1) / 2;
+  let a = lo, b = hi, c = b - g * (b - a), d = a + g * (b - a), fc = f(c), fd = f(d);
+  for (let i = 0; i < 120; i++) {
+    if (fc > fd) { b = d; d = c; fd = fc; c = b - g * (b - a); fc = f(c); }
+    else { a = c; c = d; fc = fd; d = a + g * (b - a); fd = f(d); }
+  }
+  const x = (a + b) / 2; return { x, v: f(x) };
+}
+// Peak of one body on its own: at the centre for a dyke or plug, at the extreme near the edge for a sill.
+function peakOne(m, height) {
+  const h = hOf(m, height);
+  if (m.type === "sill") return goldenMax(x => single(x, m, h), 0, 20 * h).v;
+  return Math.abs(single(0, m, h));
+}
+function verdictOf(ratio) { return ratio >= CLEAR ? "clear" : ratio >= MARGINAL ? "marginal" : "below"; }
+function maxClearHeight(m) {
+  const need = CLEAR * m.noise;
+  if (peakOne(m, 0) < need) return null;
+  let lo = 0, hi = 20000;
+  if (peakOne(m, hi) >= need) return Infinity;
+  for (let i = 0; i < 80; i++) { const mid = (lo + hi) / 2; if (peakOne(m, mid) >= need) lo = mid; else hi = mid; }
+  return (lo + hi) / 2;
+}
+// Two identical bodies: is there a dip between them, and how deep?
+function twoBodies(m, height) {
+  if (!hasSecond(m)) return null;
+  // the profile is symmetric about the midpoint, so search the half from the first body to the midpoint
+  const vmid = profile(m.sep / 2, m, height);
+  const best = goldenMax(x => profile(x, m, height), 0, m.sep / 2);
+  const vmax = Math.max(best.v, vmid, profile(0, m, height)), dip = vmax - vmid;
+  return { dip, split: dip > 1e-6 * Math.abs(vmax), vmax };
+}
+// Highest sensor height at which the dip between two bodies is still at least twice the noise.
+function maxSplitHeight(m) {
+  const ok = s => { const t = twoBodies(m, s); return t.split && t.dip >= MARGINAL * m.noise; };
+  if (!ok(0)) return null;
+  let lo = 0, hi = 20000;
+  if (ok(hi)) return Infinity;
+  for (let i = 0; i < 30; i++) { const mid = (lo + hi) / 2; if (ok(mid)) lo = mid; else hi = mid; }
+  return (lo + hi) / 2;
+}
+// Plug midway between two lines: share of the peak the nearest line still sees.
+function lineShare(m, L, height) {
+  const h = hOf(m, height);
+  return single(L / 2, m, h) / single(0, m, h);
+}
+function maxLineSpacing(m, share) {
+  let lo = 0, hi = 40 * hOf(m);
+  for (let i = 0; i < 80; i++) { const mid = (lo + hi) / 2; if (lineShare(m, mid) >= share) lo = mid; else hi = mid; }
+  return (lo + hi) / 2;
+}
+
+/* ---------- formatting ---------- */
+function nT(v) { const a = Math.abs(v); return a >= 100 ? v.toFixed(0) : a >= 10 ? v.toFixed(1) : a >= 1 ? v.toFixed(2) : v.toPrecision(2); }
+function metres(v) { return Math.round(v).toLocaleString("en-GB"); }
+// "about" figures: two significant digits, so 1,101 m reads as 1,100 m
+function about(v) { if (!(v > 0)) return metres(v); const p = Math.pow(10, Math.floor(Math.log10(v)) - 1); return metres(Math.round(v / p) * p); }
+function times(v) { return v >= 10 ? v.toFixed(0) : v.toFixed(1); }
+const NAMES = { dyke: "dyke", sill: "sill edge", plug: "plug" };
+
+/* ---------- reading the form ---------- */
+const $ = id => document.getElementById(id);
+const MINS = { depth: 0, size: 0, k: 0, F: 1000, sep: 0, height: 0, noise: 0.01, lines: 1 };
+let adjusted = [];
+function readModel() {
+  adjusted = [];
+  const num = id => {
+    const raw = $(id).value, v = parseFloat(raw), min = MINS[id];
+    const ok = raw.trim() !== "" && isFinite(v) && v >= min;
+    $(id).setAttribute("aria-invalid", ok ? "false" : "true");
+    if (!ok) adjusted.push(id);
+    return ok ? v : min;
+  };
+  const m = { type: document.querySelector("input[name=type]:checked").value };
+  for (const id of Object.keys(MINS)) m[id] = num(id);
+  return m;
+}
+function setModel(m) {
+  document.querySelector(`input[name=type][value=${m.type}]`).checked = true;
+  for (const id of ["depth", "size", "k", "F", "sep", "height", "noise", "lines"]) $(id).value = m[id];
+}
+
+/* ---------- drawing ---------- */
+const SVGNS = "http://www.w3.org/2000/svg";
+function el(name, attrs, text) {
+  const e = document.createElementNS(SVGNS, name);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+function niceStep(range, n) {
+  const raw = range / n, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+  return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * p;
+}
+function draw(m) {
+  const svg = $("chart");
+  [...svg.querySelectorAll("g, defs")].forEach(n => n.remove());
+  // draw at the width the chart is shown, so the text stays readable on a phone
+  const W = Math.max(300, Math.min(680, Math.round(svg.clientWidth || 680)));
+  const narrow = W < 540, fs = narrow ? 12 : 11;
+  const L = narrow ? 42 : 64, R = W - (narrow ? 8 : 16), T = narrow ? 58 : 26, B = T + (narrow ? 210 : 232);
+  const ST = B + 46, SB = ST + (narrow ? 132 : 152), H = SB + 4;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const h = hOf(m), two = hasSecond(m);
+  const xc = m.type === "sill" ? 0 : (two ? m.sep / 2 : 0);
+  const half = Math.max(3 * h, two ? m.sep / 2 + 2.5 * h : 0, m.type !== "sill" ? m.size * 1.2 : 0);
+  const x0 = xc - half, x1 = xc + half, sx = x => L + (x - x0) / (x1 - x0) * (R - L);
+  const N = narrow ? 241 : 361, xs = [...Array(N)].map((_, i) => x0 + (x1 - x0) * i / (N - 1));
+  const here = xs.map(x => profile(x, m)), ground = xs.map(x => profile(x, m, 0));
+  const fin = v => isFinite(v) ? v : 0;
+  const pk = Math.max(...here.map(v => Math.abs(fin(v)))), gpk = Math.max(...ground.map(v => Math.abs(fin(v))));
+  const top = Math.max(pk, CLEAR * m.noise) * 1.22;
+  const sym = m.type === "sill";
+  const ymin = sym ? -top : -Math.max(m.noise * 1.6, top * 0.12), ymax = top;
+  const sy = v => B - (v - ymin) / (ymax - ymin) * (B - T);
+  const defs = el("defs");
+  const cp = el("clipPath", { id: "plotclip" }); cp.appendChild(el("rect", { x: L, y: T, width: R - L, height: B - T })); defs.appendChild(cp);
+  svg.appendChild(defs);
+  const g = el("g"); svg.appendChild(g);
+
+  // grid and y labels, decimals set by the step
+  const step = niceStep(ymax - ymin, narrow ? 4 : 5), dec = step >= 1 ? 0 : step >= 0.1 ? 1 : 2;
+  for (let v = Math.ceil(ymin / step) * step; v <= ymax + 1e-9; v += step) {
+    g.appendChild(el("line", { x1: L, x2: R, y1: sy(v), y2: sy(v), stroke: "var(--grid)", "stroke-width": 1 }));
+    g.appendChild(el("text", { x: L - 6, y: sy(v) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, (Math.abs(v) < step / 1e6 ? 0 : v).toFixed(dec)));
+  }
+  g.appendChild(el("text", { x: 4, y: 14, "font-size": fs + 0.5, fill: "var(--ink-2)" }, "anomaly, nT"));
+  // noise band and clear level
+  g.appendChild(el("rect", { x: L, y: sy(m.noise), width: R - L, height: sy(-m.noise) - sy(m.noise), fill: "var(--band)" }));
+  const clr = CLEAR * m.noise;
+  for (const s of sym ? [1, -1] : [1]) g.appendChild(el("line", { x1: L, x2: R, y1: sy(s * clr), y2: sy(s * clr), stroke: "var(--ok)", "stroke-width": 1, "stroke-dasharray": "4 4" }));
+  // put the label where the curve is farthest from the clear level
+  const spots = [L + 70, (L + R) / 2, R - 70].map(px => {
+    const x = x0 + (px - L) / (R - L) * (x1 - x0);
+    return { px, gap: Math.abs(Math.abs(fin(profile(x, m))) - clr) };
+  }).sort((a, b) => b.gap - a.gap);
+  g.appendChild(el("text", { x: spots[0].px, y: sy(clr) - 5, "text-anchor": "middle", "font-size": fs, fill: "var(--ok)" }, "clear level, 5 × noise"));
+  g.appendChild(el("text", { x: R - 4, y: sy(-m.noise) + 14, "text-anchor": "end", "font-size": fs, fill: "var(--muted)" }, "noise ± " + nT(m.noise) + " nT (1σ)"));
+  g.appendChild(el("line", { x1: L, x2: R, y1: sy(0), y2: sy(0), stroke: "var(--axis)", "stroke-width": 1 }));
+  // curves (points that are not numbers are skipped)
+  const path = vals => { let d = "", pen = false; vals.forEach((v, i) => { if (!isFinite(v)) { pen = false; return; } d += (pen ? "L" : "M") + sx(xs[i]).toFixed(1) + " " + sy(v).toFixed(1); pen = true; }); return d || "M0 0"; };
+  const clip = el("g", { "clip-path": "url(#plotclip)" }); g.appendChild(clip);
+  if (m.height > 0) clip.appendChild(el("path", { d: path(ground), fill: "none", stroke: "var(--ground)", "stroke-width": 1.6, "stroke-dasharray": "5 4" }));
+  clip.appendChild(el("path", { d: path(here), fill: "none", stroke: "var(--accent)", "stroke-width": 2.6, "stroke-linejoin": "round" }));
+  // legend: one row on a wide screen, two rows on a phone
+  const lg = el("g", { "font-size": fs + 0.5, fill: "var(--ink-2)" }); g.appendChild(lg);
+  const row1 = narrow ? { x: 4, y: 32 } : { x: 120, y: 14 };
+  lg.appendChild(el("line", { x1: row1.x, x2: row1.x + 22, y1: row1.y - 4, y2: row1.y - 4, stroke: "var(--accent)", "stroke-width": 2.6 }));
+  lg.appendChild(el("text", { x: row1.x + 28, y: row1.y }, `sensor at ${metres(m.height)} m${two ? ", both bodies" : ""}`));
+  if (m.height > 0) {
+    const row2 = narrow ? { x: 4, y: 48 } : { x: two ? 330 : 268, y: 14 };
+    lg.appendChild(el("line", { x1: row2.x, x2: row2.x + 22, y1: row2.y - 4, y2: row2.y - 4, stroke: "var(--ground)", "stroke-width": 1.6, "stroke-dasharray": "5 4" }));
+    lg.appendChild(el("text", { x: row2.x + 28, y: row2.y }, `on the ground${gpk > ymax ? ", peak " + nT(gpk) + " nT (off scale)" : ""}`));
+  }
+  // section
+  const hs = (R - L) / (x1 - x0);
+  const vs = Math.min(hs, (SB - ST - 22) / ((m.height + m.depth + (m.type === "sill" ? m.size : 0)) * 1.25 || 1));
+  const yg = ST + 14 + m.height * vs, dz = z => yg + z * vs;
+  g.appendChild(el("text", { x: 4, y: ST - 8, "font-size": fs + 0.5, fill: "var(--ink-2)" }, "cross-section" + (vs < hs * 0.98 ? `, vertical scale × ${(vs / hs).toFixed(2)}` : "")));
+  g.appendChild(el("rect", { x: L, y: yg, width: R - L, height: Math.max(0, SB - yg), fill: "var(--surface)", stroke: "none" }));
+  g.appendChild(el("line", { x1: L, x2: R, y1: yg, y2: yg, stroke: "var(--axis)", "stroke-width": 1.4 }));
+  g.appendChild(el("text", { x: L + 4, y: yg - 5, "font-size": fs, fill: "var(--muted)" }, "ground"));
+  if (m.height > 0) {
+    g.appendChild(el("line", { x1: L, x2: R, y1: ST + 14, y2: ST + 14, stroke: "var(--accent)", "stroke-width": 1.2, "stroke-dasharray": "2 4" }));
+    g.appendChild(el("text", { x: R - 4, y: ST + 9, "text-anchor": "end", "font-size": fs, fill: "var(--accent)" }, "sensor"));
+  }
+  const bodyAt = cx => {
+    const w = Math.max(3, m.size * hs);
+    if (m.type === "sill") {
+      const x = Math.max(L, sx(cx)); g.appendChild(el("rect", { x, y: dz(m.depth), width: Math.max(0, R - x), height: Math.max(3, m.size * vs), fill: "var(--body)" }));
+    } else {
+      g.appendChild(el("rect", { x: sx(cx) - w / 2, y: dz(m.depth), width: w, height: Math.max(0, SB - dz(m.depth)), fill: "var(--body)" }));
+    }
+  };
+  bodyAt(0); if (two) bodyAt(m.sep);
+  // h marker
+  const hx = sx(0) - 10;
+  g.appendChild(el("line", { x1: hx, x2: hx, y1: ST + 14, y2: dz(m.depth), stroke: "var(--ink-2)", "stroke-width": 1 }));
+  g.appendChild(el("text", { x: hx - 5, y: (ST + 14 + dz(m.depth)) / 2 + 4, "text-anchor": "end", "font-size": fs + 0.5, fill: "var(--ink)" }, `h = ${metres(h)} m`));
+  // x axis labels
+  const xstep = niceStep(x1 - x0, narrow ? 4 : 6);
+  for (let v = Math.ceil(x0 / xstep) * xstep; v <= x1 + 1e-9; v += xstep) {
+    g.appendChild(el("line", { x1: sx(v), x2: sx(v), y1: B, y2: B + 4, stroke: "var(--axis)" }));
+    g.appendChild(el("text", { x: sx(v), y: B + 17, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, metres(v)));
+  }
+  g.appendChild(el("text", { x: (L + R) / 2, y: B + 33, "text-anchor": "middle", "font-size": fs, fill: "var(--muted)" }, "distance along the line, m"));
+}
+
+/* ---------- the answer ---------- */
+const FIELD_NAMES = { depth: "depth", size: "size", k: "contrast", F: "Earth's field", sep: "second body", height: "sensor height", noise: "noise", lines: "line spacing" };
+function setMini(cls, text) { const mini = $("mini"); mini.className = "mini " + cls + (mini.classList.contains("show") ? " show" : ""); mini.textContent = text; }
+function render() {
+  const m = readModel();
+  $("size-label").textContent = m.type === "dyke" ? "Width, m" : m.type === "sill" ? "Thickness, m" : "Diameter, m";
+  $("sep-row").style.display = m.type === "sill" ? "none" : "";
+  document.querySelectorAll(".presets button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.h === m.height ? "true" : "false"));
+  const h = hOf(m), pk = peakOne(m), name = NAMES[m.type], two = hasSecond(m);
+  const box = $("verdict");
+  const fixNote = adjusted.length ? ` Check the field${adjusted.length > 1 ? "s" : ""} marked in red (${adjusted.map(i => FIELD_NAMES[i]).join(", ")}): the page used the lowest allowed value instead.` : "";
+  if (!(pk > 0) || !isFinite(pk)) {
+    box.className = "verdict below";
+    $("v-main").textContent = "Give the body a size and a susceptibility contrast above zero.";
+    $("v-sub").textContent = fixNote.trim();
+    for (const id of ["s-peak", "s-ratio", "s-h", "s-max"]) $(id).textContent = "–";
+    $("a-two").innerHTML = ""; $("a-lines").innerHTML = ""; $("heights").querySelector("tbody").innerHTML = ""; $("depth-note").textContent = "";
+    [...$("chart").querySelectorAll("g, defs")].forEach(n => n.remove());
+    setMini("below", "Set the body first");
+    return;
+  }
+  const ratio = pk / m.noise, v = verdictOf(ratio);
+  box.className = "verdict " + v;
+  const mh = maxClearHeight(m);
+  let main;
+  if (v === "clear") main = `Visible: the ${name} stands at ${nT(pk)} nT, ${times(ratio)} times the noise.`;
+  else if (v === "marginal") main = `Marginal: ${nT(pk)} nT is only ${times(ratio)} times the noise.`;
+  else main = `Not visible: ${nT(pk)} nT is lost in ${nT(m.noise)} nT of noise.`;
+  $("v-main").textContent = main;
+  let sub;
+  if (mh === null) sub = `Even with the sensor on the ground it stays under 5 × noise. Lower noise or a different method is needed; height alone will not do it.`;
+  else if (mh === Infinity) sub = `It stays clear at any practical height.`;
+  else if (mh >= m.height) sub = `It stays clear up to about ${about(mh)} m above ground.`;
+  else sub = `To make it clear, bring the sensor down to about ${about(mh)} m above ground, or lower the noise.`;
+  $("v-sub").textContent = sub + fixNote;
+  $("s-peak").textContent = nT(pk);
+  $("s-peak-l").textContent = two ? `peak of one ${name}, nT` : "peak anomaly, nT";
+  $("s-ratio").textContent = times(ratio) + " ×";
+  $("s-h").textContent = metres(h);
+  $("s-max").textContent = mh === null ? "none" : mh === Infinity ? "any" : about(mh);
+  setMini(v, `${v === "clear" ? "Visible" : v === "marginal" ? "Marginal" : "Not visible"}: ${nT(pk)} nT, ${times(ratio)} × noise`);
+
+  // two bodies
+  const tb = twoBodies(m), a2 = $("a-two");
+  if (m.type === "sill") a2.innerHTML = `<p><b>Two bodies.</b> Not asked for a sill edge: the page treats one edge at a time.</p>`;
+  else if (!tb) a2.innerHTML = `<p><b>Two bodies.</b> Set a second body to see whether the two will show as two.</p>`;
+  else {
+    const ruleTxt = m.type === "dyke"
+      ? `Rule of thumb for thin dykes: they split beyond about 1.15 × h, here ${about(2 / Math.sqrt(3) * h)} m.`
+      : `Rule of thumb for small plugs: they split beyond about 1.0 × h, here ${about(h)} m.`;
+    const overlap = m.sep < m.size ? `<p class="warnline">The bodies overlap: set the separation larger than the ${m.type === "dyke" ? "width" : "diameter"}.</p>` : "";
+    let t;
+    if (!tb.split) t = `Two ${name}s ${metres(m.sep)} m apart show as <b>one anomaly</b> at this height.`;
+    else if (tb.dip < 2 * m.noise) t = `Two ${name}s ${metres(m.sep)} m apart leave a dip of only ${nT(tb.dip)} nT between them, under twice the noise: in practice <b>one anomaly</b>.`;
+    else t = `Two ${name}s ${metres(m.sep)} m apart show as <b>two anomalies</b>, with a dip of ${nT(tb.dip)} nT between them.`;
+    const ms = maxSplitHeight(m);
+    let fix;
+    if (ms === null) fix = `Even with the sensor on the ground they stay one anomaly: here the depth sets the limit, not the height.`;
+    else if (ms === Infinity) fix = `They stay apart at any practical height.`;
+    else if (ms >= m.height) fix = `They stay apart up to about ${about(ms)} m above ground.`;
+    else fix = `They come apart with the sensor below about ${about(ms)} m above ground.`;
+    a2.innerHTML = `<p><b>Two bodies.</b> ${t} ${fix}</p><p class="rule">${ruleTxt}</p>${overlap}`;
+  }
+  // lines
+  const al = $("a-lines");
+  if (m.type === "plug") {
+    const share = lineShare(m, m.lines), Lmax = maxLineSpacing(m, 0.7);
+    al.innerHTML = `<p><b>Lines.</b> A plug midway between lines ${metres(m.lines)} m apart keeps <b>${Math.round(share * 100)} %</b> of its peak on the nearest line (${nT(pk * share)} nT, ${times(pk * share / m.noise)} × noise).</p><p class="rule">To keep at least 70 % in the worst case, space lines no more than about ${about(Lmax)} m apart.</p>`;
+  } else {
+    const beads = m.lines > 2 * h ? ` At more than 2 h (${about(2 * h)} m) the gridded ${name} will break into beads.` : "";
+    al.innerHTML = `<p><b>Lines.</b> Lines within about 45° of perpendicular to strike cross a long ${name} on every line, so the spacing of ${metres(m.lines)} m decides how well the map follows it along strike, not whether you see it.${beads}</p><p class="rule">Switch to Plug to check a short body that can fall between lines.</p>`;
+  }
+  // heights table
+  const tbody = $("heights").querySelector("tbody"); tbody.innerHTML = "";
+  const hl = [...new Set([...PLATFORMS.map(p => p[0]), m.height])].sort((a, b) => a - b);
+  for (const s of hl) {
+    const p = peakOne(m, s), r = p / m.noise, vv = verdictOf(r);
+    const pl = (PLATFORMS.find(q => q[0] === s) || [0, ""])[1];
+    const tr = document.createElement("tr"); if (s === m.height) tr.className = "here";
+    tr.innerHTML = `<td>${metres(s)} m${s === m.height ? " (yours)" : ""}${pl ? ` <span class="pl">${pl}</span>` : ""}</td><td>${metres(m.depth + s)} m</td><td>${nT(p)}</td><td>${times(r)} ×</td><td><span class="tag ${vv}">${vv === "below" ? "not visible" : vv}</span></td>`;
+    tbody.appendChild(tr);
+  }
+  const p2 = peakOne(m, 2), p150 = peakOne(m, 150);
+  $("depth-note").textContent = p150 > 0 ? `From 150 m down to 2 m above ground the peak grows ${(p2 / p150).toFixed(p2 / p150 < 10 ? 2 : 0)} times.` + (p2 / p150 < 1.5 ? " At this depth the depth sets the limit, not the height." : "") : "";
+  draw(m);
+}
+
+/* ---------- checks against known answers ---------- */
+function runChecks() {
+  const k = 0.02, F = 55000, C = k * F / TWO_PI;
+  const ex = { ...EXAMPLE, height: 60 };  // fixed check case: h = 360 m, independent of the example on screen
+  const thin = { type: "dyke", depth: 100, size: 1, k, F, sep: 0, height: 0, noise: 1, lines: 1 };
+  const smallPlug = { type: "plug", depth: 100, size: 2, k, F, sep: 0, height: 0, noise: 1, lines: 1 };
+  const halfWidth = (f, peak) => { let lo = 0, hi = 1000; for (let i = 0; i < 80; i++) { const mid = (lo + hi) / 2; if (f(mid) > peak / 2) lo = mid; else hi = mid; } return (lo + hi) / 2; };
+  const rows = [];
+  const add = (name, expected, got, tol, src, rel = true) => {
+    const ok = typeof expected === "string" ? expected === got : (rel ? Math.abs(got - expected) <= tol * Math.abs(expected) : Math.abs(got - expected) <= tol);
+    rows.push({ name, expected, got, tol: typeof expected === "string" ? "exact" : rel ? (tol * 100).toPrecision(2).replace(/\.?0+$/, "") + " %" : tol.toExponential(0), src, ok });
+  };
+  const NUM = "independent dipole sum", HAND = "by hand";
+  add("Example dyke: peak, nT", 9.72363, peakOne(ex), 1e-3, NUM);
+  add("Example dyke: 200 m off the centre, nT", 7.43215, profile(200, { ...ex, sep: 0 }), 1e-3, NUM);
+  add("Thin dyke: half-width at half peak = h, m", 100, halfWidth(x => dyke(x, k, F, 1, 100), dyke(0, k, F, 1, 100)), 5e-3, HAND);
+  add("Wide dyke (20 km), h = 100 m, infinite-depth model: peak, nT", 546.499, dyke(0, k, F, 2e4, 100), 1e-3, NUM);
+  add("Very wide body, infinite-depth model: peak tends to k F / 2, nT", k * F / 2, dyke(0, k, F, 1e9, 100), 1e-3, HAND);
+  add("Dyke: same value either side, nT", 0, dyke(150, k, F, 20, 360) - dyke(-150, k, F, 20, 360), 1e-12, HAND, false);
+  add("Twice the contrast gives twice the peak", 2, dyke(0, 2 * k, F, 20, 360) / dyke(0, k, F, 20, 360), 1e-12, HAND);
+  const sillM = { type: "sill", depth: 200, size: 50, k, F, sep: 0, height: 0, noise: 1, lines: 1 };
+  const sx = goldenMax(x => sillEdge(x, k, F, 50, 200), 0, 4000);
+  add("Sill edge t = 50, h = 200: extreme at √(h(h + t)), m", 223.607, sx.x, 5e-3, HAND);
+  add("Sill edge: value at the extreme, nT", 19.4925, peakOne(sillM), 1e-3, NUM);
+  add("Sill edge: 100 m over the sill, nT", 14.5556, sillEdge(100, k, F, 50, 200), 1e-3, NUM);
+  add("Sill edge: 1000 m over the sill, nT", 8.33040, sillEdge(1000, k, F, 50, 200), 1e-3, NUM);
+  add("Sill edge: opposite sign either side, nT", 0, sillEdge(300, k, F, 50, 200) + sillEdge(-300, k, F, 50, 200), 1e-12, HAND, false);
+  add("Plug d = 100, h = 200: on the axis, nT", k * F / 2 * (1 - 200 / Math.hypot(200, 50)), plug(0, k, F, 100, 200), 1e-3, HAND);
+  add("Plug d = 100, h = 200: 200 m off the axis, nT", 6.11032, plug(200, k, F, 100, 200), 2e-3, NUM);
+  add("Plug d = 200, h = 10: 50 m off the axis, nT", 482.246, plug(50, k, F, 200, 10), 2e-3, NUM);
+  add("Small plug: half-width at half peak = 0.766 h, m", 100 * Math.sqrt(Math.pow(2, 2 / 3) - 1), halfWidth(x => plug(x, k, F, 2, 100), plug(0, k, F, 2, 100)), 5e-3, HAND);
+  const sepCase = (m, s) => (twoBodies({ ...m, sep: s }).split ? "two" : "one");
+  add("Two thin dykes 1.10 h apart", "one", sepCase(thin, 110), 0, HAND);
+  add("Two thin dykes 1.20 h apart", "two", sepCase(thin, 120), 0, HAND);
+  add("Two small plugs 0.95 h apart", "one", sepCase(smallPlug, 95), 0, HAND);
+  add("Two small plugs 1.05 h apart", "two", sepCase(smallPlug, 105), 0, HAND);
+  add("Small plug between lines spaced h: share kept", Math.pow(0.8, 1.5), lineShare(smallPlug, 100), 5e-3, HAND);
+  add("Small plug between lines spaced 2 h: share kept", Math.pow(0.5, 1.5), lineShare(smallPlug, 200), 5e-3, HAND);
+  add("Example dyke: highest sensor height for 5 × 0.5 nT, m", 10 / Math.tan(2.5 / (2 * C)) - 300, maxClearHeight(ex), 2e-3, HAND);
+  add("Verdicts at 5.0, 4.99 and 1.99 × noise", "clear marginal below", [5, 4.99, 1.99].map(verdictOf).join(" "), 0, HAND);
+  const tbody = $("checks").querySelector("tbody"); tbody.innerHTML = "";
+  for (const r of rows) {
+    const fmt = v => typeof v === "string" ? v : Math.abs(v) < 1e-6 ? v.toExponential(1) : (+v.toPrecision(6)).toString();
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.name}</td><td>${fmt(r.expected)}</td><td>${fmt(r.got)}</td><td class="tol">${r.tol}</td><td class="src">${r.src}</td><td class="st ${r.ok ? "ok" : "no"}">${r.ok ? "PASS" : "FAIL"}</td>`;
+    tbody.appendChild(tr);
+  }
+  const fails = rows.filter(r => !r.ok).length;
+  $("checks-sum").innerHTML = fails ? `<span class="fail">${fails} of ${rows.length} FAIL</span>` : `<span class="pass">ALL ${rows.length} PASS</span>`;
+  document.documentElement.setAttribute("data-checks", fails ? `FAIL ${fails}/${rows.length}` : `ALL ${rows.length} PASS`);
+  return rows;
+}
+
+/* ---------- wiring ---------- */
+try { const t = new URLSearchParams(location.search).get("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+let timer = 0;
+const later = () => { clearTimeout(timer); timer = setTimeout(render, 150); };
+document.querySelectorAll("#form input[type=number]").forEach(i => { i.setAttribute("inputmode", "decimal"); i.addEventListener("input", later); });
+document.querySelectorAll("#form input[type=radio]").forEach(i => i.addEventListener("change", render));
+window.addEventListener("resize", later);
+// on a phone the answer sits below the form: a short answer bar shows while the full answer is out of sight
+try { new IntersectionObserver(es => $("mini").classList.toggle("show", !es[0].isIntersecting)).observe($("verdict")); } catch (e) {}
+$("mini").addEventListener("click", () => $("verdict").scrollIntoView({ behavior: "smooth", block: "center" }));
+document.querySelectorAll(".presets button").forEach(b => b.addEventListener("click", () => { $("height").value = b.dataset.h; render(); }));
+$("reset").addEventListener("click", () => { setModel(EXAMPLE); render(); });
+setModel(EXAMPLE);
+render();
+runChecks();
+// for the build check: page width against the window (no sideways scroll on a phone)
+try { if (new URLSearchParams(location.search).has("probe")) document.documentElement.dataset.width = document.documentElement.scrollWidth + "/" + window.innerWidth; } catch (e) {}
+</script>
+</body>
+</html>
