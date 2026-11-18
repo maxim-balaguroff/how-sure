@@ -32,7 +32,7 @@
 
 Тексты и шаблоны: [CC BY 4.0](LICENSE). Можно брать и менять, указывая источник.
 
-Как сослаться: Balagurov, M. (2026). *how-sure: small tools and notes from a petroleum geologist's work* (v1.2). Zenodo. [https://doi.org/10.5281/zenodo.24242389](https://doi.org/10.5281/zenodo.24242389). DOI всегда ведёт на последнюю версию; другие форматы даёт кнопка *Cite this repository*.
+Как сослаться: Balagurov, M. (2026). *how-sure: small tools and notes from a petroleum geologist's work* (v1.2.1). Zenodo. [https://doi.org/10.5281/zenodo.24242389](https://doi.org/10.5281/zenodo.24242389). DOI всегда ведёт на последнюю версию; другие форматы даёт кнопка *Cite this repository*.
 
 Сделано с помощью ИИ; геология и проверки мои.
 
