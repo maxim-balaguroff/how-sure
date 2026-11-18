@@ -10,17 +10,20 @@
 
 ## Инструменты
 
+Инструменты делятся на два семейства. **До того, как потрачены деньги:** что измерять и где, чтобы данные ответили на вопрос, ради которого их покупают (02, магнитная съёмка; 03, мелкое бурение). **После скважины:** что результат говорит о прогнозе (01).
+
 | | Инструмент | Что делает | Файлы |
 |---|---|---|---|
 | 01 | [Прогноз против результата](01-prediction-vs-result/README.ru.md) | Разбор после бурения. По каждой цели: прогноз, что вскрыло долото, расхождение, его причина и что меняется в следующей рекомендации. Показывает смещение по группам, как часто держались диапазоны ± с поправкой на случай и попадания по неверной причине. | [Excel](https://github.com/maxim-balaguroff/how-sure/raw/main/01-prediction-vs-result/prediction-vs-result.xlsx) · PDF [RU](01-prediction-vs-result/prediction-vs-result-one-page.ru.pdf) [EN](01-prediction-vs-result/prediction-vs-result-one-page.pdf) |
 | 02 | [Проверка магнитной съёмки](02-magnetic-survey-check/README.ru.md) | Что должна разрешить съёмка? Проверяет задуманную магнитную съёмку до того, как её выполнят: для дайки, края силла или штока, поднимется ли тело над шумом, покажутся ли два тела двумя, какой нужен шаг профилей и что меняется между наземной съёмкой, UAV на малой высоте, вертолётом и самолётом. | [Открыть страницу](https://maxim-balaguroff.github.io/how-sure/02-magnetic-survey-check/magnetic-survey-check.html) · [HTML](https://github.com/maxim-balaguroff/how-sure/releases/latest/download/magnetic-survey-check.html) |
+| 03 | [Пять скважин: какие пять?](03-shallow-wells-plan/README.ru.md) | Как планировать мелкое стратиграфическое бурение, когда скважин мало: что даёт каждая следующая скважина, почему слабое звено датировка, а не керн, и как первые керны меняют оставшиеся скважины. За ним стоит опубликованная кампания, первая на российском арктическом шельфе: 10 скважин, 300 м керна, 13 стратиграфических подразделений. | [Открыть страницу](https://maxim-balaguroff.github.io/how-sure/03-shallow-wells-plan/shallow-wells-plan.html) · [HTML](https://github.com/maxim-balaguroff/how-sure/releases/latest/download/shallow-wells-plan.html) · PDF [RU](03-shallow-wells-plan/five-wells-one-page.ru.pdf) [EN](03-shallow-wells-plan/five-wells-one-page.pdf) |
 
 [![Лист Summary инструмента 01 на выдуманном примере](01-prediction-vs-result/screenshot-summary.png)](01-prediction-vs-result/README.ru.md)
 
 ## Как пользоваться
 
 1. Скачайте файл из папки инструмента или откройте страницу в браузере.
-2. Сначала посмотрите проверки. Пока пример на месте, там ALL PASS (инструмент 01, лист Test: ALL 32 PASS; инструмент 02, внизу страницы: ALL 24 PASS).
+2. Сначала посмотрите проверки. Пока пример на месте, там ALL PASS (инструмент 01, лист Test: ALL 32 PASS; инструмент 02, внизу страницы: ALL 24 PASS; инструмент 03, внизу страницы: ALL 49 PASS).
 3. Потом внесите свои числа.
 
 Если число выглядит неверным, [откройте issue](https://github.com/maxim-balaguroff/how-sure/issues).
@@ -29,7 +32,7 @@
 
 Тексты и шаблоны: [CC BY 4.0](LICENSE). Можно брать и менять, указывая источник.
 
-Как сослаться: Balagurov, M. (2026). *how-sure: small tools and notes from a petroleum geologist's work* (v1.1). Zenodo. [https://doi.org/10.5281/zenodo.24242389](https://doi.org/10.5281/zenodo.24242389). DOI всегда ведёт на последнюю версию; другие форматы даёт кнопка *Cite this repository*.
+Как сослаться: Balagurov, M. (2026). *how-sure: small tools and notes from a petroleum geologist's work* (v1.2). Zenodo. [https://doi.org/10.5281/zenodo.24242389](https://doi.org/10.5281/zenodo.24242389). DOI всегда ведёт на последнюю версию; другие форматы даёт кнопка *Cite this repository*.
 
 Сделано с помощью ИИ; геология и проверки мои.
 
