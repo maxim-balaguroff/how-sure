@@ -1,0 +1,1385 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Five wells: which five?</title>
+<meta name="description" content="Planning a shallow stratigraphic drilling campaign when only a few wells are allowed: which sites to drill, what their cores can date, and what the first cores change.">
+<style>
+  :root {
+    color-scheme: light;
+    --page: #ffffff; --surface: #fafaf8; --card: #ffffff; --ink: #111110; --ink-2: #52514e; --muted: #6b6963;
+    --rule: #e2e1db; --grid: #ecebe6; --axis: #b9b8ae; --accent: #2a78d6; --accent-soft: #e6f0fb; --heat: 34;
+    --cover: #e3e1d9; --older: #cfcdc6; --younger: #f1f0ec;
+    --u-young: #f3e3c3; --u-old: #8f5f2f;
+    --ok: #1f8a4c; --ok-soft: #e5f4ea; --warn: #965a00; --warn-soft: #fbf0dc; --bad: #b3261e; --bad-soft: #fbe7e5; --focus: #2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #9a988f;
+      --rule: #34332f; --grid: #2a2a27; --axis: #6a6961; --accent: #6aa7ee; --accent-soft: #1d2b3c; --heat: 55;
+      --cover: #45443e; --older: #57554e; --younger: #2f2e2a; --u-young: #6b5638; --u-old: #c08a50;
+      --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f; --bad: #f08a80; --bad-soft: #3a1c19;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #9a988f;
+    --rule: #34332f; --grid: #2a2a27; --axis: #6a6961; --accent: #6aa7ee; --accent-soft: #1d2b3c; --heat: 55;
+    --cover: #45443e; --older: #57554e; --younger: #2f2e2a; --u-young: #6b5638; --u-old: #c08a50;
+    --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f; --bad: #f08a80; --bad-soft: #3a1c19;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--page); color: var(--ink); }
+  body { font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif; font-size: 15px; line-height: 1.5; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 40px; }
+  .kicker { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 6px; }
+  h1 { font-size: 32px; line-height: 1.12; margin: 0 0 10px; letter-spacing: -.015em; }
+  .lead { font-size: 17px; max-width: 780px; margin: 0 0 24px; }
+  .why { font-size: 14.5px; color: var(--ink-2); max-width: 780px; margin: -12px 0 24px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 10px; }
+  h3 { font-size: 15px; margin: 0 0 6px; }
+  .card { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; min-width: 0; }
+  .inrow { display: grid; grid-template-columns: 1fr 340px; gap: 16px; align-items: start; margin-bottom: 16px; }
+  .inrow > * { min-width: 0; }
+  legend, .legend { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); padding: 0; margin: 0 0 8px; display: block; }
+  fieldset { border: 0; padding: 0; margin: 0 0 12px; min-width: 0; }
+  .field { display: grid; grid-template-columns: 1fr 92px; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .field label { font-size: 14px; }
+  .hint, .field .hint { font-size: 12.5px; color: var(--muted); }
+  .field .hint { grid-column: 1 / -1; margin-top: -4px; }
+  p.hint { margin: 6px 0 0; }
+  input[type=number], input[type=text], select { width: 100%; font: inherit; font-size: 14px; padding: 5px 7px; border: 1px solid var(--rule); border-radius: 6px; background: var(--page); color: var(--ink); min-width: 0; }
+  input[type=number] { font-variant-numeric: tabular-nums; text-align: right; }
+  input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; }
+  input:focus, select:focus { outline: 2px solid var(--focus); outline-offset: 0; border-color: transparent; }
+  input[aria-invalid="true"] { border-color: var(--bad); background: var(--bad-soft); }
+  .exnote { font-size: 13px; color: var(--ink-2); margin: 0 0 12px; }
+  /* input tables built from grid rows; on a phone each row becomes a small card with its own labels */
+  .rows { margin: 0 0 8px; }
+  .row { display: grid; gap: 6px; align-items: center; margin-bottom: 6px; }
+  .rhead { display: grid; gap: 6px; font-size: 12.5px; color: var(--muted); margin-bottom: 4px; align-items: end; }
+  .row label { display: block; min-width: 0; }
+  .row .cl { display: none; font-size: 12px; color: var(--muted); }
+  .row .no { font-size: 13px; color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }
+  .row .chk { display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .u-grid { grid-template-columns: 20px minmax(110px, 1fr) 72px 112px 92px 70px 92px 30px; }
+  .s-grid { grid-template-columns: 54px minmax(110px, 1fr) 76px 66px 58px 64px minmax(120px, 1fr) 84px 30px; }
+  .lead { font-size: 19px; }
+  .finds { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0 0 8px; }
+  .find { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; min-width: 0; }
+  .find.wide { grid-column: 1 / -1; }
+  .find h2 { font-size: 19px; line-height: 1.25; text-transform: none; letter-spacing: 0; color: var(--ink); margin: 0 0 8px; }
+  .find .fl { display: inline-block; min-width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 6px; background: var(--accent); color: var(--page); font-size: 15px; margin-right: 9px; vertical-align: 1px; }
+  .find .ft { margin: 0 0 10px; }
+  .find .rule { font-size: 13.5px; color: var(--ink-2); margin: 8px 0 0; }
+  .find figure { margin: 0; }
+  .find .btns { margin: 0 0 4px; }
+  .cgrid { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; align-items: start; margin-top: 12px; }
+  .cgrid > * { min-width: 0; }
+  .how { margin: 0 0 10px; padding-left: 18px; }
+  .how li { margin-bottom: 6px; }
+  h2.sec { font-size: 22px; line-height: 1.2; text-transform: none; letter-spacing: -.01em; color: var(--ink); margin: 30px 0 8px; }
+  details.more { margin: 0 0 14px; background: var(--card); }
+  details.more > summary + * { margin-top: 12px; }
+  details.inner { margin: 12px 0 0; border: 0; border-top: 1px solid var(--rule); border-radius: 0; padding: 10px 0 0; background: none; }
+  details.inner > summary { font-weight: 600; font-size: 14px; }
+  details.inner > summary + * { margin-top: 8px; }
+  .plain ul { margin: 0; padding-left: 18px; }
+  .plain li { margin-bottom: 6px; }
+  .lim { margin: 28px 0 14px; }
+  .lim details { margin-top: 10px; }
+  .rhead .r { text-align: right; } .rhead .c { text-align: center; }
+  button { font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; }
+  button:hover { border-color: var(--axis); }
+  button:disabled { opacity: .5; cursor: default; }
+  button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .row button { padding: 4px 0; }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .total { font-size: 13px; color: var(--ink-2); margin: 2px 0 0; }
+  .verdict { border-radius: 10px; padding: 14px 16px; margin: 0 0 14px; border: 1px solid transparent; }
+  .verdict .v { font-size: 20px; font-weight: 700; line-height: 1.25; }
+  .verdict .s { color: var(--ink-2); margin-top: 4px; }
+  .verdict.clear { background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+  .verdict.clear .v { color: var(--ok); }
+  .verdict.marginal { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+  .verdict.marginal .v { color: var(--warn); }
+  .verdict.below { background: var(--bad-soft); border-color: color-mix(in srgb, var(--bad) 35%, transparent); }
+  .verdict.below .v { color: var(--bad); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; }
+  .stat .n { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; overflow-wrap: anywhere; }
+  .stat .n small { font-size: 14px; font-weight: 600; color: var(--ink-2); }
+  .stat .l { font-size: 12.5px; color: var(--ink-2); }
+  .two { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; margin-bottom: 14px; align-items: start; }
+  .two > * { min-width: 0; }
+  figure { margin: 0 0 14px; }
+  figcaption { font-size: 13px; color: var(--ink-2); margin: 4px 0 0; }
+  svg { display: block; width: 100%; height: auto; }
+  svg text { font-family: "Segoe UI", system-ui, Arial, sans-serif; }
+  svg .halo { paint-order: stroke; stroke: var(--page); stroke-width: 3px; stroke-linejoin: round; }
+  .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; margin-bottom: 14px; }
+  .answers > * { min-width: 0; }
+  .answer { border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; }
+  .answer p { margin: 0; }
+  .answer .rule { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--rule); font-size: 14px; vertical-align: top; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 12.5px; color: var(--ink-2); font-weight: 600; vertical-align: bottom; }
+  td.l, th.l { text-align: left; }
+  td.num { white-space: nowrap; }
+  .nw { white-space: nowrap; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; border: 1px solid var(--rule); }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+  .tag.clear { background: var(--ok-soft); color: var(--ok); }
+  .tag.marginal { background: var(--warn-soft); color: var(--warn); }
+  .tag.below { background: var(--bad-soft); color: var(--bad); }
+  .tag.plain { background: var(--surface); color: var(--ink-2); border: 1px solid var(--rule); }
+  tr.reserve td { color: var(--ink-2); }
+  tr.sep td { border-top: 2px solid var(--rule); }
+  td.p { min-width: 46px; }
+  tr.bnd td:first-child { padding-left: 22px; color: var(--ink-2); }
+  .tablenote { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+  #facts .item { margin: 0 0 8px; }
+  #facts .item b { white-space: nowrap; }
+  details { margin-top: 24px; border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; background: var(--surface); }
+  summary { cursor: pointer; font-weight: 700; }
+  summary .pass { color: var(--ok); }
+  summary .fail { color: var(--bad); }
+  #checks td.st { font-weight: 700; }
+  #checks td.st.ok { color: var(--ok); }
+  #checks td.st.no { color: var(--bad); }
+  #checks td.src { text-align: left; color: var(--ink-2); font-size: 13px; }
+  footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--rule); color: var(--ink-2); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  a { color: var(--accent); }
+  .mini { display: none; }
+  .mini.show { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; padding: 12px 16px; background: var(--card); border-top: 1px solid var(--rule); box-shadow: 0 -2px 10px rgba(0, 0, 0, .08); font-weight: 700; font-size: 15px; cursor: pointer; text-align: center; }
+  .mini.clear { color: var(--ok); } .mini.marginal { color: var(--warn); } .mini.below { color: var(--bad); }
+  .mini:focus-visible { outline: 2px solid var(--focus); outline-offset: -4px; }
+  .key { font-size: 13px; color: var(--ink-2); margin: 0 0 8px; }
+  .key span { white-space: nowrap; margin-right: 10px; }
+  .lg { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin: 0 4px 0 0; vertical-align: -1px; border: 1px solid var(--axis); }
+  .pr { color: var(--ink-2); font-size: 13px; }
+  .linkbtn { font-size: inherit; padding: 0; min-height: 0; border: 0; background: none; color: var(--accent); text-decoration: underline; cursor: pointer; }
+  body { padding-bottom: 56px; }
+  @media (max-width: 1100px) { .inrow { grid-template-columns: 1fr; } }
+  @media (max-width: 980px) {
+    .two { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .answers { grid-template-columns: 1fr; }
+    .finds, .cgrid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 760px) {
+    h1 { font-size: 26px; }
+    input[type=number], input[type=text], select { font-size: 16px; min-height: 44px; }
+    button { min-height: 44px; }
+    input[type=checkbox] { width: 24px; height: 24px; }
+    .rhead { display: none; }
+    .row { border: 1px solid var(--rule); border-radius: 8px; padding: 8px; margin-bottom: 8px; align-items: end; }
+    .row .cl { display: block; margin-bottom: 2px; }
+    .row .chk { justify-content: flex-start; min-height: 44px; }
+    .u-grid { grid-template-columns: 1fr 1fr 1fr 44px; }
+    .u-grid .no { display: none; }
+    .u-grid .c-name { grid-column: 1 / 3; grid-row: 1; } .u-grid .c-t { grid-column: 3; grid-row: 1; } .u-grid .del { grid-column: 4; grid-row: 1; }
+    .u-grid .c-role { grid-column: 1 / 3; grid-row: 2; } .u-grid .c-pri { grid-column: 3 / 5; grid-row: 2; }
+    .u-grid .c-age { grid-column: 1; grid-row: 3; } .u-grid .c-base { grid-column: 2 / 5; grid-row: 3; }
+    .s-grid { grid-template-columns: 1fr 1fr 1fr 44px; }
+    .s-grid .c-name { grid-column: 1; grid-row: 1; } .s-grid .c-h { grid-column: 2 / 5; grid-row: 1; }
+    .s-grid .c-z { grid-column: 1; grid-row: 2; } .s-grid .c-q { grid-column: 2; grid-row: 2; } .s-grid .c-dip { grid-column: 3; grid-row: 2; } .s-grid .del { grid-column: 4; grid-row: 2; }
+    .s-grid .c-hr { grid-column: 1; grid-row: 3; } .s-grid .c-fact { grid-column: 2 / 5; grid-row: 3; } .s-grid .c-met { grid-column: 1 / 3; grid-row: 4; }
+    .lead { font-size: 17px; }
+  }
+  @media (max-width: 600px) { #checks .tol, #checks .src { display: none; } .hide-s { display: none; } }
+  @media (max-width: 420px) { th, td { padding: 6px 4px; font-size: 13.5px; } .stat .n { font-size: 19px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">how-sure · tool 03 · shallow stratigraphic drilling · v1.2</p>
+  <h1>Five wells: which five?</h1>
+  <p class="lead">Planning a shallow stratigraphic drilling campaign when only a few wells are allowed: which sites to drill, what their cores can date, and what the first cores change.</p>
+  <p class="why">Where older units come up beneath the seabed, short cored holes give the first hard data on source rock, reservoir and seal in a basin with no wells. My part as the geologist: planning and supervision of the first shallow stratigraphic drilling campaign on the Russian Arctic shelf (<a href="https://doi.org/10.2113/RGG20224459">Malyshev et al., 2023</a>, which I co-authored): 10 wells, 300 m of core, 13 stratigraphic units. Those figures are published; the example below is made up.</p>
+
+  <section class="finds" aria-label="Three findings on the made-up example">
+    <article class="find" id="find-a">
+      <h2><span class="fl">A</span>Why not stop at five: what each next well buys</h2>
+      <p class="ft" id="fa-text"></p>
+      <figure>
+        <svg id="curve" viewBox="0 0 680 220" role="img" aria-labelledby="curve-title curve-desc">
+          <title id="curve-title">Best score for each number of wells</title>
+          <desc id="curve-desc">For each number of wells, the score of the best set of sites, found by trying every set.</desc>
+        </svg>
+        <figcaption id="curve-cap"></figcaption>
+      </figure>
+      <p class="rule">In most drilling, fewer wells is the aim. Here it is the other way round: the product is core, and the scarce resource is the weather window and the vessel's time, so each extra hole in the same season is another try at the targets. A curve like this is the case for a number of wells.</p>
+    </article>
+    <article class="find" id="find-b">
+      <h2><span class="fl">B</span>The weak link is dating, not coring</h2>
+      <p class="ft" id="fb-text"></p>
+      <figure class="method">
+        <svg id="method" viewBox="0 0 680 200" role="img" aria-labelledby="method-title method-desc">
+          <title id="method-title">Two ways to place a core</title>
+          <desc id="method-desc">A sketch, not to scale: dipping units cut off beneath a thin flat cover under the seabed, older units to the left. Two short holes: one in the middle of a unit, one across a boundary with a bar for the pick error.</desc>
+        </svg>
+        <figcaption>Not to scale. Each hole is drilled through the cover without coring, then cored. Hole 1 sits in the middle of a unit. Hole 2 crosses a boundary and can date it, if the pick puts the boundary inside the core; the bar is the pick error.</figcaption>
+      </figure>
+      <p class="rule">A core in the middle of a unit is safe on a rough pick. A core across a boundary is worth more, but needs a sharp pick and rock that gives ages on both sides. The same choice comes up when core points are set in an exploration or appraisal well from a seismic depth with an error.</p>
+    </article>
+    <article class="find wide" id="find-c">
+      <h2><span class="fl">C</span>The first cores change the plan</h2>
+      <p class="ft" id="fc-text"></p>
+      <div class="btns"><button type="button" id="demo-facts">Example with two made-up cores: a horizon comes in deeper</button><button type="button" id="demo-facts2">Example with two made-up cores: one does not tie</button><button type="button" class="clear-facts">Clear the results</button></div>
+      <div class="cgrid">
+        <figure>
+          <svg id="cols" viewBox="0 0 680 340" role="img" aria-labelledby="cols-title cols-desc">
+            <title id="cols-title">Plan and fact, well by well</title>
+            <desc id="cols-desc">One column per planned well, in drilling order, by depth below the seabed: the cover on top, then the units the well should core, numbered as in the section. Bars beside a column show how far each horizon can move within the errors. After drilling, a second column beside it shows the fact: the section with the anchor horizon where it was met, or the unit identified in the core.</desc>
+          </svg>
+          <figcaption id="cols-cap"></figcaption>
+        </figure>
+        <div id="facts"><div id="facts-body"></div></div>
+      </div>
+    </article>
+  </section>
+
+  <h2 class="sec">Try your own section</h2>
+  <form id="form" autocomplete="off" onsubmit="return false">
+    <p class="exnote">The form holds the made-up example. Change any number and the findings above and the plan below update as you type.</p>
+    <div class="inrow">
+      <section class="card" aria-labelledby="lg-sec">
+        <span class="legend" id="lg-sec">The section, youngest unit first</span>
+        <div class="rhead u-grid"><span>#</span><span>Unit</span><span class="r">Thickness, m</span><span>Role</span><span>Priority</span><span class="r">Gives an age, %</span><span>Dating its base</span><span></span></div>
+        <div class="rows" id="units"></div>
+        <div class="btns"><button type="button" id="add-unit">Add a unit</button></div>
+        <p class="total" id="total"></p>
+        <p class="hint">Each unit lies between two mapped seismic horizons; H1 is the base of unit 1, H2 the base of unit 2, and so on. Thicknesses are true stratigraphic thickness, normal to bedding. Priority says what a core of the unit is worth. Gives an age: the chance that core from the unit comes back and yields a usable age from fossils, spores or pollen; high in marine mudstone and shale, low in red beds and clean sand. A core with dated rock on both sides of a horizon brackets its age, and the horizon carries it as far as it can be followed.</p>
+      </section>
+      <section class="card" aria-labelledby="lg-w">
+        <span class="legend" id="lg-w">Wells and errors</span>
+        <div class="field"><label for="wells">Wells to drill</label><input type="number" id="wells" min="1" max="12" step="1" value="5"></div>
+        <div class="field"><label for="depth">Depth below seabed, m</label><input type="number" id="depth" min="1" max="1000" step="5" value="100">
+          <div class="hint">What the vessel or seabed rig can reach and the permit allows.</div></div>
+        <div class="field"><label for="okp">Holes that bring back usable core, %</label><input type="number" id="okp" min="1" max="100" step="5" value="80">
+          <div class="hint">Some holes stop on boulders or refusal, lose loose sand, stop for weather or meet shallow gas. Taken the same at every site.</div></div>
+        <div class="field"><label for="minsec">Core needed to count a unit, m</label><input type="number" id="minsec" min="0.1" step="1" value="5">
+          <div class="hint">Enough for ages and rock properties.</div></div>
+        <div class="field"><label for="side">Rock needed each side of a horizon to date it, m</label><input type="number" id="side" min="0.1" step="1" value="3"></div>
+        <div class="field"><label for="ehr">Pick error on a high-res line, ± m</label><input type="number" id="ehr" min="0" step="1" value="4">
+          <div class="hint">The error in the depth of the anchor horizon, velocity included, where a high-resolution line runs through the site and is tied to the 2D.</div></div>
+        <div class="field"><label for="e2d">Pick error on 2D only, ± m</label><input type="number" id="e2d" min="0" step="1" value="30">
+          <div class="hint">Regional 2D blurs the first hundred metres or so below the seabed.</div></div>
+        <div class="field"><label for="ddip">Dip error, ± °</label><input type="number" id="ddip" min="0" max="30" step="0.5" value="1"></div>
+        <div class="field"><label for="dcover">Cover error, ± m</label><input type="number" id="dcover" min="0" step="1" value="4"></div>
+        <div class="field"><label for="dthick">Unit thickness error, ± %</label><input type="number" id="dthick" min="0" max="50" step="1" value="10">
+          <div class="hint">One factor for all units at a site. It stretches or squeezes the section away from the anchor horizon: the farther the horizon from the core, the more it matters.</div></div>
+        <div class="field"><label for="share">What the picks of one horizon share</label><select id="share"><option value="0">nothing</option><option value="50" selected>the side</option><option value="75">a quarter</option><option value="90">a tenth</option></select>
+          <div class="hint">Sites anchored on one horizon and picked on the same kind of seismic err together: the velocity of the layers above, a pick carried on the wrong leg of a doublet, a mis-tie between lines. They agree on which part of the ± range the true depth lies in: its side (deeper or shallower than picked), its quarter or its tenth. Inside that part each site errs on its own.</div></div>
+        <p class="hint">Take each ± as the largest plausible error, spread evenly over its range. The pick error grows with the anchor's depth through the velocity; a site off the seismic line adds the offset times the tangent of the dip.</p>
+      </section>
+    </div>
+    <section class="card" aria-labelledby="lg-s">
+      <span class="legend" id="lg-s">Candidate sites</span>
+      <div class="rhead s-grid"><span>Site</span><span>Anchor horizon</span><span class="r">Horizon depth, m</span><span class="r">Cover, m</span><span class="r">Dip, °</span><span class="c">High-res line</span><span>After drilling: unit identified in the core</span><span class="r">Horizon met at, m</span><span></span></div>
+      <div class="rows" id="sites"></div>
+      <div class="btns"><button type="button" id="add-site">Add a site</button><button type="button" class="clear-facts">Clear the results</button><button type="button" id="reset">Back to the example</button></div>
+      <p class="hint">Anchor: the mapped horizon nearest the planned core, and its depth below the seabed at the site, from seismic. Cover: younger sediment over the section, drilled without coring. Pick the horizon even if it lies below the hole; the page carries the section from it. After drilling, choose the unit identified in the core and, if the core crossed the anchor horizon, enter the depth below the seabed at which it was met; leave both empty for a site not drilled.</p>
+    </section>
+  </form>
+
+  <main>
+    <h2 class="sec">The plan in full</h2>
+    <div class="verdict" id="verdict" aria-live="polite"><div class="v" id="v-main"></div><div class="s" id="v-sub"></div></div>
+    <div class="stats">
+      <div class="stat"><div class="n" id="s-score"></div><div class="l">score: points for units cored and boundaries dated, on average</div></div>
+      <div class="stat"><div class="n" id="s-units"></div><div class="l">target units cored, on average</div></div>
+      <div class="stat"><div class="n" id="s-bnd"></div><div class="l">boundaries dated, on average</div></div>
+      <div class="stat"><div class="n" id="s-m"></div><div class="l">cored, of metres drilled</div></div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <h3>The plan, in drilling order</h3>
+      <p class="key" id="key"></p>
+      <div class="tablewrap"><table id="plan" aria-label="Wells in drilling order">
+        <thead><tr><th>#</th><th class="l">Site</th><th class="l hide-s">Seismic</th><th class="l">Core as planned</th><th class="l">If the hole delivers, chance of each target</th><th>Adds</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+      <p class="tablenote" id="plan-note"></p>
+      <details class="inner">
+        <summary>Reserve sites and stand-ins</summary>
+        <div class="tablewrap"><table id="reserves" aria-label="Sites left out of the plan, best first">
+          <thead><tr><th></th><th class="l">Site</th><th class="l hide-s">Seismic</th><th class="l">Core as planned</th><th class="l">If the hole delivers, chance of each target</th><th>Adds</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <p class="tablenote" id="res-note"></p>
+      </details>
+    </div>
+    <details class="more">
+      <summary>More answers: where each core lands, high-res lines, how firm the choice is</summary>
+      <div class="answers">
+        <div class="answer" id="a-land"></div>
+        <div class="answer" id="a-hr"></div>
+        <div class="answer" id="a-firm"></div>
+      </div>
+    </details>
+    <details class="more">
+      <summary>Section by well: the chance of each unit and boundary, well by well</summary>
+      <div class="tablewrap"><table id="ladder" aria-label="Chance that each planned well cores each unit and dates each boundary"><thead></thead><tbody></tbody></table></div>
+      <p class="tablenote">Chance that each planned well cores at least the set length of a unit, or dates a boundary, holes that fail included. The Plan column combines the wells; on a narrow screen the table scrolls sideways. The cores are stitched mainly through the horizons between them; where two cores also overlap in the section, they tie directly.</p>
+    </details>
+  </main>
+
+  <section class="plain lim">
+    <h2>Limits</h2>
+    <ul>
+      <li>The example is made up. At each site the page takes one dip, no faults between the core and its anchor horizon, and a flat base to the cover.</li>
+      <li>Errors are spread evenly over their ± ranges, so "always" and "never" mean within the ranges entered. Picking the wrong reflector lies outside any range: the page sees it only after drilling, as a core that does not tie.</li>
+      <li>After drilling the page knows only the unit identified and the depth of one horizon at each site. It cannot re-pick a horizon: that takes the seismic and the whole core description.</li>
+    </ul>
+    <details class="more">
+      <summary>More limits</summary>
+      <ul>
+        <li>Faults repeat or cut out section; anchor on a horizon on the same side of any fault.</li>
+        <li>What the picks of one horizon share is a rough model. Only the part of the range carries over from a core to the other sites, not the size of the miss: a 1 m miss and a 25 m miss narrow them alike. Sites on a high-res line and sites on 2D only do not inform each other, and an error common to all horizons, one velocity model for the whole area, is not in it.</li>
+        <li>A core that does not tie may put the neighbouring horizons in doubt too; the page holds only the sites on that one.</li>
+        <li>A hole either delivers or not. In practice holes also stop early on boulders or refusal, deeper targets and thick glacial cover carry more of that risk, and core is lost most at contacts, where dating needs rock; lower the age chances where that matters.</li>
+        <li>Every site gets a high-resolution site survey for shallow hazards before drilling: use 2D picks to rank sites for the survey, then re-run with the new picks. The made-up cores under finding C keep the 2D picks so that the numbers are large enough to see; on site-survey picks the same logic runs on a few metres.</li>
+        <li>Unit thicknesses come from the regional map. Rock 30–100 m below the seabed can be weathered, glacially deformed or a rafted block, and its porosity, seal quality and maturity differ from the same unit at depth.</li>
+        <li>The ages that tie a core to the section come from the laboratory, often months after the campaign; on the vessel the unit is first told from the rock itself. The page checks the unit against the pick, not the dating.</li>
+        <li>The dip, cover and thickness errors are stepped on a grid that stops a few percent short of the ends of their ranges, so "nothing within the errors" can miss the outermost corner.</li>
+        <li>Each site must clear a shallow gas and seabed hazard check and keep off mapped closures; steep dips can also push a hole off vertical. Nothing here on cost, vessels, weather or permits.</li>
+      </ul>
+    </details>
+  </section>
+
+  <details class="more plain">
+    <summary>How it works</summary>
+    <ul>
+      <li>At each site the beds dip at one angle under a flat cover. A point z metres below the seabed lies (z<sub>H</sub> − z)·cos θ above the anchor horizon in the section, z<sub>H</sub> being the horizon's depth at the site and θ the dip. So the core, from the base of the cover q to the bottom of the hole D, spans (D − q)·cos θ of section, placed by the pick.</li>
+      <li>For each site the page takes every combination of the errors: the pick error is integrated exactly, and the dip, the cover and the thickness are stepped on a grid of 21 × 21 × 11. It counts how often the core holds the set length of each unit and the set rock on both sides of each horizon, then multiplies by the share of holes that deliver.</li>
+      <li>A horizon is dated only if the rock on both sides gives an age: the chance of crossing it is multiplied by the two units' chances of giving one. Below the deepest unit, the older rock is taken to give ages like that unit.</li>
+      <li>Sites anchored on one horizon and picked on the same kind of seismic share part of the pick error. The ± range is cut into equal parts, two when they share the side: which part the true depth lies in is the same for all of them, where it lies inside the part is each site's own. Each site's error stays spread evenly, but two such wells hit and miss together more often than two wells on different horizons.</li>
+      <li>The score of a set of wells adds, for each unit, its priority (high 3, medium 2, low 1) times the chance that at least one well cores it, and for each horizon its value (key 2, useful 1) times the chance that at least one well dates it. Wells on different horizons count as independent; holes fail and rocks give ages independently everywhere.</li>
+    </ul>
+  </details>
+  <details class="more plain">
+    <summary>Rules it uses</summary>
+    <ul>
+      <li><b>Best set:</b> every set of the chosen size is scored and the best kept; on equal scores, the set that cores more metres, then the first found. With up to 12 sites that is at most 4,095 sets.</li>
+      <li><b>Order:</b> each next well is the one that adds most to the wells already drilled. The note under the plan then says whether stopping after any well leaves the best set for that number, or how close it comes.</li>
+      <li><b>Stand-ins and reserves:</b> for each planned site, the stand-in is the site that best keeps the score if that one cannot be drilled; reserves are ranked by what each would add to the full plan.</li>
+      <li><b>Verdict:</b> sure when every high-priority unit and key boundary is at least 90&nbsp;% likely; thin when one of them is under 90&nbsp;%; short when a high-priority unit is under 60&nbsp;%, a medium one under 30&nbsp;%, or a key boundary under 30&nbsp;%. One hole alone gives a target at most the share of holes that deliver, so 90&nbsp;% usually takes two holes on it.</li>
+      <li><b>After drilling:</b> a unit identified in a core fits the plan if the errors can put it in the core at least one time in five; unlikely if less; no fit if never. A horizon met in the core fits if its depth lies within the pick error. The unit is the one the rock or the age matches in the model you planned with, which is the model being tested.</li>
+      <li><b>What to drill next:</b> where the errors allow what a core showed, each part of the pick range is weighted by how well it allows it; that narrows where the horizon can lie at the other sites that share its pick error. An unlikely core is still used, and marked. Where nothing allows it, the horizon does not tie: its sites still to drill are held until it is re-picked, and the drilled well counts the unit identified only. The wells still to drill are then chosen again on top of the wells drilled; a drilled hole has delivered, and the unit identified in it counts as cored.</li>
+    </ul>
+  </details>
+
+  <details id="checks-box">
+    <summary>Checks against known answers: <span id="checks-sum"></span></summary>
+    <p>Each check compares the page with an answer worked out another way: by hand from the geometry, or by an independent count that draws two million random combinations of the errors for the sites on each horizon, searches every set of wells, and chooses the next wells again after the made-up cores (<a href="https://github.com/maxim-balaguroff/how-sure/blob/main/03-shallow-wells-plan/sites_ref.py"><code>sites_ref.py</code></a> in the repository). The checks test the arithmetic, not the geology or the error ranges. Change the code and break a formula, and a row turns FAIL.</p>
+    <div class="tablewrap"><table id="checks"><thead><tr><th>Check</th><th>Expected</th><th>Page</th><th class="tol">Tolerance</th><th class="src">Source</th><th></th></tr></thead><tbody></tbody></table></div>
+  </details>
+
+  <footer>
+    <span>Built with AI assistance; the geology and the checks are mine.</span>
+    <span>The example is made up; no survey or well data.</span>
+    <span>My part as the geologist: planning and supervision of the first shallow stratigraphic drilling campaign on the Russian Arctic shelf (Malyshev et al., 2023, which I co-authored).</span>
+    <span>References: Bugge et al. (2002), Shallow stratigraphic drilling applied in hydrocarbon exploration of the Nordkapp Basin, Barents Sea, Marine and Petroleum Geology 19, 13–37; Malyshev et al. (2023), Stratigraphic drilling in the northern Kara Sea: first case and preliminary results, Russian Geology and Geophysics 64, 257–269.</span>
+    <span>CC BY 4.0 · Maxim Balagurov, petroleum geologist</span>
+    <span><a href="https://github.com/maxim-balaguroff/how-sure">github.com/maxim-balaguroff/how-sure</a> · DOI <a href="https://doi.org/10.5281/zenodo.24242389">10.5281/zenodo.24242389</a></span>
+  </footer>
+</div>
+<div id="mini" class="mini" role="button" tabindex="0" title="Jump to the answer"></div>
+
+<script>
+"use strict";
+const q = new URLSearchParams(location.search);
+if (q.get("theme") === "light" || q.get("theme") === "dark") document.documentElement.setAttribute("data-theme", q.get("theme"));
+const $ = id => document.getElementById(id);
+const RAD = Math.PI / 180;
+const MAXU = 10, MAXS = 12;
+const ROLES = ["Reservoir", "Seal", "Source rock", "Other"];
+const PRI = [[3, "High"], [2, "Medium"], [1, "Low"], [0, "Skip"]];
+const BASE = [[2, "Key"], [1, "Useful"], [0, "Skip"]];
+const EXAMPLE = {
+  wells: 5, depth: 100, okp: 80, minsec: 5, side: 3, ehr: 4, e2d: 30, share: 50, ddip: 1, dcover: 4, dthick: 10,
+  // name, thickness m, role, priority, value of dating its base, chance its core gives an age %
+  units: [["Fluvial red beds", 120, "Other", 1, 1, 20], ["Deltaic sandstone", 90, "Reservoir", 3, 1, 60], ["Marine mudstone", 50, "Seal", 3, 2, 90],
+    ["Shoreface sandstone", 80, "Reservoir", 2, 2, 70], ["Organic-rich shale", 40, "Source rock", 3, 1, 90], ["Silty mudstone", 140, "Seal", 1, 1, 90], ["Basal sandstone", 80, "Reservoir", 2, 0, 60]],
+  // name, anchor horizon (h = base of unit h), its depth below seabed m, cover m, dip deg, high-res line, unit dated after drilling (0 = none)
+  sites: [["A", 1, 70, 10, 4, false, 0], ["B", 2, 65, 30, 6, false, 0], ["C", 3, 35, 20, 10, true, 0], ["D", 3, 50, 45, 7, false, 0],
+    ["E", 5, 70, 35, 8, true, 0], ["F", 4, 33, 12, 15, false, 0], ["G", 7, 134, 62, 12, false, 0], ["H", 7, 96, 40, 10, true, 0],
+    ["I", 1, 50, 30, 12, true, 0], ["J", 2, 18, 8, 9, false, 0], ["K", 4, 90, 50, 5, false, 0], ["L", 6, 63, 20, 20, false, 0]]
+};
+// made-up results after the first two wells: site -> [unit identified in the core, depth at which its anchor horizon was met or null]
+const DEMO = { moves: { J: [2, 31], F: [5, 29] }, breaks: { J: [1, null], F: [5, 29] } };
+
+/* ---------- number formats ---------- */
+const fmt = (v, d = 0) => v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+const f1 = v => fmt(v, 1);
+const metres = v => !isFinite(v) ? "–" : fmt(Math.round(v));
+const pct = p => p < 0.005 ? "0%" : p > 0.995 ? "100%" : Math.round(p * 100) + "%";
+const esc = s => String(s).replace(/[<>&"]/g, c => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" }[c]));
+const plural = (n, a, b) => n === 1 ? a : b;
+function listWords(a) { return a.length <= 1 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
+
+/* ---------- geometry and chances ---------- */
+// U[k]: depth in the section (normal to bedding) of the base of unit k, from the top of unit 1; U[0] = 0.
+function tops(units) { const U = [0]; units.forEach(u => U.push(U[U.length - 1] + u.t)); return U; }
+// the core of a site with nominal errors: u from top to bottom of the core (u grows downward, older)
+function window0(m, s) {
+  const U = tops(m.units), c = Math.cos(s.dip * RAD);
+  if (s.q >= m.depth) return null;
+  return { top: U[s.h] - (s.z - s.q) * c, bot: U[s.h] + (m.depth - s.z) * c };
+}
+function gridPts(v, d, n) { if (!(d > 0)) return [v]; const a = []; for (let i = 0; i < n; i++) a.push(v + d * ((2 * i + 1) / n - 1)); return a; }
+// share of the pick range [z0 - e, z0 + e] that falls inside [lo, hi]
+function frac(lo, hi, z0, e) {
+  if (hi < lo) return 0;
+  if (!(e > 0)) return lo <= z0 && z0 <= hi ? 1 : 0;
+  return Math.max(0, Math.min(hi, z0 + e) - Math.max(lo, z0 - e)) / (2 * e);
+}
+// chance that the rock on both sides of the base of unit k gives an age; below the deepest unit, older rock like it
+const ageBoth = (m, k) => m.units[k].age / 100 * (k + 1 < m.units.length ? m.units[k + 1].age : m.units[k].age) / 100;
+// sites share the pick error if they are anchored on one horizon and picked on the same kind of seismic
+const groupOf = s => s.h + (s.hr ? "h" : "d");
+// The shared part of the pick error. The ± range of a pick is cut into M equal parts: which part the true depth lies
+// in is common to the sites anchored on one horizon and picked on the same kind of seismic (2D only, or a high-res
+// line); where it lies inside that part is the site's own. Each site's error stays spread evenly over ±e whatever M.
+// M: 1 nothing shared, 2 the side of the pick (deeper or shallower), 4 its quarter, 10 its tenth.
+const parts = m => Math.max(1, Math.round(1 / (1 - m.share / 100)));
+// For one site, part by part of the pick range (index j): cu the chance that the core holds at least minsec of unit k,
+// cb that it crosses the base of unit k with side on both sides, ca that it touches unit k at all; all given that the
+// hole delivers. Inside a part the pick error is integrated exactly: the core top w = U_h − (z − q) cos θ is linear in
+// the pick depth z, so each condition on w is an interval of z. Dip, cover and thickness are stepped on a
+// 21 × 21 × 11 grid. con, after drilling: what the core showed, { k: unit dated in it or −1, d: depth at which the
+// anchor horizon was met or null }; then every chance is given that, and cn[j] is the chance of it in part j.
+const GEO = new Map();
+function siteGeom(m, s, con) {
+  const e = s.hr ? m.ehr : m.e2d, M = parts(m), n = m.units.length;
+  const key = [m.units.map(u => u.t).join("/"), s.h, s.z, s.q, s.dip, e, M, m.ddip, m.dcover, m.dthick, m.depth, m.minsec, m.side, con ? con.k + "@" + con.d : ""].join("|");
+  const hit = GEO.get(key); if (hit) return hit;
+  const U = tops(m.units), Uh = U[s.h], eo = e / M, zc = [];
+  for (let j = 0; j < M; j++) zc.push(s.z + e * (-1 + (2 * j + 1) / M));
+  const cu = new Float64Array(n * M), cb = new Float64Array(n * M), ca = new Float64Array(n * M), cn = new Float64Array(M);
+  let cnt = 0;
+  for (const th of gridPts(s.dip, m.ddip, 21)) {
+    const c = Math.cos(Math.abs(th) * RAD);
+    for (const q0 of gridPts(s.q, m.dcover, 21)) {
+      const qq = Math.max(0, q0);
+      for (const f of gridPts(1, m.dthick / 100, 11)) {
+        cnt++;
+        const L = (m.depth - qq) * c;
+        if (L <= 0) continue;
+        const zz = w => qq + (Uh - w) / c;
+        let cl = -Infinity, ch = Infinity;
+        if (con) {
+          if (con.k >= 0) { cl = zz(Uh + (U[con.k + 1] - Uh) * f); ch = zz(Uh + (U[con.k] - Uh) * f - L); }
+          if (con.d != null) { if (!(con.d > qq && con.d < m.depth)) continue; cl = Math.max(cl, con.d - 0.5); ch = Math.min(ch, con.d + 0.5); }
+          if (ch < cl) continue;
+          for (let j = 0; j < M; j++) cn[j] += frac(cl, ch, zc[j], eo);
+        }
+        const add = (arr, k, lo, hi) => {
+          if (lo < cl) lo = cl; if (hi > ch) hi = ch;
+          if (hi < lo || hi < s.z - e || lo > s.z + e) return;
+          for (let j = 0; j < M; j++) arr[k * M + j] += frac(lo, hi, zc[j], eo);
+        };
+        for (let k = 0; k < n; k++) {
+          const A = Uh + (U[k] - Uh) * f, B = Uh + (U[k + 1] - Uh) * f;
+          if (m.minsec <= Math.min(L, B - A)) add(cu, k, zz(B - m.minsec), zz(A - L + m.minsec));
+          if (L >= 2 * m.side) add(cb, k, zz(B - m.side), zz(B + m.side - L));
+          add(ca, k, zz(B), zz(A - L));
+        }
+      }
+    }
+  }
+  let tot = 0;
+  for (let j = 0; j < M; j++) { cn[j] /= cnt; tot += cn[j] / M; }
+  // the weight of each part: even before drilling, by how well it allows what the core showed after
+  const wt = j => con ? (tot > 0 ? cn[j] / (tot * M) : 0) : 1 / M;
+  const fin = arr => {
+    const mean = Array(n).fill(0);
+    for (let k = 0; k < n; k++) for (let j = 0; j < M; j++) {
+      let v = arr[k * M + j] / cnt;
+      if (con) v = cn[j] > 0 ? Math.min(1, v / cn[j]) : 0;
+      arr[k * M + j] = v; mean[k] += wt(j) * v;
+    }
+    return mean;
+  };
+  const g = { M, cu, cb, ca, cn, tot, mu: fin(cu), mb: fin(cb), ma: fin(ca) };
+  if (GEO.size > 800) GEO.clear();
+  GEO.set(key, g);
+  return g;
+}
+// One site as the scoring uses it: g the group it shares the pick error with, d the chance that the hole delivers,
+// ab[k] the chance that the rock on both sides of the base of unit k gives an age; pu, pb the chances over the whole
+// pick range that the well cores unit k and dates its base; gb the chance of crossing that base with rock on both
+// sides, given the hole delivers; pa the chance that the core touches unit k at all. After drilling (con) the hole
+// has delivered and the unit identified in it is cored for sure; whether its rock gives an age stays as entered.
+function siteProbs(m, s, con) {
+  const g = siteGeom(m, s, con), M = g.M, kn = con ? con.k : -1, d = con ? 1 : m.okp / 100;
+  const ab = m.units.map((u, k) => ageBoth(m, k));
+  const p = { g: groupOf(s), M, d, ab, cu: g.cu, cb: g.cb, ca: g.ca, cn: g.cn, tot: g.tot, pu: g.mu.map(x => d * x), pb: g.mb.map((x, k) => d * ab[k] * x), gb: g.mb, pa: g.ma };
+  if (kn >= 0) { p.cu = Float64Array.from(g.cu); for (let j = 0; j < M; j++) p.cu[kn * M + j] = 1; p.pu[kn] = 1; }
+  return p;
+}
+// a drilled site on a horizon that does not tie: it counts the unit identified in its core and nothing else
+function knownOnly(m, s) {
+  const M = parts(m), n = m.units.length, cu = new Float64Array(n * M), pu = Array(n).fill(0);
+  if (s.fact) { for (let j = 0; j < M; j++) cu[(s.fact - 1) * M + j] = 1; pu[s.fact - 1] = 1; }
+  return { g: groupOf(s), M, d: 1, ab: Array(n).fill(1), cu, cb: new Float64Array(n * M), ca: new Float64Array(n * M), cn: new Float64Array(M), tot: 0, pu, pb: Array(n).fill(0), gb: Array(n).fill(0), pa: Array(n).fill(0) };
+}
+// The chance that no well of the set S cores unit k (mu) or dates its base (mb). Wells in different groups (another
+// horizon, or another kind of seismic) are independent. Wells of one group share the part of the pick range their
+// horizon lies in: their chances are multiplied part by part, then averaged over the parts, with the weights
+// W[group] where cores have told which parts are likelier.
+function misses(m, P, S, W) {
+  const n = m.units.length, mu = Array(n).fill(1), mb = Array(n).fill(1), groups = new Map();
+  for (const i of S) { const g = P[i].g; if (groups.has(g)) groups.get(g).push(i); else groups.set(g, [i]); }
+  for (const [g, a] of groups) {
+    const w = W && W[g];
+    if (a.length === 1 && !w) { const p = P[a[0]]; for (let k = 0; k < n; k++) { mu[k] *= 1 - p.pu[k]; mb[k] *= 1 - p.pb[k]; } continue; }
+    const M = P[a[0]].M;
+    for (let k = 0; k < n; k++) {
+      let su = 0, sb = 0;
+      for (let j = 0; j < M; j++) {
+        let x = 1, y = 1;
+        for (const i of a) { const p = P[i]; x *= 1 - p.d * p.cu[k * M + j]; y *= 1 - p.d * p.ab[k] * p.cb[k * M + j]; }
+        const wj = w ? w[j] : 1 / M; su += wj * x; sb += wj * y;
+      }
+      mu[k] *= su; mb[k] *= sb;
+    }
+  }
+  return { mu, mb };
+}
+function value(m, P, S, W) {
+  const x = misses(m, P, S, W); let v = 0;
+  m.units.forEach((u, k) => { v += u.pri * (1 - x.mu[k]) + u.base * (1 - x.mb[k]); });
+  return v;
+}
+// the same score with every well counted on its own chances, as if no pick error were shared
+function valueAlone(m, P, S) {
+  let v = 0;
+  m.units.forEach((u, k) => { let a = 1, b = 1; for (const i of S) { a *= 1 - P[i].pu[k]; b *= 1 - P[i].pb[k]; } v += u.pri * (1 - a) + u.base * (1 - b); });
+  return v;
+}
+function reach(m, P, S, W) { const x = misses(m, P, S, W); return m.units.map((u, k) => ({ u: 1 - x.mu[k], b: 1 - x.mb[k] })); }
+const cored = (m, S) => S.reduce((t, i) => t + Math.max(0, m.depth - m.sites[i].q), 0);
+// higher score wins; on a tie, more metres cored; on a tie again, the first found
+const better = (m, v, S, bv, bS) => bS === null || v > bv + 1e-9 || (Math.abs(v - bv) <= 1e-9 && cored(m, S) > cored(m, bS) + 1e-9);
+function* combos(n, k) {
+  const a = Array.from({ length: k }, (_, i) => i);
+  while (true) {
+    yield a.slice();
+    let i = k - 1; while (i >= 0 && a[i] === n - k + i) i--;
+    if (i < 0) return;
+    a[i]++; for (let j = i + 1; j < k; j++) a[j] = a[j - 1] + 1;
+  }
+}
+// the best n sites out of cand (all of them if not given), added to the wells in base
+function bestSet(m, P, n, cand, base, W) {
+  cand = cand || P.map((_, i) => i); base = base || [];
+  if (n <= 0) return { S: [], v: value(m, P, base, W) };
+  let bS = null, bv = -1;
+  for (const c of combos(cand.length, n)) {
+    const S = c.map(x => cand[x]), full = base.concat(S), v = value(m, P, full, W);
+    if (better(m, v, full, bv, bS === null ? null : base.concat(bS))) { bS = S; bv = v; }
+  }
+  return { S: bS, v: bv };
+}
+function drillOrder(m, P, S, base, W) {
+  base = base || [];
+  const order = [], left = S.slice();
+  while (left.length) {
+    let bi = null, bg = -1;
+    for (const i of left) { const g = value(m, P, base.concat(order, [i]), W); if (better(m, g, [i], bg, bi === null ? null : [bi])) { bi = i; bg = g; } }
+    order.push(bi); left.splice(left.indexOf(bi), 1);
+  }
+  return order;
+}
+// for a unit dated in a core: the range of anchor-horizon depths that would put the unit in the core, nominal dip, cover, thickness
+function factShift(m, s, k) {
+  const U = tops(m.units), c = Math.cos(s.dip * RAD), L = (m.depth - s.q) * c;
+  if (L <= 0) return null;
+  const lo = s.q + (U[s.h] - U[k + 1]) / c, hi = s.q + (U[s.h] - (U[k] - L)) / c;
+  return s.z < lo ? { dir: "deeper", by: lo - s.z } : s.z > hi ? { dir: "shallower", by: s.z - hi } : { dir: "", by: 0 };
+}
+function solve(m) {
+  const P = m.sites.map(s => siteProbs(m, s));
+  const M = P.length, vmax = m.units.reduce((t, u) => t + u.pri + u.base, 0);
+  const curve = []; for (let n = 1; n <= M; n++) curve.push(bestSet(m, P, n));
+  const best = curve[m.wells - 1], order = drillOrder(m, P, best.S);
+  const prefix = order.map((_, j) => value(m, P, order.slice(0, j + 1)));
+  const rest = P.map((_, i) => i).filter(i => !best.S.includes(i));
+  const reserves = rest.map(i => ({ i, g: value(m, P, best.S.concat([i])) - best.v })).sort((a, b) => b.g - a.g || a.i - b.i);
+  // stand-in for each planned site: the site outside the plan that best keeps the score without it (same tie rule)
+  const standins = order.map(i => {
+    const others = best.S.filter(x => x !== i); let bj = null, bS = null, bv = -1;
+    for (const j of rest) { const S = others.concat([j]), v = value(m, P, S); if (better(m, v, S, bv, bS)) { bj = j; bS = S; bv = v; } }
+    return { i, j: bj, v: bv };
+  });
+  return { P, M, vmax, curve, best, order, prefix, reserves, standins, R: reach(m, P, best.S), alone: valueAlone(m, P, best.S) };
+}
+// the best set again with every hole delivering, with the 2D pick error halved and half as large again, and with no
+// part of the pick error shared
+function variants(m, N) {
+  const out = [], run = (mv, what) => out.push({ what, S: bestSet(mv, mv.sites.map(s => siteProbs(mv, s)), N).S });
+  if (m.okp < 100) run({ ...m, okp: 100 }, "if every hole delivered");
+  if (m.e2d > 0 && m.sites.some(s => !s.hr)) {
+    run({ ...m, e2d: m.e2d / 2 }, `with the 2D pick at ±${fmt(m.e2d / 2)} m`);
+    run({ ...m, e2d: m.e2d * 1.5 }, `at ±${fmt(m.e2d * 1.5)} m`);
+  }
+  if (parts(m) > 1 && m.sites.some((s, i) => m.sites.some((t, j) => j > i && groupOf(t) === groupOf(s)))) run({ ...m, share: 0 }, "if no pick error were shared");
+  return out;
+}
+function withLines(m, hr) { return { ...m, sites: m.sites.map(s => ({ ...s, hr })) }; }
+// After drilling. A site with a unit identified in its core, or with the depth at which its anchor horizon was met,
+// is drilled. Where the errors allow what the core showed, each part of the pick range is weighted by how well it
+// allows it: that narrows where the horizon can lie at the sites of the same group still to drill. Where nothing
+// allows it, the horizon does not tie: its drilled sites count the unit identified only, and all its sites still to
+// drill are held. The wells still to drill are then chosen again, on top of the wells drilled.
+function replan(m, R) {
+  const M = parts(m), all = m.sites.map((s, i) => i), rank = i => { const j = R.order.indexOf(i); return j < 0 ? 99 : j; };
+  const drilled = all.filter(i => m.sites[i].fact || m.sites[i].met != null).sort((a, b) => rank(a) - rank(b) || a - b);
+  if (!drilled.length) return null;
+  const P = R.P.slice(), W = {}, hOf = {}, broken = new Set();
+  for (const i of drilled) { const s = m.sites[i]; P[i] = siteProbs(m, s, { k: s.fact - 1, d: s.met }); if (!(P[i].tot > 1e-12)) broken.add(s.h); }
+  for (const i of drilled) {
+    const s = m.sites[i], g = groupOf(s); if (broken.has(s.h)) continue;
+    const w = W[g] || (W[g] = new Float64Array(M).fill(1)); hOf[g] = s.h;
+    for (let j = 0; j < M; j++) w[j] *= P[i].cn[j];
+  }
+  for (const g of Object.keys(W)) {
+    const t = W[g].reduce((a, b) => a + b, 0);
+    if (!(t > 1e-12)) broken.add(hOf[g]); else for (let j = 0; j < M; j++) W[g][j] /= t;
+  }
+  for (const g of Object.keys(W)) if (broken.has(hOf[g])) delete W[g];
+  for (const i of drilled) if (broken.has(m.sites[i].h)) P[i] = knownOnly(m, m.sites[i]);
+  const held = all.filter(i => !drilled.includes(i) && broken.has(m.sites[i].h));
+  const cand = all.filter(i => !drilled.includes(i) && !held.includes(i));
+  const need = Math.max(0, Math.min(m.wells - drilled.length, cand.length));
+  const best = bestSet(m, P, need, cand, drilled, W), next = drillOrder(m, P, best.S, drilled, W);
+  // where the horizon now sits, on average, at each site still to drill on it: metres deeper (+) than picked
+  // (shifts), and for each horizon the parts of the pick range still open (lo to hi) and the chance that it lies deeper
+  const shifts = [], moved = [];
+  for (const g of Object.keys(W)) {
+    let ec = 0, lo = M, hi = -1, deep = 0;
+    for (let j = 0; j < M; j++) { const c = -1 + (2 * j + 1) / M, w = W[g][j]; ec += w * c; if (c > 0) deep += w; if (w > 1e-9) { lo = Math.min(lo, j); hi = Math.max(hi, j); } }
+    const on = all.filter(i => groupOf(m.sites[i]) === g && !drilled.includes(i));
+    on.forEach(i => { const s = m.sites[i]; shifts.push({ i, h: s.h, by: (s.hr ? m.ehr : m.e2d) * ec }); });
+    moved.push({ h: hOf[g], hr: g.endsWith("h"), lo, hi, deep, on, by: drilled.filter(i => groupOf(m.sites[i]) === g) });
+  }
+  // the same wells as planned before, where none of them is held, scored on what the cores showed
+  const was = R.order.filter(i => !drilled.includes(i)), keep = was.slice(0, need);
+  const vWas = was.some(i => held.includes(i)) || keep.length < need ? null : value(m, P, drilled.concat(keep), W);
+  return { drilled, P, W, broken, held, need, next, v: best.v, v0: value(m, P, drilled, W), vWas, keep, shifts, moved, was };
+}
+
+/* ---------- form ---------- */
+const GLOB = { wells: [1, MAXS, "between 1 and the number of sites"], depth: [1, 1000, "a depth between 1 and 1,000 m"], okp: [1, 100, "a share of good holes between 1 and 100 %"],
+  minsec: [0.1, 1000, "a core length of 0.1 m or more"], side: [0.1, 500, "a length each side of 0.1 m or more"], ehr: [0, 500, "a high-res pick error of 0 m or more"],
+  e2d: [0, 500, "a 2D pick error of 0 m or more"], ddip: [0, 30, "a dip error between 0 and 30°"], dcover: [0, 500, "a cover error of 0 m or more"], dthick: [0, 50, "a thickness error between 0 and 50 %"] };
+let adjusted = [];
+const opt = (v, t, sel) => `<option value="${v}"${sel ? " selected" : ""}>${esc(t)}</option>`;
+function unitRow(u) {
+  const row = document.createElement("div"); row.className = "row u-grid";
+  row.innerHTML = `<span class="no"></span>
+    <label class="c-name"><span class="cl">Unit</span><input type="text" maxlength="40" class="nm"></label>
+    <label class="c-t"><span class="cl">Thickness, m</span><input type="number" min="1" step="5" class="t" inputmode="decimal"></label>
+    <label class="c-role"><span class="cl">Role</span><select class="role">${ROLES.map(r => opt(r, r, r === u[2])).join("")}</select></label>
+    <label class="c-pri"><span class="cl">Priority</span><select class="pri">${PRI.map(p => opt(p[0], p[1], p[0] === u[3])).join("")}</select></label>
+    <label class="c-age"><span class="cl">Gives an age, %</span><input type="number" min="0" max="100" step="5" class="age" inputmode="decimal"></label>
+    <label class="c-base"><span class="cl bl">Dating its base</span><select class="base">${BASE.map(p => opt(p[0], p[1], p[0] === u[4])).join("")}</select></label>
+    <button type="button" class="del">×</button>`;
+  row.querySelector(".nm").value = u[0]; row.querySelector(".t").value = u[1]; row.querySelector(".age").value = u[5] === undefined ? 100 : u[5];
+  row.querySelector(".del").addEventListener("click", () => { if ($("units").children.length > 2) { row.remove(); numberUnits(); render(); } });
+  row.querySelectorAll("input,select").forEach(i => i.addEventListener(i.tagName === "SELECT" ? "change" : "input", i.tagName === "SELECT" ? render : later));
+  row.querySelector(".nm").addEventListener("input", () => setTimeout(syncSiteOptions, 0));
+  return row;
+}
+function numberUnits() {
+  [...$("units").children].forEach((r, k) => {
+    r.querySelector(".no").textContent = k + 1;
+    r.querySelector(".nm").setAttribute("aria-label", `Unit ${k + 1}, name`); r.querySelector(".t").setAttribute("aria-label", `Unit ${k + 1}, thickness in metres`);
+    r.querySelector(".role").setAttribute("aria-label", `Unit ${k + 1}, role`); r.querySelector(".pri").setAttribute("aria-label", `Unit ${k + 1}, priority`);
+    r.querySelector(".base").setAttribute("aria-label", `Unit ${k + 1}, value of dating its base, horizon H${k + 1}`);
+    r.querySelector(".age").setAttribute("aria-label", `Unit ${k + 1}, chance its core gives an age, percent`);
+    r.querySelector(".bl").textContent = `Dating its base, H${k + 1}`;
+    r.querySelector(".del").setAttribute("aria-label", `Remove unit ${k + 1}`);
+  });
+  $("add-unit").disabled = $("units").children.length >= MAXU;
+  syncSiteOptions();
+}
+function unitNames() { return [...$("units").children].map((r, k) => r.querySelector(".nm").value.trim() || `Unit ${k + 1}`); }
+function siteRow(s) {
+  const row = document.createElement("div"); row.className = "row s-grid";
+  row.innerHTML = `<label class="c-name"><span class="cl">Site</span><input type="text" maxlength="6" class="nm"></label>
+    <label class="c-h"><span class="cl">Anchor horizon</span><select class="h"></select></label>
+    <label class="c-z"><span class="cl">Horizon depth, m</span><input type="number" min="0" step="1" class="z" inputmode="decimal"></label>
+    <label class="c-q"><span class="cl">Cover, m</span><input type="number" min="0" step="1" class="q" inputmode="decimal"></label>
+    <label class="c-dip"><span class="cl">Dip, °</span><input type="number" min="0" max="60" step="0.5" class="dip" inputmode="decimal"></label>
+    <label class="c-hr chk"><span class="cl">High-res line</span><input type="checkbox" class="hr"></label>
+    <label class="c-fact"><span class="cl">After drilling: unit identified</span><select class="fact"></select></label>
+    <label class="c-met"><span class="cl">Anchor horizon met at, m</span><input type="number" min="0" step="1" class="met" inputmode="decimal"></label>
+    <button type="button" class="del">×</button>`;
+  row.querySelector(".nm").value = s[0]; row.querySelector(".z").value = s[2]; row.querySelector(".q").value = s[3]; row.querySelector(".dip").value = s[4];
+  row.querySelector(".met").value = s[7] === undefined || s[7] === null ? "" : s[7];
+  row.querySelector(".hr").checked = !!s[5];
+  row.dataset.h = s[1]; row.dataset.fact = s[6] || 0;
+  row.querySelector(".del").addEventListener("click", () => { if ($("sites").children.length > 1) { row.remove(); labelSites(); render(); } });
+  row.querySelectorAll("input[type=text],input[type=number]").forEach(i => i.addEventListener("input", later));
+  row.querySelector(".hr").addEventListener("change", render);
+  row.querySelector(".h").addEventListener("change", e => { row.dataset.h = e.target.value; render(); });
+  row.querySelector(".fact").addEventListener("change", e => { row.dataset.fact = e.target.value; render(); });
+  return row;
+}
+function labelSites() {
+  [...$("sites").children].forEach((r, i) => {
+    const n = r.querySelector(".nm").value.trim() || `site ${i + 1}`;
+    [["nm", "name"], ["h", "anchor horizon"], ["z", "depth of the anchor horizon below seabed, m"], ["q", "cover, m"], ["dip", "dip, degrees"], ["hr", "high-res line through the site"], ["fact", "unit identified in the core after drilling"], ["met", "depth at which the anchor horizon was met in the core, m"]]
+      .forEach(([c, t]) => r.querySelector("." + c).setAttribute("aria-label", `Site ${i + 1}, ${t}`));
+    r.querySelector(".del").setAttribute("aria-label", `Remove ${n}`);
+  });
+  $("add-site").disabled = $("sites").children.length >= MAXS;
+}
+function syncSiteOptions() {
+  const names = unitNames(), n = names.length;
+  [...$("sites").children].forEach(r => {
+    let h = Math.min(n, Math.max(1, +r.dataset.h || 1)), f = +r.dataset.fact || 0; if (f > n) f = 0;
+    r.dataset.h = h; r.dataset.fact = f;
+    r.querySelector(".h").innerHTML = names.map((x, k) => opt(k + 1, `H${k + 1} · base of ${k + 1}, ${x}`, k + 1 === h)).join("");
+    r.querySelector(".fact").innerHTML = opt(0, "not drilled yet", f === 0) + names.map((x, k) => opt(k + 1, `${k + 1} · ${x}`, k + 1 === f)).join("");
+  });
+}
+function setUnits(list) { $("units").innerHTML = ""; list.forEach(u => $("units").appendChild(unitRow(u))); }
+function setSites(list) { $("sites").innerHTML = ""; list.forEach(s => $("sites").appendChild(siteRow(s))); labelSites(); }
+function fillForm(e) {
+  for (const id of Object.keys(GLOB)) { $(id).value = e[id]; $(id).setAttribute("aria-invalid", "false"); }
+  $("share").value = e.share;
+  setUnits(e.units); setSites(e.sites); numberUnits();
+}
+function num(el, lo, hi, ask) {
+  const raw = el.value, v = parseFloat(raw), ok = raw.trim() !== "" && isFinite(v) && v >= lo && v <= hi;
+  el.setAttribute("aria-invalid", ok ? "false" : "true");
+  if (!ok) adjusted.push(ask);
+  return ok ? v : lo;
+}
+function readModel() {
+  adjusted = [];
+  const m = {};
+  const ns = $("sites").children.length;
+  for (const id of Object.keys(GLOB)) {
+    const [lo, hi, ask] = GLOB[id];
+    m[id] = num($(id), lo, id === "wells" ? Math.min(hi, ns) : hi, id === "wells" ? `${ask} (${ns})` : ask);
+  }
+  m.wells = Math.round(m.wells);
+  m.share = +$("share").value;
+  m.units =[...$("units").children].map((r, k) => ({
+    name: r.querySelector(".nm").value.trim() || `Unit ${k + 1}`, t: num(r.querySelector(".t"), 1, 5000, `a thickness of 1 m or more for unit ${k + 1}`),
+    role: r.querySelector(".role").value, pri: +r.querySelector(".pri").value, base: +r.querySelector(".base").value,
+    age: num(r.querySelector(".age"), 0, 100, `an age chance between 0 and 100 % for unit ${k + 1}`) }));
+  m.sites = [...$("sites").children].map((r, i) => {
+    const name = r.querySelector(".nm").value.trim() || `S${i + 1}`, me = r.querySelector(".met");
+    if (me.value.trim() === "") me.setAttribute("aria-invalid", "false");
+    return { name, met: me.value.trim() === "" ? null : num(me, 0, 2000, `a depth of 0 m or more for the horizon met at site ${name}, or nothing`), h: +r.dataset.h, z: num(r.querySelector(".z"), 0, 2000, `a horizon depth of 0 m or more at site ${name}`), q: num(r.querySelector(".q"), 0, 2000, `a cover of 0 m or more at site ${name}`),
+      dip: num(r.querySelector(".dip"), 0, 60, `a dip between 0 and 60° at site ${name}`), hr: r.querySelector(".hr").checked, fact: +r.dataset.fact };
+  });
+  return m;
+}
+
+/* ---------- drawing ---------- */
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text !== undefined) e.textContent = text; return e; }
+function css(name) { return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function mix(a, b, t) { const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); const A = p(a), B = p(b); return "#" + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, "0")).join(""); }
+function unitColours(n) { const y = css("--u-young"), o = css("--u-old"); return Array.from({ length: n }, (_, k) => mix(y, o, n === 1 ? 0.5 : k / (n - 1))); }
+function svgWidth(svg) { return Math.max(300, Math.min(680, Math.round(svg.getBoundingClientRect().width || svg.parentNode.clientWidth || 680))); }
+function niceStep(span, n) { if (!(span > 0)) return 1; const raw = span / n, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p; }
+function clearSvg(svg) { while (svg.lastChild && svg.lastChild.nodeName !== "desc") svg.removeChild(svg.lastChild); }
+
+// the sketch of the two ways to place a core: one structure, two holes; drawn 680 wide and squeezed sideways on a narrow screen
+function drawMethod() {
+  const svg = $("method"); clearSvg(svg);
+  const W = svgWidth(svg), narrow = W < 540, fs = narrow ? 12 : 11, sx = W / 680;
+  const ys = 24, yc = ys + 14, yb = yc + 150, t = 0.6, Lc = 70, dx = (yb - yc) / t;
+  svg.setAttribute("viewBox", `0 0 ${W} ${yb + 4}`);
+  const g = el("g", {}); svg.appendChild(g);
+  g.appendChild(el("rect", { x: 0, y: 0, width: W, height: ys, fill: "var(--accent-soft)" }));
+  const cp = el("clipPath", { id: "method-clip" }); cp.appendChild(el("rect", { x: 0, y: yc, width: W, height: yb - yc })); g.appendChild(cp);
+  const beds = el("g", { "clip-path": "url(#method-clip)" }); g.appendChild(beds);
+  // where each boundary subcrops at the base of the cover; the beds dip to the right, so the oldest unit is on the left
+  const xb = [-300, 20, 296, 480, 690, 1100], cols = unitColours(xb.length - 1);
+  for (let k = 0; k < xb.length - 1; k++) {
+    const a = xb[k] * sx, b = xb[k + 1] * sx;
+    beds.appendChild(el("polygon", { points: `${a},${yc} ${b},${yc} ${b + dx * sx},${yb} ${a + dx * sx},${yb}`, fill: cols[xb.length - 2 - k], stroke: "var(--page)", "stroke-width": 1 }));
+  }
+  g.appendChild(el("rect", { x: 0, y: ys, width: W, height: yc - ys, fill: "var(--cover)" }));
+  g.appendChild(el("line", { x1: 0, x2: W, y1: ys, y2: ys, stroke: "var(--ink-2)", "stroke-width": 1.5 }));
+  g.appendChild(el("text", { x: 6, y: ys - 7, "font-size": fs, fill: "var(--ink-2)" }, "seabed"));
+  g.appendChild(el("text", { x: 6, y: yc - 3, "font-size": fs, fill: "var(--ink-2)" }, "cover"));
+  g.appendChild(el("text", { x: 6, y: yb - 6, "font-size": fs, fill: "var(--ink)", class: "halo" }, "older"));
+  // top right is the youngest rock in the picture; on a narrow screen the label drops below the pick-error bar
+  g.appendChild(el("text", { x: W - 6, y: narrow ? yc + 82 : yc + fs + 3, "text-anchor": "end", "font-size": fs, fill: "var(--ink)", class: "halo" }, "younger"));
+  // hole 1 keeps to one unit over its whole core; hole 2 crosses the boundary that subcrops at 480, halfway down its core
+  const holes = [[216, "in the middle of a unit"], [538, "across a boundary"]];
+  holes.forEach(([x0, lab], j) => {
+    const x = x0 * sx;
+    g.appendChild(el("line", { x1: x, x2: x, y1: ys - 5, y2: yc, stroke: "var(--ink)", "stroke-width": 1.5 }));
+    g.appendChild(el("rect", { x: x - 3.5, y: yc, width: 7, height: Lc, fill: "var(--ink)", stroke: "var(--page)", "stroke-width": 1.5 }));
+    g.appendChild(el("text", { x, y: ys - 9, "text-anchor": "middle", "font-size": fs + 1, "font-weight": 700, fill: "var(--ink)" }, String(j + 1)));
+    if (!narrow) g.appendChild(el("text", { x: x - 10, y: yc + Lc + 16, "text-anchor": "end", "font-size": fs, fill: "var(--ink)", class: "halo" }, lab));
+  });
+  // the pick error at hole 2: how far the boundary it crosses can sit from where the seismic puts it
+  const xh = 538 * sx, yh = yc + (538 - 480) * t, bx = xh + 11;
+  g.appendChild(el("path", { d: `M${bx - 4},${yh - 24} H${bx + 4} M${bx},${yh - 24} V${yh + 24} M${bx - 4},${yh + 24} H${bx + 4}`, stroke: "var(--ink)", "stroke-width": 1.5, fill: "none" }));
+  g.appendChild(el("text", { x: bx + 7, y: yh + 4, "font-size": fs, fill: "var(--ink)", class: "halo" }, narrow ? "±" : "± pick error"));
+}
+
+// the worst of what a drilled site's core says against the plan: the unit identified, the depth of its anchor horizon,
+// and the two together
+function drillStatus(m, p, s) {
+  const e = s.hr ? m.ehr : m.e2d;
+  if (s.fact && factStatus(m, p, s).cls === "below") return { cls: "below", short: "no fit" };
+  if (s.met != null && (Math.abs(s.met - s.z) - e > 0.5 || s.met >= m.depth || s.met <= s.q - m.dcover)) return { cls: "below", short: "no fit" };
+  if (!(siteProbs(m, s, { k: s.fact - 1, d: s.met }).tot > 1e-12)) return { cls: "below", short: "no fit" };
+  return s.fact ? factStatus(m, p, s) : { cls: "clear", short: "fits" };
+}
+
+function drawCols(m, R) {
+  const svg = $("cols"); clearSvg(svg);
+  const W = svgWidth(svg), narrow = W < 540, fs = narrow ? 12 : 11;
+  // the planned wells in drilling order, then any site drilled outside the plan
+  const extra = m.sites.map((s, i) => i).filter(i => (m.sites[i].fact || m.sites[i].met != null) && !R.order.includes(i)), list = R.order.concat(extra), n = list.length;
+  const Lm = 34, Rm = W - 8, Tp = 22, H = narrow ? 250 : 270, B = Tp + H, Hh = B + 38;
+  svg.setAttribute("viewBox", `0 0 ${W} ${Hh}`);
+  const zMax = m.depth * 1.03, sz = z => Tp + Math.max(0, Math.min(zMax, z)) / zMax * H;
+  const U = tops(m.units), T = U[U.length - 1], cols = unitColours(m.units.length);
+  const g = el("g", {}); svg.appendChild(g);
+  const step = niceStep(m.depth, 5);
+  for (let v = 0; v <= m.depth + 1e-9; v += step) {
+    g.appendChild(el("line", { x1: Lm, x2: Rm, y1: sz(v), y2: sz(v), stroke: "var(--grid)" }));
+    g.appendChild(el("text", { x: Lm - 5, y: sz(v) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--ink-2)" }, fmt(v)));
+  }
+  g.appendChild(el("text", { x: 2, y: Tp - 8, "font-size": fs, fill: "var(--ink-2)" }, "m"));
+  // after drilling: a fact column beside each plan column, where the slots are wide enough for two
+  const anyFact = m.sites.some(s => s.fact || s.met != null), slot = (Rm - Lm) / n, gap = 14, any = anyFact && slot >= 38;
+  const cw = Math.max(10, Math.min(40, slot * (any ? 0.3 : 0.46))), fw = any ? Math.max(10, Math.min(30, cw * 0.8)) : 0;
+  list.forEach((i, j) => {
+    const s = m.sites[i], c = Math.cos(s.dip * RAD), cx = Lm + slot * (j + 0.5), x0 = any ? cx - (cw + gap + fw) / 2 : cx - cw / 2, xf = x0 + cw + gap, w = el("g", {});
+    // one column: the cover, then the section as it lies with the anchor horizon at depth za
+    const column = (x, wd, za) => {
+      const zOf = u => za - (U[s.h] - u) / c;
+      const box = (zA, zB, fill) => { const a = Math.max(zA, s.q), b = Math.min(zB, m.depth); if (b > a) w.appendChild(el("rect", { x, y: sz(a), width: wd, height: sz(b) - sz(a), fill, stroke: "var(--page)", "stroke-width": 1 })); };
+      w.appendChild(el("rect", { x, y: sz(0), width: wd, height: sz(Math.min(s.q, m.depth)) - sz(0), fill: "var(--cover)" }));
+      box(-1e6, zOf(0), "var(--younger)");
+      m.units.forEach((u, k) => {
+        box(zOf(U[k]), zOf(U[k + 1]), cols[k]);
+        const a = Math.max(zOf(U[k]), s.q), b = Math.min(zOf(U[k + 1]), m.depth);
+        if (sz(b) - sz(a) >= fs + 1) w.appendChild(el("text", { x: x + wd / 2, y: (sz(a) + sz(b)) / 2 + fs / 3, "text-anchor": "middle", "font-size": fs, "font-weight": 700, fill: "var(--ink)", class: "halo" }, String(k + 1)));
+      });
+      box(zOf(T), 1e6, "var(--older)");
+      return zOf;
+    };
+    const zOf = column(x0, cw, s.z);
+    // how far each horizon can move: the extreme corners of pick, dip and thickness errors
+    const e = s.hr ? m.ehr : m.e2d, f = m.dthick / 100;
+    m.units.forEach((u, k) => {
+      const d = U[s.h] - U[k + 1], zs = [];
+      for (const ze of [s.z - e, s.z + e]) for (const ff of [1 - f, 1 + f]) for (const th of [Math.max(0, s.dip - m.ddip), s.dip + m.ddip]) zs.push(ze - d * ff / Math.cos(th * RAD));
+      const lo = Math.max(Math.min(...zs), s.q), hi = Math.min(Math.max(...zs), m.depth);
+      if (hi <= lo) return;
+      const bx = x0 + cw + 3 + (k % 2) * 6;
+      w.appendChild(el("line", { x1: bx, x2: bx, y1: sz(lo), y2: sz(hi), stroke: "var(--ink-2)", "stroke-width": 2, "stroke-linecap": "round" }));
+      const zn = zOf(U[k + 1]);
+      if (!any && slot - cw >= (narrow ? 28 : 34) && bx + 24 <= W && zn > s.q && zn < m.depth) w.appendChild(el("text", { x: bx + 5, y: sz(zn) + 4, "font-size": fs - 1, fill: "var(--ink-2)", class: "halo" }, `H${k + 1}`));
+    });
+    w.appendChild(el("text", { x: cx, y: Tp - 7, "text-anchor": "middle", "font-size": fs, "font-weight": 700, fill: "var(--ink)" }, j >= R.order.length ? `+ ${s.name}` : narrow ? s.name : `${j + 1} · ${s.name}`));
+    w.appendChild(el("text", { x: cx, y: B + 15, "text-anchor": "middle", "font-size": fs - 1, fill: "var(--ink-2)" }, s.hr ? (narrow ? "hi-res" : "high-res") : "2D"));
+    const drilled = s.fact || s.met != null;
+    if (drilled) {
+      const st = drillStatus(m, R.P[i], s), colr = st.cls === "clear" ? "var(--ok)" : st.cls === "marginal" ? "var(--warn)" : "var(--bad)";
+      if (any) {
+        const y0 = sz(0), yq = sz(Math.min(s.q, m.depth)), yd = sz(m.depth);
+        if (s.met != null && s.met > 0 && s.met < m.depth) {
+          // the fact: the section as it lies with the anchor horizon where it was met, and a line at that depth
+          column(xf, fw, s.met);
+          w.appendChild(el("line", { x1: xf - 3, x2: xf + fw + 3, y1: sz(s.met), y2: sz(s.met), stroke: "var(--ink)", "stroke-width": 2.5 }));
+        } else {
+          // only the unit is known: its number on its colour, the rest of the core left blank
+          w.appendChild(el("rect", { x: xf, y: y0, width: fw, height: yq - y0, fill: "var(--cover)" }));
+          if (yd > yq) w.appendChild(el("rect", { x: xf, y: yq, width: fw, height: yd - yq, fill: "var(--surface)" }));
+          if (s.fact && yd - yq >= fs + 8) {
+            const ym = (yq + yd) / 2;
+            w.appendChild(el("rect", { x: xf, y: ym - fs, width: fw, height: 2 * fs, fill: cols[s.fact - 1] }));
+            w.appendChild(el("text", { x: xf + fw / 2, y: ym + fs / 3, "text-anchor": "middle", "font-size": fs, "font-weight": 700, fill: "var(--ink)", class: "halo" }, String(s.fact)));
+          }
+        }
+        w.appendChild(el("rect", { x: xf, y: y0, width: fw, height: yd - y0, fill: "none", stroke: colr, "stroke-width": 2 }));
+      }
+      w.appendChild(el("text", { x: cx, y: B + 30, "text-anchor": "middle", "font-size": fs - 1, "font-weight": 700, fill: colr }, narrow ? (st.cls === "clear" ? "ok" : st.cls === "marginal" ? "?" : "no") : st.short));
+    } else if (any) w.appendChild(el("rect", { x: xf, y: sz(0), width: fw, height: sz(m.depth) - sz(0), fill: "none", stroke: "var(--axis)", "stroke-dasharray": "3 3" }));
+    const w0 = window0(m, s);
+    w.appendChild(el("title", {}, `${s.name}, ${s.hr ? "high-res line" : "2D only"}: ${w0 ? coreText(m, w0) : "the hole stops in the cover"}`));
+    w.appendChild(el("rect", { x: cx - slot / 2, y: Tp, width: slot, height: H, fill: "transparent" }));
+    g.appendChild(w);
+  });
+  g.appendChild(el("line", { x1: Lm, x2: Rm, y1: sz(0), y2: sz(0), stroke: "var(--ink-2)", "stroke-width": 1.5 }));
+  $("cols-cap").innerHTML = `Each column is one planned well, in drilling order, by depth below the seabed: the cover on top, then the units it should core, numbered as in the section. The bars beside a column show where each horizon can sit within the errors. ` +
+    (any ? `These are the wells as planned before drilling. Outlined beside a drilled well is the fact: the section with its anchor horizon where it was met (the line), or the unit identified in the core, and below it whether that fits the plan. A dashed outline is a well not drilled yet${extra.length ? "; a well drilled outside the plan is added on the right, marked +" : ""}. ` :
+      anyFact ? `These are the wells as planned before drilling; under a drilled well, whether its core fits the plan. ` : "") +
+    `<span class="nw"><i class="lg" style="background:var(--cover)"></i>cover</span> &nbsp;<span class="nw"><i class="lg" style="background:var(--younger)"></i>younger than the section</span> &nbsp;<span class="nw"><i class="lg" style="background:var(--older)"></i>older than the section</span>`;
+}
+
+function drawCurve(m, R) {
+  const svg = $("curve"); clearSvg(svg);
+  const W = svgWidth(svg), narrow = W < 540, fs = narrow ? 12 : 11;
+  const Lm = 30, Rm = W - 8, Tp = 18, H = 160, B = Tp + H, Hh = B + 34;
+  svg.setAttribute("viewBox", `0 0 ${W} ${Hh}`);
+  const sy = v => B - v / R.vmax * H, g = el("g", {}); svg.appendChild(g);
+  const step = niceStep(R.vmax, 4);
+  for (let v = 0; v <= R.vmax + 1e-9; v += step) {
+    g.appendChild(el("line", { x1: Lm, x2: Rm, y1: sy(v), y2: sy(v), stroke: "var(--grid)" }));
+    g.appendChild(el("text", { x: Lm - 5, y: sy(v) + 4, "text-anchor": "end", "font-size": fs, fill: "var(--ink-2)" }, fmt(v)));
+  }
+  g.appendChild(el("line", { x1: Lm, x2: Rm, y1: sy(R.vmax), y2: sy(R.vmax), stroke: "var(--ink-2)", "stroke-dasharray": "4 3" }));
+  g.appendChild(el("text", { x: Lm + 4, y: sy(R.vmax) - 4, "font-size": fs, fill: "var(--ink-2)", class: "halo" }, `all targets, sure: ${fmt(R.vmax)}`));
+  const slot = (Rm - Lm) / R.M, bw = Math.max(4, Math.min(28, slot * 0.62));
+  R.curve.forEach((c, j) => {
+    const n = j + 1, cx = Lm + slot * (j + 0.5), on = n === m.wells, y = sy(c.v), w = el("g", {});
+    const r = Math.min(4, bw / 2), h = B - y;
+    w.appendChild(el("path", { d: `M${cx - bw / 2},${B} V${y + r} Q${cx - bw / 2},${y} ${cx - bw / 2 + r},${y} H${cx + bw / 2 - r} Q${cx + bw / 2},${y} ${cx + bw / 2},${y + r} V${B} Z`, fill: on ? "var(--accent)" : "var(--axis)" }));
+    // label the chosen number, the first bar and the last; skip the last if it would sit on the dashed line
+    if (on || (n === R.M && y - sy(R.vmax) >= 16) || (!narrow && n === 1)) w.appendChild(el("text", { x: cx, y: y - 5, "text-anchor": "middle", "font-size": fs, "font-weight": on ? 700 : 400, fill: "var(--ink)", class: "halo" }, f1(c.v)));
+    if (slot >= 16 || n % 2 === 1 || on) w.appendChild(el("text", { x: cx, y: B + 15, "text-anchor": "middle", "font-size": fs, "font-weight": on ? 700 : 400, fill: on ? "var(--ink)" : "var(--ink-2)" }, String(n)));
+    w.appendChild(el("title", {}, `${n} ${plural(n, "well", "wells")}: best set ${c.S.map(i => m.sites[i].name).join(", ")}, score ${f1(c.v)} of ${fmt(R.vmax)}`));
+    w.appendChild(el("rect", { x: cx - slot / 2, y: Tp, width: slot, height: H, fill: "transparent" }));
+    g.appendChild(w);
+    if (h < 0) return;
+  });
+  g.appendChild(el("line", { x1: Lm, x2: Rm, y1: B, y2: B, stroke: "var(--axis)" }));
+  g.appendChild(el("text", { x: (Lm + Rm) / 2, y: B + 30, "text-anchor": "middle", "font-size": fs, fill: "var(--ink-2)" }, "wells drilled"));
+  $("curve-cap").textContent = `Best score for each number of wells, every set of sites tried. Your choice of ${m.wells} in blue; all ${R.M} sites together score ${f1(R.curve[R.M - 1].v)}. The dashed line is the score if every target were cored and every boundary dated for sure.`;
+}
+
+/* ---------- words ---------- */
+const uLabel = (m, k) => `unit ${k + 1} (${m.units[k].name.toLowerCase()})`;
+const hLabel = k => `H${k + 1}`;
+function coreText(m, w) {
+  const U = tops(m.units), T = U[U.length - 1], parts = [];
+  if (w.top < 0) parts.push("younger rocks");
+  m.units.forEach((u, k) => { const ov = Math.min(w.bot, U[k + 1]) - Math.max(w.top, U[k]); if (ov >= 0.5) parts.push(`${metres(ov)} m of ${k + 1}`); });
+  if (w.bot > T) parts.push("older rocks");
+  return parts.length ? parts.join(", ") : "nothing of the section";
+}
+// the targets a site may reach, given the hole delivers, most likely first
+function chances(m, p) {
+  const ok = m.okp / 100, out = [];
+  m.units.forEach((u, k) => { if (u.pri > 0 && p.pu[k] / ok >= 0.05) out.push({ t: `${k + 1}`, c: p.pu[k] / ok, w: u.pri, kind: "u", k }); });
+  m.units.forEach((u, k) => { if (u.base > 0 && p.pb[k] / ok >= 0.05) out.push({ t: hLabel(k), c: p.pb[k] / ok, w: u.base, kind: "b", k }); });
+  return out.sort((a, b) => b.c - a.c || b.w - a.w);
+}
+function factStatus(m, p, s) {
+  const k = s.fact - 1, pa = p.pa[k];
+  if (pa >= 0.2) return { cls: "clear", short: "fits", pa };
+  if (pa > 1e-9) return { cls: "marginal", short: "unlikely", pa };
+  return { cls: "below", short: "no fit", pa };
+}
+
+/* ---------- render ---------- */
+function setVerdict(cls, main, sub, mini) {
+  $("verdict").className = "verdict " + cls; $("v-main").textContent = main; $("v-sub").textContent = sub;
+  $("mini").className = "mini " + cls + ($("mini").classList.contains("show") ? " show" : ""); $("mini").textContent = mini;
+}
+function clearOut() {
+  ["s-score", "s-units", "s-bnd", "s-m"].forEach(id => $(id).textContent = "–");
+  ["a-land", "a-hr", "a-firm", "facts-body", "key", "fa-text", "fb-text", "fc-text"].forEach(id => $(id).innerHTML = "");
+  ["plan", "reserves", "ladder"].forEach(id => $(id).querySelector("tbody").innerHTML = "");
+  $("ladder").querySelector("thead").innerHTML = ""; $("plan-note").textContent = ""; $("res-note").textContent = "";
+  ["cols", "curve"].forEach(id => clearSvg($(id))); $("cols-cap").textContent = ""; $("curve-cap").textContent = "";
+}
+let last = null;
+function render() {
+  drawMethod();
+  const m = readModel();
+  const U = tops(m.units);
+  $("total").textContent = `Section ${metres(U[U.length - 1])} m thick in ${m.units.length} units.`;
+  if (!m.units.some(u => u.pri > 0 || u.base > 0)) adjusted.push("a priority for at least one unit, or a value for dating its base");
+  if (adjusted.length) {
+    clearOut(); last = null;
+    setVerdict("below", "Check the inputs.", `Enter ${adjusted.slice(0, 3).join("; ")}${adjusted.length > 3 ? "; and the fields marked red" : ""}.`, `Check the inputs: ${adjusted[0]}`);
+    $("fa-text").textContent = "Check the inputs in the form below: the fields marked red.";
+    return;
+  }
+  const R = solve(m), rp = replan(m, R); last = { m, R };
+  const S = R.best.S, N = m.wells, ok = m.okp / 100;
+  const nm = i => m.sites[i].name;
+  // verdict
+  const items = [];
+  m.units.forEach((u, k) => {
+    if (u.pri > 0) items.push({ lab: `the ${u.name.toLowerCase()}, unit ${k + 1},`, short: `unit ${k + 1}`, p: R.R[k].u, w: u.pri, k, kind: "u" });
+    if (u.base > 0) items.push({ lab: `boundary ${hLabel(k)}`, short: hLabel(k), p: R.R[k].b, w: u.base, k, kind: "b" });
+  });
+  const high = items.filter(x => (x.kind === "u" && x.w === 3) || (x.kind === "b" && x.w === 2));
+  const short = items.filter(x => (x.kind === "u" && x.w === 3 && x.p < 0.6) || (x.kind === "u" && x.w === 2 && x.p < 0.3) || (x.kind === "b" && x.w === 2 && x.p < 0.3));
+  const thin = high.filter(x => x.p < 0.9).sort((a, b) => a.p - b.p);
+  const carriers = x => S.filter(i => (x.kind === "u" ? R.P[i].pu[x.k] : R.P[i].pb[x.k]) >= 0.05).map(nm);
+  // labels for units carry their own commas ("the shale, unit 5,"): trim the last one where the sentence stops
+  const bare = x => x.lab.replace(/,$/, "");
+  const withP = x => `${x.lab} at ${pct(x.p)}`;
+  const why = x => { const c = carriers(x); return c.length === 0 ? `no planned well reaches ${bare(x)}` : c.length === 1 ? `${x.lab} rests on site ${c[0]} alone (${pct(x.p)})` : `${x.lab} is ${pct(x.p)} sure from sites ${listWords(c)}`; };
+  // the two weakest targets; when both hang on the same single site, say it once
+  const whyTwo = a => {
+    if (a.length > 1) { const c0 = carriers(a[0]), c1 = carriers(a[1]); if (c0.length === 1 && c1.length === 1 && c0[0] === c1[0]) return `${withP(a[0])} and ${withP(a[1])} both rest on site ${c0[0]} alone`; }
+    return a.slice(0, 2).map(why).join("; ");
+  };
+  const nxt = R.reserves[0];
+  // once results are entered, the verdict stays the plan as it stood and points to what to drill next
+  const nextTxt = rp ? ` This is the plan as it stood before drilling; results are entered for ${rp.drilled.length} ${plural(rp.drilled.length, "well", "wells")}, and what to drill next is under finding C.` : nxt ? ` The best next well is ${nm(nxt.i)}, adding ${f1(nxt.g)} to the score.` : "";
+  const W = `${N} ${plural(N, "well", "wells")}`, names = R.order.map(nm);
+  const drill = N > 1 ? `Drill ${listWords(names)}, in that order. ` : `Drill ${names[0]}. `;
+  const cap = t => t.replace(/^./, c => c.toUpperCase());
+  if (short.length) {
+    const s = short.sort((a, b) => a.p - b.p);
+    setVerdict("below", `${W}: ${listWords(s.slice(0, 3).map(x => x.short))} may stay out of reach.`,
+      drill + cap(whyTwo(s)) + "." + nextTxt, `${names.join(", ")}: ${s[0].short} may stay out of reach`);
+  } else if (thin.length) {
+    setVerdict("marginal", `${W} reach every high-priority unit and key boundary, but ${listWords(thin.slice(0, 3).map(x => x.short))}${thin.length > 3 ? " and more" : ""} ${plural(thin.length, "is", "are")} under 90% sure.`,
+      drill + cap(whyTwo(thin)) + "." + nextTxt, `${names.join(", ")}: ${thin.length} ${plural(thin.length, "target", "targets")} under 90% sure`);
+  } else {
+    setVerdict("clear", `${W}: every high-priority unit and key boundary is at least 90% sure.`, `${drill}Score ${f1(R.best.v)} of ${fmt(R.vmax)}.${nextTxt}`, `${names.join(", ")}: every key target 90%+ sure`);
+  }
+  // tiles
+  const tu = items.filter(x => x.kind === "u"), tb = items.filter(x => x.kind === "b");
+  const avgU = tu.reduce((t, x) => t + x.p, 0), avgB = tb.reduce((t, x) => t + x.p, 0);
+  $("s-score").innerHTML = `${f1(R.best.v)} <small>of ${fmt(R.vmax)}</small>`;
+  $("s-units").innerHTML = `${f1(avgU)} <small>of ${tu.length}</small>`;
+  $("s-bnd").innerHTML = tb.length ? `${f1(avgB)} <small>of ${tb.length}</small>` : "–";
+  $("s-m").innerHTML = `${metres(cored(m, S))} m <small>of ${metres(N * m.depth)} m</small>`;
+  // finding A: what each next well buys, and which high targets still hang on one hole
+  const all = R.curve[R.M - 1].v;
+  let fa;
+  if (N < R.M) {
+    const lone = high.filter(x => carriers(x).length === 1), on = [...new Set(lone.map(x => carriers(x)[0]))];
+    const loneLab = x => x.kind === "u" ? `the ${esc(m.units[x.k].name.toLowerCase())} (unit ${x.k + 1})` : `boundary ${x.short}`;
+    fa = `<b>${N} ${plural(N, "well", "wells")} out of ${R.M} candidate sites ${plural(N, "takes", "take")} ${pct(R.best.v / all)} of what all ${R.M} could give.</b> ` +
+      (N > 1 ? `Well ${N} adds ${f1(R.best.v - R.curve[N - 2].v)} of ${fmt(R.vmax)} points, well ${N + 1} would add ${f1(R.curve[N].v - R.best.v)}` : `Well ${N + 1} would add ${f1(R.curve[N].v - R.best.v)} of ${fmt(R.vmax)} points`) +
+      (R.M > N + 1 ? `, well ${R.M} only ${f1(all - R.curve[R.M - 2].v)}.` : `.`) + ` A point is a target unit cored or a boundary dated, weighted by priority.` +
+      (lone.length ? ` What more wells buy is back-up: ${listWords(lone.slice(0, 3).map(loneLab))}${lone.length > 3 ? " and more" : ""} still ${lone.length === 1 ? "rests" : "rest"} on one hole${lone.length > 1 ? " each" : ""}${on.length === 1 ? `, site ${esc(on[0])}` : ""}.` :
+        ` Every high-priority unit and key boundary already has a second hole on it.`);
+  } else fa = `<b>Every candidate site is in the plan:</b> ${f1(R.best.v)} of ${fmt(R.vmax)} points. Add sites in the form to see what more wells would buy.`;
+  $("fa-text").innerHTML = fa;
+  // finding B: units are cored far more surely than boundaries are dated
+  let fb;
+  if (tb.length) {
+    const keyB = tb.filter(x => x.w === 2).sort((a, b) => a.p - b.p).slice(0, 2), show = keyB.length ? keyB : tb.slice().sort((a, b) => a.p - b.p).slice(0, 2);
+    fb = `<b>${f1(avgU)} of ${tu.length} target units are cored on average, but only ${f1(avgB)} of ${tb.length} boundaries dated.</b> ` +
+      `${keyB.length ? "Key boundary" : "Boundary"} ${show.map(x => `${x.short} is dated ${pct(x.p)} of the time`).join(", ")}. A boundary is dated only if the hole brings back core, the core crosses it, and the rock on both sides gives an age.`;
+  } else fb = `<b>${f1(avgU)} of ${tu.length} target units are cored on average.</b> No boundary is set to be dated: give the base of a unit a value in the form to see how sure its date is.`;
+  $("fb-text").innerHTML = fb;
+  // key to the numbers
+  const ucol = unitColours(m.units.length);
+  $("key").innerHTML = m.units.map((u, k) => `<span><i class="sw" style="background:${ucol[k]}"></i>${k + 1} ${esc(u.name)}</span>`).join("") + `<span>H<i>n</i>: base of unit <i>n</i></span>`;
+  // plan table, and the sites left out
+  const row = (tbody, lab, i, adds, cls) => {
+    const s = m.sites[i], w0 = window0(m, s), ch = chances(m, R.P[i]);
+    const chT = ch.length ? ch.slice(0, 5).map(x => `<span class="nw">${x.kind === "u" ? "unit " : ""}${x.t} ${pct(x.c)}</span>`).join(", ") + (ch.length > 5 ? `, +${ch.length - 5} more` : "") : "no target";
+    const tr = document.createElement("tr"); if (cls) tr.className = cls;
+    tr.innerHTML = `<td>${lab}</td><td class="l"><b>${esc(s.name)}</b></td><td class="l hide-s">${s.hr ? "high-res" : "2D only"}</td><td class="l">${w0 ? coreText(m, w0) : "stops in the cover"}</td><td class="l">${chT}</td><td class="num">+${f1(adds)}</td>`;
+    tbody.appendChild(tr);
+  };
+  const tbody = $("plan").querySelector("tbody"), rbody = $("reserves").querySelector("tbody"); tbody.innerHTML = ""; rbody.innerHTML = "";
+  R.order.forEach((i, j) => row(tbody, String(j + 1), i, R.prefix[j] - (j ? R.prefix[j - 1] : 0)));
+  R.reserves.forEach(r => row(rbody, "", r.i, r.g, "reserve"));
+  const stop = R.prefix.map((v, j) => v / R.curve[j].v), worstStop = Math.min(...stop);
+  $("plan-note").innerHTML = `Adds: what each well adds to the score of the wells before it. ` +
+    (worstStop > 0.9999 ? `Stopped after any well, the wells drilled here are the best set for that number. ` : `Stopped early, the wells drilled keep at least ${pct(worstStop)} of the best score for that number. `) +
+    `Chances in this table assume the hole delivers; a horizon's chance includes the rock on both sides giving an age. The verdict and the tiles also count the holes that fail.`;
+  $("res-note").innerHTML = (R.reserves.length ? `Adds: what each site would add to the full plan, best first.` : `Every site is in the plan.`) +
+    (R.standins.length && R.standins[0].j !== null ? ` If a planned site cannot be drilled, its best stand-in: ${R.standins.map(x => `for ${esc(nm(x.i))}, ${esc(nm(x.j))} (score ${f1(x.v)})`).join("; ")}.` : "");
+  // ladder table: the combined chance first, then well by well
+  const lad = $("ladder"), cols = unitColours(m.units.length), heat = +css("--heat") || 34;
+  lad.querySelector("thead").innerHTML = `<tr><th class="l">Unit or boundary</th><th>Plan</th>${R.order.map(i => `<th>${esc(nm(i))}</th>`).join("")}</tr>`;
+  const lb = lad.querySelector("tbody"); lb.innerHTML = "";
+  const cell = (p, b) => `<td class="num p" style="background:${p >= 0.005 ? `color-mix(in srgb, var(--accent) ${Math.round(p * heat)}%, transparent)` : "transparent"}">${b ? "<b>" : ""}${p >= 0.005 ? pct(p) : "–"}${b ? "</b>" : ""}</td>`;
+  m.units.forEach((u, k) => {
+    const tr = document.createElement("tr");
+    const what = u.pri > 0 ? `${u.role === "Other" ? "" : esc(u.role.toLowerCase()) + ", "}${PRI.find(p => p[0] === u.pri)[1].toLowerCase()} priority` : "not a target";
+    tr.innerHTML = `<td class="l"><span class="nw"><span class="sw" style="background:${cols[k]}"></span>${k + 1} ·</span> ${esc(u.name)} <span class="pr nw">· ${what}</span></td>` + (u.pri > 0 ? cell(R.R[k].u, true) : `<td class="num">–</td>`) + R.order.map(i => cell(R.P[i].pu[k])).join("");
+    lb.appendChild(tr);
+    if (u.base > 0) {
+      const tb2 = document.createElement("tr"); tb2.className = "bnd";
+      tb2.innerHTML = `<td class="l">${hLabel(k)}, base of ${k + 1}, dated <span class="pr nw">· ${u.base === 2 ? "key" : "useful"}</span></td>` + cell(R.R[k].b, true) + R.order.map(i => cell(R.P[i].pb[k])).join("");
+      lb.appendChild(tb2);
+    }
+  });
+  // answers: where each core lands, by the geometry alone (a horizon: crossed with rock on both sides)
+  const toss = [], sure = [];
+  R.order.forEach(i => {
+    const P = R.P[i];
+    m.units.forEach((u, k) => {
+      if (u.pri > 0) { const c = P.pu[k] / ok; if (c >= 0.25 && c <= 0.75) toss.push({ i, t: `holds ${metres(m.minsec)} m of unit ${k + 1}`, s: `unit ${k + 1}`, c }); }
+      if (u.base > 0) { const c = P.gb[k]; if (c >= 0.25 && c <= 0.75) toss.push({ i, t: `crosses ${hLabel(k)} with ${metres(m.side)} m on both sides`, s: hLabel(k), c }); else if (c >= 0.95) sure.push({ i, k, c, a: ageBoth(m, k) }); }
+    });
+  });
+  let land = `<p><b>Where each core lands.</b> `;
+  if (toss.length) {
+    toss.sort((a, b) => Math.abs(a.c - 0.5) - Math.abs(b.c - 0.5));
+    const t = toss[0], s = m.sites[t.i];
+    land += `At site ${esc(s.name)}, with a ${s.hr ? "high-res" : "2D"} pick of ±${metres(s.hr ? m.ehr : m.e2d)} m, whether the core ${t.t} is close to a coin toss: ${pct(t.c)} if the hole delivers.`;
+    const more = toss.slice(1, 4).map(x => `${x.s} at ${esc(nm(x.i))} (${pct(x.c)})`);
+    if (more.length) land += ` Also close to a toss: ${listWords(more)}${toss.length > 4 ? " and more" : ""}.`;
+  } else land += `No planned core is a coin toss: each one is either likely or unlikely to reach each target.`;
+  if (sure.length) {
+    const s0 = sure.sort((a, b) => b.a - a.a || (m.sites[b.i].hr - m.sites[a.i].hr) || b.c - a.c)[0], ss = m.sites[s0.i];
+    land += ` Site ${esc(ss.name)}, on ${ss.hr ? "a high-res line" : "2D only"}, crosses ${hLabel(s0.k)} ${s0.c > 0.995 ? "within all the error ranges entered" : `in ${pct(s0.c)} of cases`}${s0.a < 0.995 ? `; dating it then rests on the rock giving ages, ${pct(s0.a)}` : ""}.`;
+  }
+  land += `</p><p class="rule">A site in the middle of a unit is safe on a rough pick; a site meant to cross a horizon needs a sharp one, and rock on both sides that gives ages. Where the pick is from 2D only, place the core mid-unit or shoot a high-res line first.</p>`;
+  $("a-land").innerHTML = land;
+  // answers: high-res lines
+  const vh = bestSet(m, withLines(m, true).sites.map(s => siteProbs(m, s)), N), v2 = bestSet(m, m.sites.map(s => siteProbs(m, { ...s, hr: false })), N);
+  const setName = S0 => listWords(S0.map(nm));
+  const changed = vh.S.join() !== S.join();
+  let hrT = `<p><b>High-res lines.</b> A high-res line through every site would lift the best ${N} from ${f1(R.best.v)} to ${f1(vh.v)}${changed ? ` and change the choice to ${setName(vh.S)}` : ""}. `;
+  const loss = R.best.v - v2.v;
+  hrT += m.sites.some(s => s.hr) ? (loss < 0.05 ? `Without the high-res lines you have, the score would drop by less than 0.1.</p>` : `Without the high-res lines you have, the score would drop by ${f1(loss)}.</p>`) : `</p>`;
+  $("a-hr").innerHTML = hrT + `<p class="rule">A sharper pick helps most where a core is meant to cross a horizon and date it. Every site gets a site survey before drilling anyway: use the 2D picks to choose where to shoot, then re-run with the new picks.</p>`;
+  // answers: how firm the choice is against the inputs you are least sure of
+  const vs = variants(m, N), key = S0 => S0.slice().sort((a, b) => a - b).join();
+  let firm = `<p><b>How firm is the choice.</b> `;
+  if (!vs.length) firm += `Nothing to vary: every hole delivers and no site rests on 2D alone.</p>`;
+  else if (vs.every(v => key(v.S) === key(S))) {
+    const w = vs.map(v => v.what), d = w.filter(x => !x.startsWith("if")), o = w.filter(x => x.startsWith("if"));
+    firm += `The best ${N === 1 ? "well stays" : N + " stay"} the same ${[...o, d.join(" or ")].filter(Boolean).join(", and ")}.</p>`;
+  }
+  else {
+    const common = S.filter(i => vs.every(v => v.S.includes(i))).map(nm), sorted = S0 => listWords(S0.slice().sort((a, b) => a - b).map(nm));
+    firm += `The best ${N} are now ${sorted(S)}. ` + cap(vs.map((v, j) => `${v.what}, ${j ? "" : "they would be "}${key(v.S) === key(S) ? "the same" : sorted(v.S)}`).join("; ")) + ". ";
+    firm += common.length ? `${listWords(common)} ${plural(common.length, "is", "are")} in every one: the firm ${plural(common.length, "pick", "picks")}.</p>` : `No site is in every one.</p>`;
+  }
+  // what sharing the pick error does to this plan: its score against the same wells counted one by one
+  const paired = S.some((i, a) => S.some((j, b) => b > a && groupOf(m.sites[i]) === groupOf(m.sites[j]))), dA = R.alone - R.best.v;
+  $("a-firm").innerHTML = firm + `<p class="rule">The share of holes that deliver, the 2D pick error and what the picks of one horizon share are the inputs least known before a campaign. Where the choice moves with them, drill the firm sites first.` +
+    (parts(m) === 1 || !paired ? `` : Math.abs(dA) < 0.05 ? ` What the picks share changes this plan's score by less than 0.1: its back-ups guard against a hole that fails more than against the pick.` : ` What the picks share ${dA > 0 ? "takes" : "adds"} ${f1(Math.abs(dA))}: counted one by one, these wells would score ${f1(R.alone)}.`) + `</p>`;
+  // finding C: each drilled site against the plan, then what the cores change and what to drill next
+  const eOf = s => s.hr ? m.ehr : m.e2d;
+  if (!rp) {
+    $("fc-text").innerHTML = `<b>The plan is to drill ${listWords(names.map(esc))}${N > 1 ? ", in that order" : ""}.</b> When a core comes in, the page checks it against the pick, narrows where that horizon can lie at the other sites, and chooses the remaining wells again. Two made-up cases, each after the first two wells; the buttons put the example back in the form:`;
+    $("facts-body").innerHTML = `<ul class="how"><li>A core that fits the plan narrows where its horizon can lie at the other sites picked on the same seismic.</li><li>A core that does not tie puts the sites still to drill on that horizon on hold until it is re-picked.</li><li>Either way the wells still to drill are chosen again, on top of what the drilled ones gave.</li></ul>` +
+      `<p class="hint">Press a button above, or enter your own result in the form: under "After drilling", the unit identified in the core and, if the core crossed its anchor horizon, the depth at which it was met.</p>`;
+  } else {
+    const M = parts(m), D = rp.drilled.length;
+    let t = rp.drilled.map(i => {
+      const s = m.sites[i], st = s.fact ? factStatus(m, R.P[i], s) : null; let x = `<p class="item"><b>${esc(s.name)}</b>`, outD = false;
+      if (s.fact) {
+        const k = s.fact - 1, sh = factShift(m, s, k);
+        x += `, core identified as ${esc(uLabel(m, k))}: <span class="tag ${st.cls}">${st.short}</span> `;
+        if (st.cls === "clear") x += `The errors put this unit in the core ${pct(st.pa)} of the time.`;
+        else {
+          x += st.cls === "marginal" ? `Only ${pct(st.pa)} of the error combinations put this unit in the core.` : `Nothing within the errors puts this unit in the core.`;
+          if (sh && sh.by > 0) x += ` With the dip, cover and thicknesses as entered, H${s.h} would have to lie at least ${metres(sh.by)} m ${sh.dir} than the ${metres(s.z)} m picked, against a pick error of ±${metres(eOf(s))} m.`;
+          x += ` Re-check the pick and the velocity at this site${k < s.h - 1 ? ", or the core may be a younger fill, such as a channel or an incision, that the seismic does not separate" : ""}.`;
+        }
+      }
+      if (s.met != null) {
+        const d = s.met - s.z, out = Math.abs(d) - eOf(s);
+        x += `${s.fact ? " " : ": "}H${s.h} met at ${metres(s.met)} m, ${Math.abs(d) < 0.5 ? "as picked" : `${metres(Math.abs(d))} m ${d > 0 ? "deeper" : "shallower"} than picked`}: `;
+        outD = s.met >= m.depth || s.met <= s.q - m.dcover || out > 0.5;
+        if (s.met >= m.depth || s.met <= s.q - m.dcover) x += `<span class="tag below">no fit</span> That depth lies outside the cored part of the hole.`;
+        else x += out > 0.5 ? `<span class="tag below">no fit</span> ${metres(out)} m outside the pick error of ±${metres(eOf(s))} m.` : `<span class="tag clear">fits</span> Within the pick error of ±${metres(eOf(s))} m.`;
+      }
+      // each may fit on its own while the two cannot hold together
+      if (!(st && st.cls === "below") && !outD && !(siteProbs(m, s, { k: s.fact - 1, d: s.met }).tot > 1e-12))
+        x += s.fact ? ` <span class="tag below">no fit together</span> The unit and the depth cannot both hold within the errors.` : ` <span class="tag below">no fit</span> Nothing within the errors of the cover allows the horizon at that depth in the core.`;
+      return x + `</p>`;
+    }).join("");
+    const ch = [];
+    [...rp.broken].sort((a, b) => a - b).forEach(h => {
+      const on = rp.held.filter(i => m.sites[i].h === h).map(i => esc(nm(i))), at = rp.drilled.filter(i => m.sites[i].h === h).map(i => esc(nm(i)));
+      ch.push(`H${h} does not tie at ${listWords(at)}: nothing within the errors allows what the ${plural(at.length, "core", "cores")} showed. ` +
+        (on.length ? `${plural(on.length, "Site", "Sites")} ${listWords(on)}, still to drill on H${h}, ${plural(on.length, "is", "are")} held. To bring ${plural(on.length, "it", "them")} back, re-pick H${h} and enter its new depth at ${listWords(at)}, where the core must then fit, and at ${listWords(on)}.` : `No site still to drill rests on it.`));
+    });
+    rp.moved.forEach(x => {
+      const on = x.on.filter(i => eOf(m.sites[i]) > 0);
+      if (M === 1 || !on.length) return;
+      // a core that fits only rarely is used all the same, and marked
+      const rare = x.by.map(i => m.sites[i].fact ? factStatus(m, R.P[i], m.sites[i]) : null).filter(st => st && st.cls === "marginal").sort((a, b) => a.pa - b.pa)[0];
+      const lead = rare ? `On a core that fits only ${pct(rare.pa)} of the time, ` : "", kind = x.hr ? "high-res" : "2D-only";
+      if (x.lo > 0 || x.hi < M - 1) {
+        const side = x.lo >= M / 2 ? "deeper than picked" : x.hi < M / 2 ? "shallower than picked" : "within a narrower range";
+        ch.push(`${lead}H${x.h} is taken to lie ${side} at the other ${kind} sites on it: ` + on.map(i => { const s = m.sites[i], e = eOf(s);
+          return `at ${esc(nm(i))} between ${metres(Math.max(0, s.z + e * (2 * x.lo / M - 1)))} and ${metres(s.z + e * (2 * (x.hi + 1) / M - 1))} m below the seabed, not ${metres(Math.max(0, s.z - e))} to ${metres(s.z + e)} m`; }).join("; ") + ".");
+      } else if (Math.abs(x.deep - 0.5) >= 0.05) ch.push(`${lead}H${x.h} is now ${pct(Math.max(x.deep, 1 - x.deep))} likely to lie ${x.deep > 0.5 ? "deeper" : "shallower"} than picked at ${listWords(on.map(i => esc(nm(i))))}.`);
+    });
+    if (!ch.length) ch.push(M === 1 ? `The picks are set to share nothing, so a core says nothing about where a horizon lies at the other sites; the plan can still change with what the drilled wells gave.` : `The cores narrow no horizon at the sites still to drill.`);
+    const nx = rp.next.map(i => esc(nm(i))), was = rp.was.map(i => esc(nm(i)));
+    let nt, swap = false;
+    if (D >= N) nt = D > N ? `${D} wells are drilled, against ${N} planned.` : `${N === 1 ? "The well is" : `All ${N} wells are`} drilled.`;
+    else if (!nx.length) nt = `${D} of ${N} wells drilled. No site is free to drill: add sites, or re-pick the horizon of the sites held.`;
+    else {
+      nt = `${D} of ${N} wells drilled. Drill ${listWords(nx)} next${nx.length > 1 ? ", in that order" : ""}.`;
+      if (nx.join() === was.join()) nt += ` That is the rest of the plan as it stood.`;
+      else if (nx.slice().sort().join() === was.slice().sort().join()) nt += ` The same sites as before, in a new order.`;
+      else if (was.length) {
+        nt += ` Before these results the plan went on with ${listWords(was)}.`; swap = true;
+        // why a well drops out: what it and its replacement each add on top of the wells drilled and the others still to drill
+        const out = rp.keep.filter(i => !rp.next.includes(i)), inn = rp.next.filter(i => !rp.keep.includes(i));
+        if (out.length === 1 && inn.length === 1 && !rp.held.includes(out[0])) {
+          const base = rp.drilled.concat(rp.next.filter(i => i !== inn[0]));
+          const v0 = value(m, rp.P, base, rp.W), gOut = value(m, rp.P, base.concat(out), rp.W) - v0, gIn = value(m, rp.P, base.concat(inn), rp.W) - v0;
+          nt += ` On top of the wells drilled and the others still to drill, ${esc(nm(out[0]))} would now add ${f1(gOut)} and ${esc(nm(inn[0]))} adds ${f1(gIn)}.`;
+        }
+      }
+      if (nx.length < N - D) nt += ` Only ${nx.length} ${plural(nx.length, "site is", "sites are")} free to drill.`;
+    }
+    nt += ` Counting what the cores showed, ${D >= N ? "the wells drilled" : "the wells drilled and these"} would score ${f1(rp.v)} of ${fmt(R.vmax)}` + (swap && rp.vWas !== null ? `, against ${f1(rp.vWas)} with ${listWords(rp.keep.map(i => esc(nm(i))))} as planned before` : "") +
+      `. Before drilling the plan stood at ${f1(R.best.v)}${rp.v > R.best.v + 0.5 ? "; most of the rise is holes that have now delivered" : ""}.`;
+    $("fc-text").innerHTML = (D >= N ? `<b>${D > N ? `${D} wells are drilled, against ${N} planned.` : N === 1 ? "The well is drilled." : `All ${N} wells are drilled.`}</b>` :
+      !nx.length ? `<b>After ${listWords(rp.drilled.map(i => esc(nm(i))))}: no site is free to drill.</b>` :
+        `<b>After ${listWords(rp.drilled.map(i => esc(nm(i))))}: drill ${listWords(nx)} next${swap ? `, not ${listWords(rp.keep.map(i => esc(nm(i))))}` : nx.join() === was.join() ? ", as planned" : ""}.</b>`) +
+      ` The columns show the plan as it stood before drilling: ${listWords(names.map(esc))}.`;
+    $("facts-body").innerHTML = t + `<p class="item"><b>What the cores change.</b> ${ch.join(" ")}</p><p class="item" style="margin-bottom:0"><b>What to drill next.</b> ${nt}</p>`;
+  }
+  drawCols(m, R);
+  drawCurve(m, R);
+}
+
+/* ---------- checks against known answers ---------- */
+function runChecks() {
+  const ex = { ...EXAMPLE, units: EXAMPLE.units.map(u => ({ name: u[0], t: u[1], role: u[2], pri: u[3], base: u[4], age: u[5] })),
+    sites: EXAMPLE.sites.map(s => ({ name: s[0], h: s[1], z: s[2], q: s[3], dip: s[4], hr: s[5], fact: s[6], met: null })) };
+  const R = solve(ex), idx = n => ex.sites.findIndex(s => s.name === n), P = n => R.P[idx(n)];
+  const rows = [];
+  const add = (name, expected, got, tol, src) => {
+    const ok = typeof expected === "string" ? expected === got : Math.abs(got - expected) <= tol;
+    rows.push({ name, expected, got, tol: typeof expected === "string" ? "exact" : "± " + tol, src, ok });
+  };
+  const HAND = "by hand", REF = "independent count";
+  // by hand: one site, H3 at 40 m below seabed, cover 10 m, dip 10°, hole to 100 m, in the example section,
+  // with no errors and every unit giving ages; then the same with the example's age chances
+  const one = { ...ex, units: ex.units.map(u => ({ ...u, age: 100 })), ddip: 0, dcover: 0, dthick: 0, okp: 100, ehr: 0, e2d: 0 }, s1 = { name: "X", h: 3, z: 40, q: 10, dip: 10, hr: false, fact: 0 };
+  const w1 = window0(one, s1);
+  add("Core top in the section: 260 − (40 − 10)·cos 10°, m", 230.45577, w1.top, 1e-4, HAND);
+  add("Core length in the section: (100 − 10)·cos 10°, m", 88.63270, w1.bot - w1.top, 1e-4, HAND);
+  add("Pick ±30 m only: chance this core crosses H2, (70 − 63.818) / 60", 0.10304, siteProbs({ ...one, e2d: 30 }, s1).pb[1], 1e-4, HAND);
+  add("Same site, no errors: dates H3 (0 or 1)", 1, siteProbs(one, s1).pb[2], 0, HAND);
+  add("Same, with ages from 90% and 70% of cores: dates H3, 0.9 × 0.7", 0.63, siteProbs({ ...one, units: ex.units }, s1).pb[2], 1e-12, HAND);
+  add("Same site, no errors: cores unit 5 (0 or 1)", 0, siteProbs(one, s1).pu[4], 0, HAND);
+  add("A hole that stops in the cover reaches nothing", 0, siteProbs(ex, { ...s1, q: 120 }).pu.reduce((a, b) => a + b, 0), 0, HAND);
+  add("Two holes on different horizons, each 80% on a high-priority unit: 3 × (1 − 0.2²)", 2.88, value({ units: [{ pri: 3, base: 0 }] }, [{ g: 1, pu: [0.8], pb: [0] }, { g: 2, pu: [0.8], pb: [0] }], [0, 1]), 1e-12, HAND);
+  // wells on one horizon, half the pick error shared: they hit and miss together
+  const u1 = { units: [{ pri: 3, base: 0 }] }, half = (g, cu) => ({ g, M: 2, d: 1, ab: [1], cu: Float64Array.from(cu), cb: new Float64Array(2), pu: [(cu[0] + cu[1]) / 2], pb: [0] });
+  add("Two holes on one horizon, each reaching the unit only if the horizon is shallower than picked, half the pick error shared: 3 × 0.5", 1.5, value(u1, [half(1, [1, 0]), half(1, [1, 0])], [0, 1]), 1e-12, HAND);
+  add("Same, but one hole needs the horizon shallower and the other deeper: 3 × 1", 3, value(u1, [half(1, [1, 0]), half(1, [0, 1])], [0, 1]), 1e-12, HAND);
+  const p30 = siteProbs({ ...one, e2d: 30 }, s1);
+  add("Two such sites on H3, pick ±30 m only, half shared: chance one crosses H2, 0.5 × (1 − (1 − 0.20608)²)", 0.18484, 1 - misses({ ...one, e2d: 30 }, [p30, p30], [0, 1]).mb[1], 1e-4, HAND);
+  // after drilling, two sites on H3 with a pick of ±30 m and no other error: what one core says about the other site
+  const two = (x, n) => { const mm = { ...one, e2d: 30, wells: n, sites: [{ ...s1, name: "X", met: null, ...x }, { ...s1, name: "Y", z: 60, met: null }] }; return replan(mm, solve(mm)); };
+  add("H3 met 12 m deeper than picked at one site: the other, on the deeper half, expects it 30 × 0.5 m deeper", 15, two({ met: 52 }, 2).shifts[0].by, 1e-9, HAND);
+  add("A core identified as unit 3 under 30 m of cover: weights 0.25 shallower and 0.75 deeper, the other site expects 30 × 0.25 m deeper", 7.5, two({ q: 30, fact: 3 }, 2).shifts[0].by, 1e-9, HAND);
+  add("A core identified as unit 7, which no error allows: the other site on that horizon is held", "Y", two({ fact: 7 }, 2).held.map(i => "XY"[i]).join(""), 0, HAND);
+  add("Example: most the score can be, priorities plus boundary values", 23, R.vmax, 0, HAND);
+  add("Site J, no errors: metres of unit 2 in the core, 10·cos 9°", 9.87688, 210 - window0(ex, ex.sites[idx("J")]).top, 1e-4, HAND);
+  add("Fact at B, unit 1: H2 must lie deeper by 30 + 90 / cos 6° − 65, m", 55.49575, factShift(ex, ex.sites[idx("B")], 0).by, 1e-4, HAND);
+  // independent count: two million random draws of the errors per site (sites_ref.py)
+  add("Site J: cores unit 2, chance", 0.4660, P("J").pu[1], 0.005, REF);
+  add("Site J: dates H2, chance", 0.2662, P("J").pb[1], 0.005, REF);
+  add("Site F: dates H4, chance", 0.4023, P("F").pb[3], 0.005, REF);
+  add("Site D: dates H3, chance", 0.2688, P("D").pb[2], 0.005, REF);
+  add("Site K: cores unit 5, chance", 0.4663, P("K").pu[4], 0.005, REF);
+  add("Site B: cores unit 4, chance", 0.1292, P("B").pu[3], 0.005, REF);
+  add("Site G: cores unit 6, chance", 0.2009, P("G").pu[5], 0.005, REF);
+  add("Site D: the core touches unit 5 at all, chance (used after drilling)", 0.0286, P("D").pa[4], 0.005, REF);
+  add("Best five sites", "BFIJL", R.best.S.map(i => ex.sites[i].name).sort().join(""), 0, REF);
+  add("Best five: score", 16.9170, R.best.v, 0.02, REF);
+  add("Drilling order", "JFLIB", R.order.map(i => ex.sites[i].name).join(""), 0, REF);
+  add("Best single well: score", 6.5333, R.curve[0].v, 0.02, REF);
+  add("Best ten wells: score", 19.6239, R.curve[9].v, 0.02, REF);
+  add("Plan: chance unit 4 is cored", 0.9126, R.R[3].u, 0.005, REF);
+  add("First reserve", "K", ex.sites[R.reserves[0].i].name, 0, REF);
+  add("First reserve: adds to the score", 0.8305, R.reserves[0].g, 0.02, REF);
+  add("Stand-in for J, the first well", "C", ex.sites[R.standins[0].j].name, 0, REF);
+  add("Stand-in for J: score", 16.7856, R.standins[0].v, 0.02, REF);
+  const vh = bestSet(ex, ex.sites.map(s => siteProbs(ex, { ...s, hr: true })), 5);
+  add("High-res line at every site: best five", "ACFJL", vh.S.map(i => ex.sites[i].name).join(""), 0, REF);
+  add("High-res line at every site: score", 17.5891, vh.v, 0.02, REF);
+  add("2D only at every site: score", 16.8884, bestSet(ex, ex.sites.map(s => siteProbs(ex, { ...s, hr: false })), 5).v, 0.02, REF);
+  const vv = variants(ex, 5).map(v => v.S.map(i => ex.sites[i].name).sort().join(""));
+  add("Every hole delivers: best five", "CFIJL", vv[0], 0, REF);
+  add("2D pick ±15 m: best five", "ACFJL", vv[1], 0, REF);
+  add("2D pick ±45 m: best five", "CFIJL", vv[2], 0, REF);
+  add("No pick error shared: best five", "BFIJL", vv[3], 0, REF);
+  // wells on one horizon, counted together
+  add("Sites F and K, both on H4: chance one of them dates H4", 0.6076, 1 - misses(ex, R.P, [idx("F"), idx("K")]).mb[3], 0.005, REF);
+  add("Sites B and J, both on H2: chance one of them cores unit 2", 0.8814, 1 - misses(ex, R.P, [idx("B"), idx("J")]).mu[1], 0.005, REF);
+  // after drilling: the made-up results of the first two wells, then the wells to drill next
+  const after = f => { const mm = { ...ex, sites: ex.sites.map(s => ({ ...s, fact: f[s.name] ? f[s.name][0] : 0, met: f[s.name] ? f[s.name][1] : null })) }; return replan(mm, R); };
+  const mv = after(DEMO.moves), br = after(DEMO.breaks), names = a => a.map(i => ex.sites[i].name).join("");
+  add("After J and F, H2 met 13 m deeper at J: wells to drill next", "LIG", names(mv.next), 0, REF);
+  add("Same: score with what the cores showed", 19.1881, mv.v, 0.02, REF);
+  add("After J and F, the core at J identified as unit 1: wells to drill next", "CIL", names(br.next), 0, REF);
+  add("Same: site held on the horizon that does not tie", "B", names(br.held), 0, REF);
+  add("Same: score with what the cores showed", 17.0060, br.v, 0.02, REF);
+  const tb = $("checks").querySelector("tbody"); tb.innerHTML = "";
+  const show = v => typeof v === "string" ? v : Math.abs(v) < 1e-9 ? "0" : String(+v.toPrecision(6));
+  for (const r of rows) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.name}</td><td class="num">${show(r.expected)}</td><td class="num">${show(r.got)}</td><td class="tol">${r.tol}</td><td class="src">${r.src}</td><td class="st ${r.ok ? "ok" : "no"}">${r.ok ? "PASS" : "FAIL"}</td>`;
+    tb.appendChild(tr);
+  }
+  const nOk = rows.filter(r => r.ok).length, all = nOk === rows.length;
+  const label = all ? `ALL ${rows.length} PASS` : `${rows.length - nOk} of ${rows.length} FAIL`;
+  $("checks-sum").innerHTML = `<span class="${all ? "pass" : "fail"}">${label}</span>`;
+  document.documentElement.setAttribute("data-checks", label);
+}
+
+/* ---------- wiring ---------- */
+let timer = 0, rtimer = 0;
+const later = () => { clearTimeout(timer); timer = setTimeout(render, 200); };
+document.querySelectorAll("#form .card input[type=number]").forEach(i => { if (i.id) { i.setAttribute("inputmode", "decimal"); i.addEventListener("input", later); } });
+$("add-unit").addEventListener("click", () => { if ($("units").children.length < MAXU) { $("units").appendChild(unitRow([`Unit ${$("units").children.length + 1}`, 50, "Other", 1, 0, 70])); numberUnits(); render(); } });
+$("add-site").addEventListener("click", () => {
+  if ($("sites").children.length >= MAXS) return;
+  const used = new Set([...$("sites").children].map(r => r.querySelector(".nm").value.trim()));
+  let name = "M"; for (const c of "ABCDEFGHIJKLMNOPQRSTUVWXYZ") if (!used.has(c)) { name = c; break; }
+  $("sites").appendChild(siteRow([name, 1, 50, 10, 5, false, 0])); labelSites(); syncSiteOptions(); render();
+});
+function demo(which, still) {
+  fillForm(EXAMPLE);
+  [...$("sites").children].forEach(r => {
+    const f = DEMO[which][r.querySelector(".nm").value.trim()];
+    r.dataset.fact = f && f[0] <= $("units").children.length ? f[0] : 0; r.querySelector(".met").value = f && f[1] !== null ? f[1] : "";
+  });
+  syncSiteOptions(); render(); if (!still) $("find-c").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+$("demo-facts").addEventListener("click", () => demo("moves"));
+$("demo-facts2").addEventListener("click", () => demo("breaks"));
+document.querySelectorAll(".clear-facts").forEach(b => b.addEventListener("click", () => { [...$("sites").children].forEach(r => { r.dataset.fact = 0; r.querySelector(".met").value = ""; }); syncSiteOptions(); render(); }));
+$("share").addEventListener("change", render);
+$("reset").addEventListener("click", () => { fillForm(EXAMPLE); render(); });
+// redraw the figures on resize with their own timer, so a resize never cancels a render that typing has queued
+window.addEventListener("resize", () => { clearTimeout(rtimer); rtimer = setTimeout(() => { drawMethod(); if (last) { drawCols(last.m, last.R); drawCurve(last.m, last.R); } }, 150); });
+$("facts-body").addEventListener("click", e => { const b = e.target.closest("[data-demo]"); if (b) demo(b.dataset.demo); });
+// the bar at the bottom shows the answer while the form is on screen and the verdict is not
+try {
+  let vIn = true, fIn = false;
+  new IntersectionObserver(es => { es.forEach(e => { if (e.target.id === "verdict") vIn = e.isIntersecting; else fIn = e.isIntersecting; }); $("mini").classList.toggle("show", !vIn && fIn); }).observe($("verdict"));
+  new IntersectionObserver(es => { es.forEach(e => { fIn = e.isIntersecting; }); $("mini").classList.toggle("show", !vIn && fIn); }).observe($("form"));
+} catch (e) {}
+$("mini").addEventListener("click", () => $("verdict").scrollIntoView({ behavior: "smooth", block: "center" }));
+$("mini").addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("verdict").scrollIntoView({ behavior: "smooth", block: "center" }); } });
+if (window.matchMedia) matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
+fillForm(EXAMPLE);
+render();
+runChecks();
+// ?demo=moves or ?demo=breaks opens the page with those made-up results filled in
+if (Object.prototype.hasOwnProperty.call(DEMO, q.get("demo") || "")) demo(q.get("demo"), true);
+// ?probe=1 writes the page width and where the findings sit, for the build checks and the README picture
+if (q.has("probe")) {
+  const r = document.querySelector(".finds").getBoundingClientRect();
+  document.documentElement.setAttribute("data-width", document.documentElement.scrollWidth + "/" + innerWidth);
+  document.documentElement.setAttribute("data-finds", Math.round(r.top + scrollY) + "/" + Math.round(r.bottom + scrollY));
+}
+</script>
+</body>
+</html>
