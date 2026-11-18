@@ -74,6 +74,7 @@
   .find .fl { display: inline-block; min-width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 6px; background: var(--accent); color: var(--page); font-size: 15px; margin-right: 9px; vertical-align: 1px; }
   .find .ft { margin: 0 0 10px; }
   .find .rule { font-size: 13.5px; color: var(--ink-2); margin: 8px 0 0; }
+  .find .pub { font-size: 13.5px; margin: 10px 0 0; padding: 2px 0 2px 10px; border-left: 3px solid var(--accent); }
   .find figure { margin: 0; }
   .find .btns { margin: 0 0 4px; }
   .cgrid { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; align-items: start; margin-top: 12px; }
@@ -198,10 +199,10 @@
 </head>
 <body>
 <div class="wrap">
-  <p class="kicker">how-sure · tool 03 · shallow stratigraphic drilling · v1.2</p>
+  <p class="kicker">how-sure · tool 03 · shallow stratigraphic drilling · v1.2.1</p>
   <h1>Five wells: which five?</h1>
   <p class="lead">Planning a shallow stratigraphic drilling campaign when only a few wells are allowed: which sites to drill, what their cores can date, and what the first cores change.</p>
-  <p class="why">Where older units come up beneath the seabed, short cored holes give the first hard data on source rock, reservoir and seal in a basin with no wells. My part as the geologist: planning and supervision of the first shallow stratigraphic drilling campaign on the Russian Arctic shelf (<a href="https://doi.org/10.2113/RGG20224459">Malyshev et al., 2023</a>, which I co-authored): 10 wells, 300 m of core, 13 stratigraphic units; those figures are published. The campaign was planned for five wells and drilled ten in one season. The example below is made up.</p>
+  <p class="why">Where older units come up beneath the seabed, short cored holes give the first hard data on source rock, reservoir and seal in a basin with no wells. My part as the geologist: planning and supervision of the first shallow stratigraphic drilling campaign on the Russian Arctic shelf (<a href="https://doi.org/10.2113/RGG20224459">Malyshev et al., 2023</a>, which I co-authored): 10 wells, 300 m of core, 13 stratigraphic units; those figures are published. The campaign was planned for five wells and drilled ten in one season. The example below is made up; the last line under each finding says what the published paper reports.</p>
 
   <section class="finds" aria-label="Three findings on the made-up example">
     <article class="find" id="find-a">
@@ -215,6 +216,7 @@
         <figcaption id="curve-cap"></figcaption>
       </figure>
       <p class="rule">In most drilling, fewer wells is the aim. Here it is the other way round: the product is core, and the scarce resource is the weather window and the vessel's time, so each extra hole in the same season is another try at the targets. A curve like this is the case for a number of wells.</p>
+      <p class="pub"><b>In the published campaign.</b> Sites were chosen as principal and reserve ones, aiming at the widest stratigraphic range with wells shallower than 100 m. One of the ten wells was a reserve site, drilled during a storm mooring; it penetrated the same Upper Devonian unit as one of the principal wells.</p>
     </article>
     <article class="find" id="find-b">
       <h2><span class="fl">B</span>The weak link is dating, not coring</h2>
@@ -227,6 +229,7 @@
         <figcaption>Not to scale. Each hole is drilled through the cover without coring, then cored. Hole 1 sits in the middle of a unit. Hole 2 crosses a boundary and can date it, if the pick puts the boundary inside the core; the bar is the pick error.</figcaption>
       </figure>
       <p class="rule">A core in the middle of a unit is safe on a rough pick. A core across a boundary is worth more, but needs a sharp pick and rock that gives ages on both sides. The same choice comes up when core points are set in an exploration or appraisal well from a seismic depth with an error.</p>
+      <p class="pub"><b>In the published campaign.</b> Ages came from conodonts, fish remains, spores and other fossils; in well SSD 23 no macrofauna was encountered and the age came from palynology. The fossil ages moved two boundaries on the seismic: the Ordovician–Silurian boundary to an unconformity earlier taken to separate Silurian and Devonian, and the Silurian–Devonian boundary to near a horizon earlier read as lying inside the Lower Devonian.</p>
     </article>
     <article class="find wide" id="find-c">
       <h2><span class="fl">C</span>The first cores change the plan</h2>
@@ -242,6 +245,7 @@
         </figure>
         <div id="facts"><div id="facts-body"></div></div>
       </div>
+      <p class="pub"><b>In the published campaign.</b> The later sites were adjusted from new seismic rather than from cores: while one vessel drilled, a second shot ultrahigh-resolution seismic across the planned sites. Within a well, total depth and coring intervals were decided from the rock description sent from the site. Overall, the first results tend to make the section older than the base model implied.</p>
     </article>
   </section>
 
