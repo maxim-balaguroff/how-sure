@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How much, and how sure?</title>
+<meta name="description" content="A prospect's oil in place as a range, P90 to P10: where the range comes from, which inputs drive it, and which data could change the decision.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="How much, and how sure?">
+<meta property="og:description" content="A prospect's oil in place as a range, P90 to P10: where the range comes from, which inputs drive it, and which data could change the decision.">
+<meta property="og:url" content="https://maxim-balaguroff.github.io/how-sure/04-volume-range/volume-range.html">
+<meta property="og:image" content="https://maxim-balaguroff.github.io/how-sure/04-volume-range/cover.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1254">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    color-scheme: light;
+    --page: #ffffff; --surface: #fafaf8; --card: #ffffff; --ink: #111110; --ink-2: #52514e; --muted: #6b6963;
+    --rule: #e2e1db; --grid: #ecebe6; --axis: #b9b8ae; --accent: #2a78d6; --accent-soft: #e6f0fb;
+    --ok: #1f8a4c; --ok-soft: #e5f4ea; --warn: #965a00; --warn-soft: #fbf0dc; --bad: #b3261e; --bad-soft: #fbe7e5; --focus: #2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #9a988f;
+      --rule: #34332f; --grid: #2a2a27; --axis: #6a6961; --accent: #6aa7ee; --accent-soft: #1d2b3c;
+      --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f; --bad: #f08a80; --bad-soft: #3a1c19;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #9a988f;
+    --rule: #34332f; --grid: #2a2a27; --axis: #6a6961; --accent: #6aa7ee; --accent-soft: #1d2b3c;
+    --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f; --bad: #f08a80; --bad-soft: #3a1c19;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--page); color: var(--ink); }
+  body { font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif; font-size: 15px; line-height: 1.5; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 40px; }
+  .kicker { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 6px; }
+  h1 { font-size: 32px; line-height: 1.12; margin: 0 0 10px; letter-spacing: -.015em; }
+  .lead { font-size: 19px; max-width: 780px; margin: 0 0 24px; }
+  .why { font-size: 14.5px; color: var(--ink-2); max-width: 780px; margin: -12px 0 24px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 10px; }
+  h2.sec { font-size: 22px; line-height: 1.2; text-transform: none; letter-spacing: -.01em; color: var(--ink); margin: 30px 0 8px; }
+  .card { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; min-width: 0; }
+  .finds { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0 0 8px; }
+  .find { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; min-width: 0; }
+  .find.wide { grid-column: 1 / -1; }
+  .find h2 { font-size: 19px; line-height: 1.25; text-transform: none; letter-spacing: 0; color: var(--ink); margin: 0 0 8px; }
+  .find .fl { display: inline-block; min-width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 6px; background: var(--accent); color: var(--page); font-size: 15px; margin-right: 9px; vertical-align: 1px; }
+  .find .ft { margin: 0 0 10px; }
+  .find .rule { font-size: 13.5px; color: var(--ink-2); margin: 8px 0 0; }
+  .cgrid { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; align-items: start; }
+  .cgrid > * { min-width: 0; }
+  .cgrid p { margin: 0 0 8px; }
+  figure { margin: 0; }
+  figcaption { font-size: 13px; color: var(--ink-2); margin: 4px 0 0; }
+  svg { display: block; width: 100%; height: auto; }
+  svg text { font-family: "Segoe UI", system-ui, Arial, sans-serif; font-size: 12px; fill: var(--ink-2); }
+  svg .b { fill: var(--ink); font-weight: 700; }
+  svg .ax { stroke: var(--axis); stroke-width: 1; fill: none; }
+  svg .gr { stroke: var(--grid); stroke-width: 1; }
+  svg .ln { stroke: var(--accent); stroke-width: 2; fill: none; }
+  svg .dash { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 4 3; fill: none; }
+  svg .need { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 5 3; }
+  svg .bar { fill: var(--accent); }
+  svg .barm { fill: var(--axis); }
+  svg .dot { fill: var(--accent); stroke: var(--card); stroke-width: 2; }
+  svg .dotm { fill: var(--axis); stroke: var(--card); stroke-width: 2; }
+  svg .seg { stroke: var(--accent); stroke-width: 4; stroke-linecap: round; }
+  svg .segm { stroke: var(--axis); stroke-width: 4; stroke-linecap: round; }
+  svg .tri { fill: var(--ink); }
+  svg .halo { paint-order: stroke; stroke: var(--card); stroke-width: 3px; stroke-linejoin: round; }
+  .inrow { display: grid; grid-template-columns: 1fr 340px; gap: 16px; align-items: start; margin-bottom: 16px; }
+  .inrow > * { min-width: 0; }
+  .legend { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 8px; display: block; }
+  .exnote { font-size: 13px; color: var(--ink-2); margin: 0 0 12px; }
+  .rhead, .row { display: grid; grid-template-columns: minmax(130px, 1fr) 96px 96px 132px; gap: 6px; align-items: center; }
+  .rhead { font-size: 12.5px; color: var(--muted); margin-bottom: 4px; align-items: end; }
+  .rhead .r { text-align: right; }
+  .row { margin-bottom: 6px; }
+  .row .nm { font-size: 14px; }
+  .row .cl { display: none; font-size: 12px; color: var(--muted); }
+  .field { display: grid; grid-template-columns: 1fr 150px; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .field label { font-size: 14px; }
+  .field.full { grid-template-columns: 1fr; }
+  .hint { font-size: 12.5px; color: var(--muted); margin: 6px 0 0; }
+  input[type=number], select { width: 100%; font: inherit; font-size: 14px; padding: 5px 7px; border: 1px solid var(--rule); border-radius: 6px; background: var(--page); color: var(--ink); min-width: 0; }
+  input[type=number] { font-variant-numeric: tabular-nums; text-align: right; }
+  input:focus, select:focus { outline: 2px solid var(--focus); outline-offset: 0; border-color: transparent; }
+  input[aria-invalid="true"] { border-color: var(--bad); background: var(--bad-soft); }
+  button { font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; }
+  button:hover { border-color: var(--axis); }
+  button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .errs { border: 1px solid var(--bad); background: var(--bad-soft); color: var(--bad); border-radius: 8px; padding: 10px 14px; margin: 0 0 14px; }
+  .errs ul { margin: 0; padding-left: 18px; }
+  .verdict { border-radius: 10px; padding: 14px 16px; margin: 0 0 14px; border: 1px solid transparent; }
+  .verdict .v { font-size: 20px; font-weight: 700; line-height: 1.25; }
+  .verdict .s { color: var(--ink-2); margin-top: 4px; }
+  .verdict.clear { background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+  .verdict.clear .v { color: var(--ok); }
+  .verdict.marginal { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+  .verdict.marginal .v { color: var(--warn); }
+  .verdict.below { background: var(--bad-soft); border-color: color-mix(in srgb, var(--bad) 35%, transparent); }
+  .verdict.below .v { color: var(--bad); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; }
+  .stat .n { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; overflow-wrap: anywhere; }
+  .stat .l { font-size: 12.5px; color: var(--ink-2); }
+  .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; margin: 14px 0; }
+  .answers > * { min-width: 0; }
+  .answer { border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; }
+  .answer p { margin: 0; }
+  .answer h3 { font-size: 15px; margin: 0 0 4px; }
+  .answer .rule { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--rule); font-size: 14px; vertical-align: top; }
+  th:first-child, td:first-child { text-align: left; }
+  #tbl td { white-space: nowrap; } #tbl td:first-child { white-space: normal; }
+  th { font-size: 12.5px; color: var(--ink-2); font-weight: 600; vertical-align: bottom; }
+  .tablenote { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+  .tag.yes { background: var(--accent-soft); color: var(--accent); }
+  .tag.no { background: var(--surface); color: var(--ink-2); border: 1px solid var(--rule); }
+  details { margin-top: 24px; border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; background: var(--surface); }
+  details > summary + * { margin-top: 12px; }
+  summary { cursor: pointer; font-weight: 700; }
+  summary .pass { color: var(--ok); }
+  summary .fail { color: var(--bad); }
+  .plain ul, .plain ol { margin: 0; padding-left: 18px; }
+  .plain li { margin-bottom: 6px; }
+  .lim { margin: 28px 0 14px; }
+  #checks td.st { font-weight: 700; }
+  #checks td.st.ok { color: var(--ok); }
+  #checks td.st.no { color: var(--bad); }
+  #checks td.src { text-align: left; color: var(--ink-2); font-size: 13px; }
+  footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--rule); color: var(--ink-2); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  a { color: var(--accent); }
+  .nw { white-space: nowrap; }
+  @media (max-width: 1100px) { .inrow { grid-template-columns: 1fr; } }
+  @media (max-width: 980px) { .finds, .cgrid, .answers { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 760px) {
+    h1 { font-size: 26px; }
+    .lead { font-size: 17px; }
+    input[type=number], select { font-size: 16px; min-height: 44px; }
+    button { min-height: 44px; }
+    .rhead { display: none; }
+    .row { grid-template-columns: 1fr 1fr; border: 1px solid var(--rule); border-radius: 8px; padding: 8px; margin-bottom: 8px; align-items: end; }
+    .row .nm { grid-column: 1 / -1; font-weight: 600; }
+    .row .c-shape { grid-column: 1 / -1; }
+    .row .cl { display: block; margin-bottom: 2px; }
+  }
+  @media (max-width: 600px) { #checks .tol, #checks .src { display: none; } }
+  @media (max-width: 420px) { th, td { padding: 6px 4px; font-size: 13.5px; } .stat .n { font-size: 19px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">how-sure · tool 04 · prospect volume as a range · v1.3</p>
+  <h1>How much, and how sure?</h1>
+  <p class="lead">A prospect's oil in place as a range, P90 to P10: where the range comes from, which inputs drive it, and which data could change the decision.</p>
+  <p class="why">Maxim Balagurov, petroleum geologist. In my own work I ran probabilistic volumetrics (P90/P50/P10) using a Monte Carlo spreadsheet; this page shows the reasoning. Oil in place here is stock-tank oil initially in place (STOIIP). P90 is the low case, the volume exceeded with a 90 % chance, and P10 the high case. The example below is made up.</p>
+
+  <div id="errs" class="errs" hidden></div>
+
+  <section class="finds" aria-label="Three findings on the made-up example">
+    <article class="find" id="find-a">
+      <h2><span class="fl">A</span>The low case is not every input at its low end</h2>
+      <p class="ft" id="fa-text"></p>
+      <figure>
+        <svg id="curve" viewBox="0 0 680 262" role="img" aria-labelledby="curve-title curve-desc">
+          <title id="curve-title">Chance of exceeding each volume</title>
+          <desc id="curve-desc">The chance that the oil in place exceeds a volume, against that volume on a logarithmic scale, with P90, P50 and P10 marked, and the products of all inputs at their unfavourable and at their favourable ends.</desc>
+        </svg>
+        <figcaption id="curve-cap"></figcaption>
+      </figure>
+      <p class="rule">Each input's low is a value it beats nine times in ten. All five landing at that end together is far rarer, so their product sits well below the P90. The same holds at the high end.</p>
+    </article>
+    <article class="find" id="find-b">
+      <h2><span class="fl">B</span>A few inputs drive the range</h2>
+      <p class="ft" id="fb-text"></p>
+      <figure>
+        <svg id="tornado" viewBox="0 0 680 262" role="img" aria-labelledby="tor-title tor-desc">
+          <title id="tor-title">What each input does to the volume, one at a time</title>
+          <desc id="tor-desc">One bar per input: the volume with that input at its low and at its high value and the others at their P50, on a logarithmic scale, widest first.</desc>
+        </svg>
+        <figcaption id="tor-cap"></figcaption>
+      </figure>
+      <p class="rule">The variance is that of the volume on a logarithmic scale, each input taken alone. Sharpening an input that accounts for a few per cent of it leaves the range almost as wide.</p>
+    </article>
+    <article class="find wide" id="find-c">
+      <h2><span class="fl">C</span>Which data could change the decision</h2>
+      <p class="ft" id="fc-text"></p>
+      <div class="cgrid">
+        <figure>
+          <svg id="know" viewBox="0 0 680 250" role="img" aria-labelledby="know-title know-desc">
+            <title id="know-title">Chance of reaching the minimum volume if one input were known</title>
+            <desc id="know-desc">One line per input: the chance that the volume exceeds the minimum if that input were known to sit at its low value and at its high value. A dashed line marks the required chance.</desc>
+          </svg>
+          <figcaption id="know-cap"></figcaption>
+        </figure>
+        <div id="know-body"></div>
+      </div>
+      <p class="rule">Each input is tested as if it could be known exactly. Real data only narrows a range, so this is the most that data on one input could do. Data can only be worth getting if its answer could move you across the line. Before the well, area is what seismic and depth conversion can sharpen; pay, porosity and saturation mostly wait for the well or rest on analogues. Tools 02 and 03 of this set ask the same of a survey and of a drilling campaign.</p>
+    </article>
+  </section>
+
+  <h2 class="sec">Try your own prospect</h2>
+  <form id="form" autocomplete="off" onsubmit="return false">
+    <p class="exnote">The form holds the made-up example: a prospect with seismic and nearby wells, so its ranges are fairly tight. An undrilled frontier prospect often has a P10 ten times its P90 or more. Change any number and the findings above and the numbers below update.</p>
+    <div class="inrow">
+      <section class="card" aria-labelledby="lg-in">
+        <span class="legend" id="lg-in">Inputs</span>
+        <div class="rhead"><span>Input</span><span class="r">Low</span><span class="r">High</span><span>Distribution</span></div>
+        <div id="rows"></div>
+        <p class="hint">Low and high are the values the input exceeds with a 90 % and a 10 % chance. They describe the uncertainty in the average over the prospect, not the spread inside the reservoir. Lognormal suits positive, right-skewed quantities such as area and thickness; normal is adequate for average porosity, Sw and Bo while the range stays well inside 0 to 1. Set low equal to high to fix an input.</p>
+        <div class="btns" style="margin-top:10px"><button type="button" id="reset">Back to the example</button></div>
+      </section>
+      <section class="card" aria-labelledby="lg-dec">
+        <span class="legend" id="lg-dec">The decision</span>
+        <div class="field"><label for="unit">Volume in</label><select id="unit"><option value="bbl">million barrels</option><option value="m3">million m³</option></select></div>
+        <div class="field"><label for="thr">Minimum volume to justify a well</label><input type="number" id="thr" step="any" min="0"></div>
+        <div class="field"><label for="need">Required chance of exceeding it, %</label><input type="number" id="need" step="1" min="1" max="99"></div>
+        <span class="legend" style="margin-top:14px">Correlated inputs</span>
+        <div class="field"><label for="lps">Porosity and Sw</label><select id="lps"><option value="0">independent</option><option value="-0.5">moderate (−0.5)</option><option value="-0.8">strong (−0.8)</option></select></div>
+        <div class="field"><label for="lah">Area and net pay</label><select id="lah"><option value="0">independent</option><option value="0.5">moderate (0.5)</option><option value="0.8">strong (0.8)</option></select></div>
+        <p class="hint">Better rock tends to hold less water. A deeper contact gives both a larger area and a thicker average pay.</p>
+        <span class="legend" style="margin-top:14px">If your ranges run narrow</span>
+        <div class="field"><label for="widen">Widen all input ranges</label><select id="widen"><option value="1">as entered</option><option value="1.25">1.25 times as wide</option><option value="1.5">1.5 times as wide</option><option value="2">twice as wide</option></select></div>
+        <p class="hint">If past predictions fell outside their ranges more often than they should, the ranges were too narrow. <a href="https://github.com/maxim-balaguroff/how-sure/tree/main/01-prediction-vs-result">Tool 01</a> measures by how much.</p>
+      </section>
+    </div>
+  </form>
+
+  <main id="out">
+    <h2 class="sec">The numbers in full</h2>
+    <div id="verdict" class="verdict"></div>
+    <div class="stats" id="stats"></div>
+    <div class="tablewrap"><table id="tbl"></table></div>
+    <p class="tablenote" id="tbl-note"></p>
+    <div class="answers" id="answers"></div>
+  </main>
+
+  <section class="card lim plain" aria-labelledby="lim-h">
+    <h2 id="lim-h">Limits</h2>
+    <ul>
+      <li><b>The numbers are made up.</b> No survey, well or company data went into the example.</li>
+      <li><b>The range is only as good as the input ranges.</b> The page multiplies the ranges you give it; it cannot tell a careful range from a hopeful one. A look-back on past predictions can.</li>
+      <li><b>This is the volume if the prospect works.</b> The chance that there is a trap, a reservoir, a seal and a charge at all is a separate number and is not in here.</li>
+    </ul>
+    <details>
+      <summary>More limits</summary>
+      <ul>
+        <li>Oil in place only: no recovery factor, no gas, no column height tied to a spill point. Area times average net pay stands in for a mapped rock volume.</li>
+        <li>The minimum volume is set on oil in place to keep recovery out of the page. In practice it is set on recoverable oil.</li>
+        <li>Two distributions, lognormal and normal, both set by a low and a high value. A skewed fraction or a range with hard ends is not represented. Values below zero count as zero and Sw above 1 as 1; a widened normal range can still reach values that make no physical sense, such as Bo below 1.</li>
+        <li>Only two pairs of inputs can be correlated, each through one number. The bars and the variance shares in finding B take inputs one at a time and ignore correlation.</li>
+        <li>Finding C tests one input at a time, as if it could be known exactly. Two inputs known together are not tested.</li>
+        <li>The decision here is a volume and a chance. Cost, price and timing are left out on purpose.</li>
+      </ul>
+    </details>
+  </section>
+
+  <details class="plain">
+    <summary>How it works</summary>
+    <ol>
+      <li>Oil in place = area × net pay × porosity × (1 − Sw) ÷ Bo, times 6.2898 to turn km²·m into million barrels.</li>
+      <li>The page takes 50,000 sets of the five inputs. A fixed pattern, with no random numbers, spreads them evenly over all five ranges at once, so the tails are covered and the same inputs always give the same answer.</li>
+      <li>The 50,000 volumes are sorted. P90 is the value 10 % of the way up, P50 the middle, P10 the value 90 % of the way up; the mean is their average, and the chance of the minimum volume is the share of volumes above it.</li>
+      <li>"One at a time" varies one input from its low to its high value with the others at their P50. An input's share of the variance is its swing squared, on a logarithmic scale, over the sum for all inputs.</li>
+      <li>"If it were known" holds one input at a value, takes the others again and reads the chance of the minimum volume. The value at which that chance equals the required one is found by halving the interval. If the input is correlated with a partner, the partner follows it.</li>
+      <li>Correlated inputs share part of their position in the range: with a correlation of 0.5, a quarter of one input's variance is explained by the other.</li>
+      <li>Widening multiplies each input's spread around its P50 and the page then works with the widened low and high values throughout.</li>
+    </ol>
+  </details>
+
+  <details class="plain">
+    <summary>Rules it uses</summary>
+    <ul>
+      <li><b>P90 is the low case.</b> The volume exceeded with a 90 % chance, as in petroleum usage; other disciplines count the other way round.</li>
+      <li><b>Low and high inputs are P90 and P10 too.</b> They span eight outcomes in ten, short of the extremes.</li>
+      <li><b>Lows do not multiply into a low case.</b> Run the draws, or at least do not report the product of the lows as P90.</li>
+      <li><b>The mean sits above the P50</b> when the range leans towards large volumes, as it almost always does when sizes multiply. Swanson's rule, 0.3 × P90 + 0.4 × P50 + 0.3 × P10, gets close to it.</li>
+      <li><b>Independence is an assumption.</b> If the large inputs rise together, the range is wider than independent draws say.</li>
+    </ul>
+  </details>
+
+  <details id="checks-box">
+    <summary>Checks: <span id="checks-sum"></span></summary>
+    <p class="hint">The checks run in your browser each time the page opens, on fixed cases, whatever is in the form. "By hand" answers come from formulas and arithmetic written out beside them. "Independent calculation" answers come from <a href="volume_ref.py">volume_ref.py</a>: plain Monte Carlo, 4,000,000 draws per case, sharing no code with this page.</p>
+    <div class="tablewrap"><table id="checks"></table></div>
+  </details>
+
+  <footer>
+    <span>Built with AI assistance; the geology and the checks are mine.</span>
+    <span>Maxim Balagurov, petroleum geologist</span>
+    <span><a href="https://github.com/maxim-balaguroff/how-sure">github.com/maxim-balaguroff/how-sure</a></span>
+    <span>CC BY 4.0</span>
+  </footer>
+</div>
+
+<script>
+"use strict";
+// ---------- constants and the fixed points ----------
+const Z = 1.2815515655446004, N = 50000, C_BBL = 6.2898;
+const KEYS = ["area", "pay", "por", "sw", "bo"];
+const META = {
+  area: { name: "Area", unit: "km²", dec: 0, down: false },
+  pay:  { name: "Average net pay", unit: "m", dec: 0, down: false },
+  por:  { name: "Porosity", unit: "", dec: 2, down: false },
+  sw:   { name: "Water saturation, Sw", unit: "", dec: 2, down: true },
+  bo:   { name: "Oil formation volume factor, Bo", unit: "", dec: 2, down: true }
+};
+const SHORT = { area: "area", pay: "net pay", por: "porosity", sw: "Sw", bo: "Bo" };
+const EXAMPLE = {
+  spec: { area: [12, 40, "lognormal"], pay: [15, 45, "lognormal"], por: [0.14, 0.22, "normal"], sw: [0.25, 0.45, "normal"], bo: [1.2, 1.4, "normal"] },
+  unit: "bbl", thr: 230, need: 50, lps: 0, lah: 0, widen: 1
+};
+
+function invNorm(p) {            // Acklam's rational approximation of the inverse normal
+  const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+  const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01];
+  const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+  const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00];
+  const pl = 0.02425;
+  if (p < pl) { const q = Math.sqrt(-2 * Math.log(p)); return (((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1); }
+  if (p > 1 - pl) { const q = Math.sqrt(-2 * Math.log(1 - p)); return -(((((c[0] * q + c[1]) * q + c[2]) * q + c[3]) * q + c[4]) * q + c[5]) / ((((d[0] * q + d[1]) * q + d[2]) * q + d[3]) * q + 1); }
+  const q = p - 0.5, r = q * q;
+  return (((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * q / (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
+}
+function normCdf(x) {            // Abramowitz and Stegun 7.1.26
+  const t = 1 / (1 + 0.3275911 * Math.abs(x) / Math.SQRT2);
+  const e = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x / 2);
+  return x >= 0 ? 0.5 * (1 + e) : 0.5 * (1 - e);
+}
+// every input: N normal scores. The N points fill the five-dimensional range evenly by a fixed pattern
+// (an additive sequence: point i sits at the fractional part of i times a fixed step in each direction),
+// so the same inputs always give the same answer and the tails are covered better than by random draws.
+const SCORE = {};
+(function () {
+  const g = 1.1347241384015194;              // the root of x^6 = x + 1: steps g^-1, g^-2, ... spread five directions evenly
+  KEYS.forEach(function (k, j) {
+    const step = Math.pow(g, -(j + 1)), z = new Float64Array(N);
+    for (let i = 0; i < N; i++) { const u = (0.5 + step * (i + 1)) % 1; z[i] = invNorm(Math.min(Math.max(u, 1e-12), 1 - 1e-12)); }
+    SCORE[k] = z;
+  });
+})();
+
+// ---------- the calculation ----------
+function valueAt(k, s, z, widen) {
+  if (s[2] === "lognormal") {
+    const m = (Math.log(s[0]) + Math.log(s[1])) / 2, sd = (Math.log(s[1]) - Math.log(s[0])) / (2 * Z) * widen;
+    return Math.exp(m + sd * z);
+  }
+  const m = (s[0] + s[1]) / 2, sd = (s[1] - s[0]) / (2 * Z) * widen;
+  let x = Math.max(m + sd * z, 0);
+  if (k === "sw") x = Math.min(x, 1);
+  return x;
+}
+function widened(spec, w) {             // the low and high values after widening the spread around the P50
+  const out = {};
+  KEYS.forEach(function (k) {
+    const s = spec[k];
+    if (s[2] === "lognormal") { const m = (Math.log(s[0]) + Math.log(s[1])) / 2, h = (Math.log(s[1]) - Math.log(s[0])) / 2 * w; out[k] = [Math.exp(m - h), Math.exp(m + h), s[2]]; }
+    else { const m = (s[0] + s[1]) / 2, h = (s[1] - s[0]) / 2 * w; out[k] = [m - h, m + h, s[2]]; }
+  });
+  return out;
+}
+function vol(c, v) { return c * v.area * v.pay * v.por * (1 - v.sw) / v.bo; }
+function conv(m) { return m.unit === "m3" ? 1 : C_BBL; }
+// the N volumes; fixed = [key, score] holds one input at a known value, and its correlated partner follows it
+function run(m, o) {
+  o = o || {};
+  const lps = o.lps === undefined ? m.lps : o.lps, lah = o.lah === undefined ? m.lah : o.lah, widen = o.widen || 1;
+  const f = o.fixed || null, c = conv(m), out = new Float64Array(N);
+  const qps = Math.sqrt(1 - lps * lps), qah = Math.sqrt(1 - lah * lah), S = SCORE, sp = m.spec;
+  for (let i = 0; i < N; i++) {
+    let za = S.area[i], zh = S.pay[i], zp = S.por[i], zs = S.sw[i], zb = S.bo[i];
+    if (f) { if (f[0] === "area") za = f[1]; else if (f[0] === "pay") zh = f[1]; else if (f[0] === "por") zp = f[1]; else if (f[0] === "sw") zs = f[1]; else zb = f[1]; }
+    if (lps) { if (f && f[0] === "sw") zp = lps * zs + qps * zp; else zs = lps * zp + qps * zs; }
+    if (lah) { if (f && f[0] === "pay") za = lah * zh + qah * za; else zh = lah * za + qah * zh; }
+    out[i] = c * valueAt("area", sp.area, za, widen) * valueAt("pay", sp.pay, zh, widen) * valueAt("por", sp.por, zp, widen) * (1 - valueAt("sw", sp.sw, zs, widen)) / valueAt("bo", sp.bo, zb, widen);
+  }
+  return out;
+}
+function pct(sorted, p) { const x = (sorted.length - 1) * p, i = Math.floor(x), f = x - i; return i + 1 < sorted.length ? sorted[i] * (1 - f) + sorted[i + 1] * f : sorted[i]; }
+function chanceOver(sorted, t) {        // share of volumes above t, %
+  let lo = 0, hi = sorted.length;
+  while (lo < hi) { const mid = (lo + hi) >> 1; if (sorted[mid] > t) hi = mid; else lo = mid + 1; }
+  return (sorted.length - lo) / sorted.length * 100;
+}
+function summary(v, thr) {
+  const s = Float64Array.from(v).sort();
+  let sum = 0; for (let i = 0; i < s.length; i++) sum += s[i];
+  const p90 = pct(s, 0.1), p50 = pct(s, 0.5), p10 = pct(s, 0.9);
+  return { s: s, p90: p90, p50: p50, p10: p10, mean: sum / s.length, swanson: 0.3 * p90 + 0.4 * p50 + 0.3 * p10, chance: chanceOver(s, thr) };
+}
+function chanceFixed(m, k, z) {         // chance of the minimum volume with input k held at score z, %
+  const v = run(m, { fixed: [k, z] }); let n = 0;
+  for (let i = 0; i < v.length; i++) if (v[i] > m.thr) n++;
+  return n / v.length * 100;
+}
+function ends(m, which) {               // every input at its unfavourable end, its P50 or its favourable end
+  const v = {};
+  KEYS.forEach(function (k) {
+    const s = m.spec[k], d = META[k].down;
+    v[k] = which === "mid" ? valueAt(k, s, 0, 1) : which === "low" ? (d ? s[1] : s[0]) : (d ? s[0] : s[1]);
+  });
+  return vol(conv(m), v);
+}
+function tornado(m) {
+  const mid = {}; KEYS.forEach(function (k) { mid[k] = valueAt(k, m.spec[k], 0, 1); });
+  const out = {}; let tot = 0;
+  KEYS.forEach(function (k) {
+    const a = Object.assign({}, mid), b = Object.assign({}, mid); a[k] = m.spec[k][0]; b[k] = m.spec[k][1];
+    const va = vol(conv(m), a), vb = vol(conv(m), b), w = va > 0 && vb > 0 ? Math.pow(Math.log(vb / va), 2) : 0;
+    out[k] = { atLow: va, atHigh: vb, w: w }; tot += w;
+  });
+  KEYS.forEach(function (k) { out[k].share = tot > 0 ? out[k].w / tot * 100 : 0; });
+  return out;
+}
+function known(m) {
+  const out = {};
+  KEYS.forEach(function (k) { out[k] = { atLow: chanceFixed(m, k, -Z), atHigh: chanceFixed(m, k, Z) }; });
+  return out;
+}
+// the value of input k at which the chance of the minimum volume equals the required chance, and how often
+// the input lies on the unfavourable side of it; null if no value within 3.5 spreads of the P50 does it
+function breakEven(m, k) {
+  if (m.spec[k][0] === m.spec[k][1]) return null;
+  let zl = -3.5, zh = 3.5, fl = chanceFixed(m, k, zl) - m.need;
+  const fh = chanceFixed(m, k, zh) - m.need;
+  if (fl * fh > 0) return null;
+  for (let i = 0; i < 12; i++) { const zm = (zl + zh) / 2, fm = chanceFixed(m, k, zm) - m.need; if (fm * fl <= 0) zh = zm; else { zl = zm; fl = fm; } }
+  const z = (zl + zh) / 2, below = normCdf(z);
+  return { z: z, value: valueAt(k, m.spec[k], z, 1), unfav: (META[k].down ? 1 - below : below) * 100 };
+}
+function solve(m) {
+  const base = summary(run(m), m.thr), tor = tornado(m), kn = known(m);
+  const go = base.chance >= m.need, movers = [], still = [], be = {};
+  KEYS.forEach(function (k) {
+    be[k] = breakEven(m, k);
+    if (m.spec[k][0] === m.spec[k][1]) return;
+    const a = kn[k].atLow >= m.need, b = kn[k].atHigh >= m.need;
+    (a !== go || b !== go ? movers : still).push(k);
+  });
+  const order = KEYS.slice().sort(function (a, b) { return tor[b].share - tor[a].share; });
+  const pin = summary(run(m, { fixed: [order[0], 0] }), m.thr);
+  return { base: base, tor: tor, kn: kn, be: be, go: go, movers: movers, still: still, order: order, pin: pin,
+           allLow: ends(m, "low"), allMid: ends(m, "mid"), allHigh: ends(m, "high") };
+}
+
+// ---------- the form ----------
+const $ = function (id) { return document.getElementById(id); };
+function buildRows() {
+  $("rows").innerHTML = KEYS.map(function (k) {
+    const u = META[k].unit ? ", " + META[k].unit : "";
+    return '<div class="row" data-k="' + k + '"><span class="nm">' + META[k].name + u + '</span>' +
+      '<label><span class="cl">Low</span><input type="number" step="any" class="lo" aria-label="' + META[k].name + ', low"></label>' +
+      '<label><span class="cl">High</span><input type="number" step="any" class="hi" aria-label="' + META[k].name + ', high"></label>' +
+      '<label class="c-shape"><span class="cl">Distribution</span><select class="sh" aria-label="' + META[k].name + ', distribution"><option value="lognormal">lognormal</option><option value="normal">normal</option></select></label></div>';
+  }).join("");
+}
+function fill(e) {
+  KEYS.forEach(function (k) {
+    const r = document.querySelector('.row[data-k="' + k + '"]');
+    r.querySelector(".lo").value = e.spec[k][0]; r.querySelector(".hi").value = e.spec[k][1]; r.querySelector(".sh").value = e.spec[k][2];
+  });
+  $("unit").value = e.unit; $("thr").value = e.thr; $("need").value = e.need; $("lps").value = String(e.lps); $("lah").value = String(e.lah); $("widen").value = String(e.widen);
+}
+function read() {
+  const errs = [], spec = {};
+  document.querySelectorAll("#form [aria-invalid]").forEach(function (x) { x.removeAttribute("aria-invalid"); });
+  KEYS.forEach(function (k) {
+    const r = document.querySelector('.row[data-k="' + k + '"]'), lo = r.querySelector(".lo"), hi = r.querySelector(".hi"), sh = r.querySelector(".sh").value;
+    const a = parseFloat(lo.value), b = parseFloat(hi.value), nm = META[k].name;
+    let bad = false;
+    if (!isFinite(a) || !isFinite(b)) { errs.push(nm + ": enter a low and a high value."); bad = true; }
+    else if (a > b) { errs.push(nm + ": the low value is above the high value."); bad = true; }
+    else if (a <= 0) { errs.push(nm + ": the low value must be above zero."); bad = true; }
+    else if (k === "sw" && b >= 1) { errs.push(nm + ": a fraction below 1 is expected, for example 0.35."); bad = true; }
+    else if (k === "por" && b > 1) { errs.push(nm + ": a fraction is expected, for example 0.18."); bad = true; }
+    if (bad) { lo.setAttribute("aria-invalid", "true"); hi.setAttribute("aria-invalid", "true"); }
+    spec[k] = [a, b, sh];
+  });
+  const thr = parseFloat($("thr").value), need = parseFloat($("need").value), widen = parseFloat($("widen").value);
+  if (!isFinite(thr) || thr <= 0) { errs.push("Minimum volume: enter a volume above zero."); $("thr").setAttribute("aria-invalid", "true"); }
+  if (!isFinite(need) || need < 1 || need > 99) { errs.push("Required chance: enter a number from 1 to 99."); $("need").setAttribute("aria-invalid", "true"); }
+  let eff = spec;
+  if (!errs.length && widen !== 1) {
+    eff = widened(spec, widen);
+    KEYS.forEach(function (k) {
+      if (eff[k][0] <= 0 || (k === "sw" && eff[k][1] >= 1)) errs.push(META[k].name + ": widened that much, the range leaves the values an input can take. Widen less or change the range.");
+    });
+  }
+  return { m: { spec: eff, entered: spec, unit: $("unit").value, thr: thr, need: need, lps: parseFloat($("lps").value), lah: parseFloat($("lah").value), widen: widen }, errs: errs };
+}
+
+// ---------- words and numbers ----------
+function fv(x) {                        // a volume
+  if (!isFinite(x)) return "–";
+  const d = x >= 100 ? 0 : x >= 10 ? 1 : 2;
+  return x.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+function fp(x) { return (x > 99.5 && x < 100 ? "over 99" : x < 0.5 && x > 0 ? "under 1" : Math.round(x).toString()) + " %"; }
+function fi(k, x) { const u = META[k].unit; return x.toLocaleString("en-US", { maximumFractionDigits: META[k].dec + 1 }) + (u ? " " + u : ""); }
+function unitName(m) { return m.unit === "m3" ? "million m³" : "million barrels"; }
+function list(a) { return a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
+function orList(a) { return list(a).replace(/ and ([^,]*)$/, " or $1"); }
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+// ---------- pictures ----------
+// on a narrow screen the charts are drawn on a narrower canvas, so the text keeps its size
+function vw() { return window.matchMedia("(max-width: 600px)").matches ? 420 : 680; }
+function logScale(lo, hi, x0, x1) { const a = Math.log(lo), b = Math.log(hi); return function (v) { return x0 + (Math.log(v) - a) / (b - a) * (x1 - x0); }; }
+function logTicks(lo, hi) {
+  const make = function (ks) { const out = []; for (let d = Math.pow(10, Math.floor(Math.log10(lo))); d <= hi; d *= 10) ks.forEach(function (k) { const v = +(k * d).toPrecision(3); if (v >= lo && v <= hi) out.push(v); }); return out; };
+  let t = make([1, 2, 5]);
+  if (t.length < 4) t = make([1, 1.5, 2, 3, 4, 5, 7]);
+  if (t.length > 9) t = make([1]);
+  return t;
+}
+function drawCurve(m, R) {
+  const W = vw(), s = R.base.s, x0 = 46, x1 = W - 16, y0 = 208, y1 = 28;
+  const lo = Math.min(R.allLow, pct(s, 0.002)) * 0.85, hi = Math.max(R.allHigh, pct(s, 0.998)) * 1.18;
+  const X = logScale(lo, hi, x0, x1), Y = function (p) { return y0 - p / 100 * (y0 - y1); };
+  let h = '<text x="' + (x0 - 34) + '" y="12">chance of exceeding, %</text>';
+  [0, 25, 50, 75, 100].forEach(function (p) { h += '<line class="gr" x1="' + x0 + '" x2="' + x1 + '" y1="' + Y(p) + '" y2="' + Y(p) + '"/><text x="' + (x0 - 6) + '" y="' + (Y(p) + 4) + '" text-anchor="end">' + p + '</text>'; });
+  logTicks(lo, hi).forEach(function (v) { h += '<line class="ax" x1="' + X(v) + '" x2="' + X(v) + '" y1="' + y0 + '" y2="' + (y0 + 4) + '"/><text x="' + X(v) + '" y="' + (y0 + 17) + '" text-anchor="middle">' + v.toLocaleString("en-US") + '</text>'; });
+  h += '<line class="ax" x1="' + x0 + '" x2="' + x1 + '" y1="' + y0 + '" y2="' + y0 + '"/>';
+  let d = "";
+  for (let i = 0; i <= 240; i++) { const q = 0.001 + 0.998 * i / 240, v = pct(s, q); d += (i ? "L" : "M") + X(v).toFixed(1) + "," + Y(100 - q * 100).toFixed(1); }
+  h += '<path class="ln" d="' + d + '"/>';
+  [["P90", R.base.p90, 90], ["P50", R.base.p50, 50], ["P10", R.base.p10, 10]].forEach(function (a) {
+    const x = X(a[1]), y = Y(a[2]);
+    h += '<path class="dash" d="M' + x + ',' + y + ' V' + y0 + '"/><circle class="dot" cx="' + x + '" cy="' + y + '" r="5"><title>' + a[0] + ': ' + fv(a[1]) + ' ' + unitName(m) + '</title></circle>';
+    h += '<text class="b halo" x="' + (x + 8) + '" y="' + (y - (a[2] === 10 ? 20 : 7)) + '">' + a[0] + ' ' + fv(a[1]) + '</text>';
+  });
+  [["all unfavourable", R.allLow, "start", -12], ["all favourable", R.allHigh, "end", 12]].forEach(function (a) {
+    const x = X(a[1]);
+    h += '<path class="tri" d="M' + x + ',' + (y0 - 1) + ' l-6,-11 h12 z"><title>Every input at its ' + (a[0] === "all unfavourable" ? "unfavourable" : "favourable") + ' end: ' + fv(a[1]) + ' ' + unitName(m) + '</title></path>';
+    h += '<text class="halo" x="' + Math.min(Math.max(x, x0 + 46), x1 - 40) + '" y="' + (y0 - 17) + '" text-anchor="middle">' + a[0] + '</text>';
+  });
+  h += '<text x="' + ((x0 + x1) / 2) + '" y="' + (y0 + 36) + '" text-anchor="middle">oil in place, ' + unitName(m) + ' (logarithmic scale)</text>';
+  $("curve").setAttribute("viewBox", "0 0 " + W + " 262");
+  $("curve").innerHTML = '<title>Chance of exceeding each volume</title>' + h;
+  $("curve-cap").textContent = "The triangles mark the product of every input at its unfavourable end (" + fv(R.allLow) + ") and at its favourable end (" + fv(R.allHigh) + ").";
+}
+function drawTornado(m, R) {
+  const W = vw(), ks = R.order, x0 = W < 500 ? 112 : 150, x1 = W - (W < 500 ? 46 : 80), top = 30, rowH = 38;
+  let lo = Infinity, hi = 0;
+  ks.forEach(function (k) { lo = Math.min(lo, R.tor[k].atLow, R.tor[k].atHigh); hi = Math.max(hi, R.tor[k].atLow, R.tor[k].atHigh); });
+  if (!(hi > lo)) { lo = R.allMid * 0.8; hi = R.allMid * 1.25; }
+  const X = logScale(lo * 0.72, hi * 1.25, x0, x1), y0 = top + rowH * ks.length + 6;
+  let h = "";
+  logTicks(lo * 0.72, hi * 1.25).forEach(function (v) { h += '<line class="gr" x1="' + X(v) + '" x2="' + X(v) + '" y1="' + top + '" y2="' + y0 + '"/><text x="' + X(v) + '" y="' + (y0 + 15) + '" text-anchor="middle">' + v.toLocaleString("en-US") + '</text>'; });
+  ks.forEach(function (k, i) {
+    const t = R.tor[k], a = Math.min(t.atLow, t.atHigh), b = Math.max(t.atLow, t.atHigh), y = top + rowH * i + 8, big = t.share >= 15;
+    const la = t.atLow <= t.atHigh ? m.spec[k][0] : m.spec[k][1], lb = t.atLow <= t.atHigh ? m.spec[k][1] : m.spec[k][0];
+    h += '<text class="b" x="' + (x0 - 12) + '" y="' + (y + 10) + '" text-anchor="end">' + cap(SHORT[k]) + '</text><text x="' + (x0 - 12) + '" y="' + (y + 24) + '" text-anchor="end">' + Math.round(t.share) + ' % of variance</text>';
+    h += '<rect class="' + (big ? "bar" : "barm") + '" x="' + X(a) + '" y="' + y + '" width="' + Math.max(2, X(b) - X(a)) + '" height="18" rx="3"><title>' + cap(SHORT[k]) + ' from ' + fi(k, m.spec[k][0]) + ' to ' + fi(k, m.spec[k][1]) + ': ' + fv(a) + ' to ' + fv(b) + ' ' + unitName(m) + '</title></rect>';
+    h += '<text x="' + (X(a) - 5) + '" y="' + (y + 13) + '" text-anchor="end" class="halo">' + fi(k, la) + '</text><text x="' + (X(b) + 5) + '" y="' + (y + 13) + '" class="halo">' + fi(k, lb) + '</text>';
+  });
+  h += '<line class="dash" x1="' + X(R.allMid) + '" x2="' + X(R.allMid) + '" y1="' + (top - 6) + '" y2="' + y0 + '"/><text class="halo" x="' + X(R.allMid) + '" y="' + (top - 11) + '" text-anchor="middle">every input at its P50: ' + fv(R.allMid) + '</text>';
+  h += '<text x="' + ((x0 + x1) / 2) + '" y="' + (y0 + 33) + '" text-anchor="middle">oil in place, ' + unitName(m) + ' (logarithmic scale)</text>';
+  $("tornado").setAttribute("viewBox", "0 0 " + W + " 262");
+  $("tornado").innerHTML = '<title>What each input does to the volume, one at a time</title>' + h;
+  $("tor-cap").textContent = "Each bar: the volume with one input at its low and at its high value, the others at their P50. The labels at the bar ends are the input's own values.";
+}
+function drawKnow(m, R) {
+  const ks = KEYS.slice().sort(function (a, b) { return Math.abs(R.kn[b].atHigh - R.kn[b].atLow) - Math.abs(R.kn[a].atHigh - R.kn[a].atLow); });
+  const W = vw(), x0 = W < 500 ? 84 : 150, x1 = W - (W < 500 ? 48 : 40), top = 30, rowH = 36, y0 = top + rowH * ks.length;
+  const X = function (p) { return x0 + p / 100 * (x1 - x0); };
+  let h = "";
+  [0, 25, 50, 75, 100].forEach(function (p) { h += '<line class="gr" x1="' + X(p) + '" x2="' + X(p) + '" y1="' + top + '" y2="' + y0 + '"/><text x="' + X(p) + '" y="' + (y0 + 15) + '" text-anchor="middle">' + p + ' %</text>'; });
+  const nowRight = R.base.chance >= m.need;
+  h += '<line class="need" x1="' + X(m.need) + '" x2="' + X(m.need) + '" y1="' + (top - 8) + '" y2="' + y0 + '"/><text class="b" x="' + (X(m.need) + (nowRight ? -6 : 6)) + '" y="' + (top - 12) + '" text-anchor="' + (nowRight ? "end" : "start") + '">required: ' + Math.round(m.need) + ' %</text>';
+  h += '<line class="dash" x1="' + X(R.base.chance) + '" x2="' + X(R.base.chance) + '" y1="' + (top - 8) + '" y2="' + y0 + '"/><text x="' + (X(R.base.chance) + (nowRight ? 6 : -6)) + '" y="' + (top - 12) + '" text-anchor="' + (nowRight ? "start" : "end") + '">now: ' + fp(R.base.chance) + '</text>';
+  ks.forEach(function (k, i) {
+    const a = R.kn[k].atLow, b = R.kn[k].atHigh, y = top + rowH * i + 20, mv = R.movers.indexOf(k) >= 0;
+    h += '<text class="b" x="' + (x0 - 12) + '" y="' + (y + 4) + '" text-anchor="end">' + cap(SHORT[k]) + '</text>';
+    h += '<line class="' + (mv ? "seg" : "segm") + '" x1="' + X(a) + '" x2="' + X(b) + '" y1="' + y + '" y2="' + y + '"/>';
+    [[a, m.spec[k][0]], [b, m.spec[k][1]]].forEach(function (e, j) {
+      const left = (a <= b) === (j === 0);
+      h += '<circle class="' + (mv ? "dot" : "dotm") + '" cx="' + X(e[0]) + '" cy="' + y + '" r="5.5"><title>' + cap(SHORT[k]) + ' at ' + fi(k, e[1]) + ': ' + fp(e[0]) + ' chance of ' + fv(m.thr) + ' ' + unitName(m) + '</title></circle>';
+      h += '<text class="halo" x="' + (X(e[0]) + (left ? -9 : 9)) + '" y="' + (y - 8) + '" text-anchor="' + (left ? "end" : "start") + '">' + fi(k, e[1]) + '</text>';
+    });
+  });
+  h += '<text x="' + ((x0 + x1) / 2) + '" y="' + (y0 + 33) + '" text-anchor="middle">chance of at least ' + fv(m.thr) + (W < 500 ? '' : ' ' + unitName(m)) + ' if the input were known</text>';
+  $("know").setAttribute("viewBox", "0 0 " + W + " " + (y0 + 42));
+  $("know").innerHTML = '<title>Chance of reaching the minimum volume if one input were known</title>' + h;
+  $("know-cap").textContent = "Each line runs from the chance with that input at its low value to the chance with it at its high value. Blue lines cross the required chance.";
+}
+
+// ---------- the page ----------
+function render() {
+  const got = read(), m = got.m, box = $("errs");
+  if (got.errs.length) {
+    box.hidden = false; box.innerHTML = "<b>The findings below still show the last valid inputs.</b><ul>" + got.errs.map(function (e) { return "<li>" + esc(e) + "</li>"; }).join("") + "</ul>";
+    return;
+  }
+  box.hidden = true;
+  const R = solve(m), u = unitName(m), B = R.base, linked = m.lps !== 0 || m.lah !== 0;
+  drawCurve(m, R); drawTornado(m, R); drawKnow(m, R);
+  // A
+  const rare = 100 - chanceOver(B.s, R.allLow);
+  let fa = "<b>P90 " + fv(B.p90) + ", P50 " + fv(B.p50) + ", P10 " + fv(B.p10) + " " + u + " in place.</b> ";
+  if (R.allLow < B.p90 * 0.98) {
+    fa += "With every input at its unfavourable end (low area, pay and porosity, high Sw and Bo) the product is " + fv(R.allLow) + ", " + (R.allLow / B.p90 < 0.5 ? "less than half of the P90" : R.allLow / B.p90 < 0.67 ? "less than two thirds of the P90" : "below the P90") + ": ";
+    fa += rare >= 0.05 ? "a volume that low turns up about once in " + Math.round(100 / rare).toLocaleString("en-US") + " draws. " : "no draw falls that low. ";
+    fa += "With every input at its favourable end it is " + fv(R.allHigh) + (R.allHigh / B.p10 >= 1.5 ? ", " + (R.allHigh / B.p10).toFixed(1) + " times the P10. " : ", above the P10. ");
+  } else fa += "Only one input varies here, so its unfavourable end is the low case. ";
+  if (B.mean > B.p50 * 1.03) fa += "The mean is " + fv(B.mean) + ", above the P50, because the range leans towards large volumes.";
+  $("fa-text").innerHTML = fa;
+  // B
+  const o = R.order, last = o[o.length - 1];
+  let nTop = 1, acc = R.tor[o[0]].share; while (nTop < o.length && acc < 75) { acc += R.tor[o[nTop]].share; nTop++; }
+  let fb = "<b>" + cap(list(o.slice(0, nTop).map(function (k) { return SHORT[k]; }))) + " account" + (nTop === 1 ? "s" : "") + " for " + Math.round(acc) + " % of the variance.</b> ";
+  fb += "Varied alone from low to high, " + SHORT[o[0]] + " moves the volume from " + fv(Math.min(R.tor[o[0]].atLow, R.tor[o[0]].atHigh)) + " to " + fv(Math.max(R.tor[o[0]].atLow, R.tor[o[0]].atHigh)) + " " + u;
+  if (R.tor[last].share < 10 && last !== o[0]) fb += "; " + SHORT[last] + " only from " + fv(Math.min(R.tor[last].atLow, R.tor[last].atHigh)) + " to " + fv(Math.max(R.tor[last].atLow, R.tor[last].atHigh));
+  fb += ". ";
+  if (R.pin.p90 > 0 && B.p90 > 0 && R.tor[o[0]].share > 0) fb += "With " + SHORT[o[0]] + " pinned at its P50, P10 would be " + (R.pin.p10 / R.pin.p90).toFixed(1) + " times P90 instead of " + (B.p10 / B.p90).toFixed(1) + ". ";
+  if (linked) fb += "The bars take each input alone; with correlated inputs the range is wider than the bars suggest.";
+  $("fb-text").innerHTML = fb;
+  // C
+  const mv = R.movers.map(function (k) { return SHORT[k]; }), st = R.still.map(function (k) { return SHORT[k]; });
+  let fc = "<b>";
+  if (mv.length && st.length) fc += cap(orList(mv)) + " could change the decision; " + list(st) + (st.length > 1 ? " are" : " is") + " unlikely to.";
+  else if (mv.length) fc += "Any of the inputs could change the decision.";
+  else fc += "No single input is likely to change the decision.";
+  fc += "</b> If the prospect works, the chance of at least " + fv(m.thr) + " " + u + " is " + fp(B.chance) + ", " + (R.go ? "above" : "below") + " the " + Math.round(m.need) + " % required.";
+  $("fc-text").innerHTML = fc;
+  const beText = function (k) {
+    const e = R.be[k]; if (!e) return "No value in its range brings the chance to " + Math.round(m.need) + " %.";
+    const badSide = META[k].down ? "above" : "below", goodSide = META[k].down ? "below" : "above";
+    return R.go ? "It would have to be " + badSide + " " + fi(k, e.value) + " to bring the chance under " + Math.round(m.need) + " %: " + (e.unfav < 0.5 ? "a chance under 1 %" : "a " + fp(e.unfav).replace(" %", "") + " % chance") + "."
+                : "It would have to be " + goodSide + " " + fi(k, e.value) + " to lift the chance to " + Math.round(m.need) + " %: " + (100 - e.unfav < 0.5 ? "a chance under 1 %" : "a " + fp(100 - e.unfav).replace(" %", "") + " % chance") + ".";
+  };
+  let kb = "";
+  R.movers.concat(R.still).forEach(function (k) {
+    kb += "<p><b>" + cap(SHORT[k]) + ".</b> At " + fi(k, m.spec[k][0]) + " the chance would be " + fp(R.kn[k].atLow) + "; at " + fi(k, m.spec[k][1]) + ", " + fp(R.kn[k].atHigh) + ". " + beText(k) + " " +
+      (R.movers.indexOf(k) >= 0 ? '<span class="tag yes">could change it</span>' : '<span class="tag no">unlikely to change it</span>') + "</p>";
+  });
+  kb += '<p class="hint">' + (R.go ? "On current ranges the prospect clears the bar." + (mv.length ? " A low outcome in the inputs marked above would turn the answer to no." : " No single input at its low or high value turns the answer to no.")
+                                   : "On current ranges the prospect is below the bar." + (mv.length ? " A high outcome in the inputs marked above would turn the answer to yes." : " No single input at its low or high value turns the answer to yes.")) + "</p>";
+  $("know-body").innerHTML = kb;
+  // in full
+  const vd = $("verdict");
+  vd.className = "verdict " + (R.go ? (mv.length ? "marginal" : "clear") : "below");
+  vd.innerHTML = '<div class="v">If the prospect works: ' + fp(B.chance) + " chance of at least " + fv(m.thr) + " " + u + "; " + Math.round(m.need) + " % required. " + (R.go ? "Clears the bar." : "Below the bar.") + "</div>" +
+    '<div class="s">' + (mv.length ? "A " + (R.go ? "low" : "high") + " outcome in " + orList(mv) + " would move it across the line." : "No single input at its low or high value moves it across the line.") + "</div>";
+  const tile = function (n, l) { return '<div class="stat"><div class="n">' + n + '</div><div class="l">' + l + "</div></div>"; };
+  $("stats").innerHTML = tile(fv(B.p90), "P90, low case, " + u) + tile(fv(B.p50), "P50") + tile(fv(B.p10), "P10, high case") + tile(fv(B.mean), "mean (P10/P90 = " + (B.p10 / B.p90).toFixed(1) + ")");
+  let t = "<thead><tr><th>Input</th><th>Low</th><th>High</th><th>Volume, input low</th><th>Volume, input high</th><th>Share of variance</th><th>Chance, input known low</th><th>Chance, input known high</th><th>Chance equals required at</th></tr></thead><tbody>";
+  R.order.forEach(function (k) {
+    t += "<tr><td>" + META[k].name + "</td><td>" + fi(k, m.spec[k][0]) + "</td><td>" + fi(k, m.spec[k][1]) + "</td><td>" + fv(R.tor[k].atLow) + "</td><td>" + fv(R.tor[k].atHigh) + "</td><td>" + Math.round(R.tor[k].share) + " %</td><td>" + fp(R.kn[k].atLow) + "</td><td>" + fp(R.kn[k].atHigh) + "</td><td>" + (R.be[k] ? fi(k, R.be[k].value) : "–") + "</td></tr>";
+  });
+  $("tbl").innerHTML = t + "</tbody>";
+  $("tbl-note").textContent = "Volumes in " + u + ": one input at its low or high value, the others at their P50. Chances: of at least " + fv(m.thr) + " " + u + " if that input were known. Low and high are the input's own values, so a high Sw or Bo gives the smaller volume." +
+    (m.widen !== 1 ? " Low and high are shown as widened, " + m.widen + " times the range entered." : "");
+  // other answers
+  const alt = function (o2) { return summary(run(m, o2), m.thr); };
+  const ah = alt({ lah: 0.5 }), ps = alt({ lps: -0.5 }), wd = alt({ widen: 1.5 });
+  let an = '<div class="answer"><h3>If inputs are correlated</h3><p>';
+  an += m.lah === 0.5 ? "Area and net pay are already taken as moderately correlated. " : "With area and net pay moderately correlated, P90 would be " + fv(ah.p90) + " and P10 " + fv(ah.p10) + ", against " + fv(B.p90) + " and " + fv(B.p10) + " now. ";
+  an += m.lps === -0.5 ? "Porosity and Sw are already taken as moderately correlated." : "With porosity and Sw moderately correlated: " + fv(ps.p90) + " and " + fv(ps.p10) + ".";
+  an += '</p><p class="rule">A correlation matters as much as the inputs it joins. Joining the two that drive the range widens it; joining two small ones barely shows.</p></div>';
+  an += '<div class="answer"><h3>If the ranges run narrow</h3><p>With every range 1.5 times as wide' + (m.widen !== 1 ? " as it is taken now" : "") + ", P90 would be " + fv(wd.p90) + " and P10 " + fv(wd.p10) + "; the chance of " + fv(m.thr) + " would be " + fp(wd.chance) + ". Each input keeps its P50, so the middle of the volume barely moves (" + fv(wd.p50) + ") while the mean rises to " + fv(wd.mean) + '.</p><p class="rule">Ranges that are too narrow are the usual way a P90 ends up too high. If a look-back also shows volumes coming in under prediction, the middle has to move as well as the width.</p></div>';
+  an += '<div class="answer"><h3>The mean without the draws</h3><p>Swanson\'s rule, 0.3 × P90 + 0.4 × P50 + 0.3 × P10, gives ' + fv(B.swanson) + "; the draws give " + fv(B.mean) + '.</p><p class="rule">Close when the range is moderately skewed; it falls short as the range gets very wide.</p></div>';
+  an += '<div class="answer"><h3>The deterministic estimate</h3><p>Every input at its P50 gives ' + fv(R.allMid) + ", against a P50 of " + fv(B.p50) + " and a mean of " + fv(B.mean) + '.</p><p class="rule">A one-line estimate from middle values lands near the P50 and below the mean. It says nothing about the low case.</p></div>';
+  $("answers").innerHTML = an;
+  if (PROBE) probe();
+}
+
+// ---------- checks ----------
+function runChecks() {
+  const E = JSON.parse(JSON.stringify(EXAMPLE)), rows = [];
+  const add = function (what, exp, got, tol, kind, src) { rows.push({ what: what, exp: exp, got: got, tol: tol, kind: kind, src: src, ok: kind === "abs" ? Math.abs(got - exp) <= tol : Math.abs(got - exp) <= tol * Math.abs(exp) }); };
+  const S = function (o, m) { m = m || E; return summary(run(m, o), m.thr); };
+  const HAND = "by hand", REF = "independent calculation";
+  // by hand
+  const fx = JSON.parse(JSON.stringify(E)); KEYS.forEach(function (k) { fx.spec[k][0] = fx.spec[k][1]; });
+  const f1 = S({}, fx), prod = 6.2898 * 40 * 45 * 0.22 * (1 - 0.45) / 1.4;
+  add("Every input fixed: P90 is the plain product, 6.2898 × 40 × 45 × 0.22 × 0.55 ÷ 1.4", prod, f1.p90, 1e-9, "rel", HAND);
+  add("Every input fixed: P10 equals P90", f1.p90, f1.p10, 1e-9, "rel", HAND);
+  const one = JSON.parse(JSON.stringify(fx)); one.spec.area = [12, 40, "lognormal"];
+  const o1 = S({}, one), rest = 6.2898 * 45 * 0.22 * 0.55 / 1.4;
+  add("Only area varies, 12 to 40: P90 is 12 × the rest", 12 * rest, o1.p90, 0.002, "rel", HAND);
+  add("Only area varies: P10 is 40 × the rest", 40 * rest, o1.p10, 0.002, "rel", HAND);
+  add("Only area varies: P50 is √(12 × 40) × the rest", Math.sqrt(480) * rest, o1.p50, 0.002, "rel", HAND);
+  add("Only area varies, area known: nothing left to vary, P10 equals P90", 1, S({ fixed: ["area", Z] }, one).p10 / S({ fixed: ["area", Z] }, one).p90, 1e-9, "rel", HAND);
+  one.thr = 500; one.need = 50;
+  add("Only area varies, minimum 500: the chance turns at area = 500 ÷ the rest, 500 ÷ 24.4628", 20.439, breakEven(one, "area").value, 0.005, "rel", HAND);
+  add("All unfavourable ends: 6.2898 × 12 × 15 × 0.14 × 0.55 ÷ 1.4", 62.269, ends(E, "low"), 0.0005, "rel", HAND);
+  add("All favourable ends: 6.2898 × 40 × 45 × 0.22 × 0.75 ÷ 1.2", 1556.73, ends(E, "high"), 0.0005, "rel", HAND);
+  add("Every input at its P50: 6.2898 × √480 × √675 × 0.18 × 0.65 ÷ 1.3", 322.22, ends(E, "mid"), 0.0005, "rel", HAND);
+  const tr = tornado(E);
+  add("Area at 12, others at their P50: 322.22 × 12 ÷ √480", 176.49, tr.area.atLow, 0.0005, "rel", HAND);
+  add("Bo at 1.4, others at their P50: 322.22 × 1.3 ÷ 1.4", 299.20, tr.bo.atHigh, 0.0005, "rel", HAND);
+  add("Area's share of the variance: ln(40/12)² over the sum of the five squared swings, %", 48.63, tr.area.share, 0.05, "abs", HAND);
+  const wsp = widened(E.spec, 1.5);
+  add("Area 12 to 40 widened 1.5 times: low is √480 ÷ (40/12)^0.75", 8.881, wsp.area[0], 0.001, "rel", HAND);
+  add("Porosity 0.14 to 0.22 widened 1.5 times: high is 0.18 + 0.06", 0.24, wsp.por[1], 1e-9, "rel", HAND);
+  const lg = JSON.parse(JSON.stringify(E)); lg.spec.por[2] = "lognormal"; lg.spec.bo[2] = "lognormal"; lg.spec.sw = [0.3, 0.3, "lognormal"];
+  const l1 = S({}, lg), l2 = S({ lah: 0.5 }, lg);
+  add("Every input lognormal, Sw fixed at 0.3: P50 by formula, the product of the P50s", 339.335, l1.p50, 0.005, "rel", HAND);
+  add("Same case: P90 = P50 × exp(−1.2816 × 0.6626), spreads added in squares", 145.153, l1.p90, 0.005, "rel", HAND);
+  add("Same case: P10 = P50 × exp(+1.2816 × 0.6626)", 793.287, l1.p10, 0.005, "rel", HAND);
+  add("Same case: mean = P50 × exp(0.6626² ÷ 2)", 422.643, l1.mean, 0.003, "rel", HAND);
+  add("Same case, area and net pay correlated at 0.5: P90 by formula, spread 0.8003", 121.682, l2.p90, 0.006, "rel", HAND);
+  add("Same case, area and net pay correlated at 0.5: P10 by formula", 946.306, l2.p10, 0.006, "rel", HAND);
+  const mb = JSON.parse(JSON.stringify(E)); mb.spec.bo = [1.3, 1.3, "normal"];
+  add("Bo fixed at 1.3: the mean of independent inputs is the product of their means, 6.2898 × 24.4645 × 28.4804 × 0.18 × 0.65 ÷ 1.3", 394.42, S({}, mb).mean, 0.003, "rel", HAND);
+  const b0 = S({});
+  add("Chance of exceeding the P50 is 50 %", 50, chanceOver(b0.s, b0.p50), 0.01, "abs", HAND);
+  add("Chance of exceeding the P90 is 90 %", 90, chanceOver(b0.s, b0.p90), 0.01, "abs", HAND);
+  const em = JSON.parse(JSON.stringify(E)); em.unit = "m3"; em.thr = 230 / 6.2898;
+  add("In million m³ the P50 is the P50 in million barrels ÷ 6.2898", b0.p50 / 6.2898, S({}, em).p50, 1e-9, "rel", HAND);
+  // against the independent calculation
+  add("Example: P90", 132.748, b0.p90, 0.01, "rel", REF);
+  add("Example: P50", 316.099, b0.p50, 0.01, "rel", REF);
+  add("Example: P10", 748.538, b0.p10, 0.01, "rel", REF);
+  add("Example: mean", 396.183, b0.mean, 0.005, "rel", REF);
+  add("Example: chance of at least 230, %", 68.132, b0.chance, 0.7, "abs", REF);
+  add("Example: share of draws below the product of the unfavourable ends, %", 0.8405, 100 - chanceOver(b0.s, ends(E, "low")), 0.15, "abs", REF);
+  add("Example: share of draws above the product of the favourable ends, %", 0.8865, chanceOver(b0.s, ends(E, "high")), 0.15, "abs", REF);
+  const kn = known(E), KR = { area: [27.869, 96.973], pay: [32.783, 95.069], por: [54.910, 79.353], sw: [75.933, 59.422], bo: [72.187, 63.981] };
+  KEYS.forEach(function (k) {
+    add("Chance of 230 with " + SHORT[k] + " known at its low value, %", KR[k][0], kn[k].atLow, 0.8, "abs", REF);
+    add("Chance of 230 with " + SHORT[k] + " known at its high value, %", KR[k][1], kn[k].atHigh, 0.8, "abs", REF);
+  });
+  const BR = { area: [15.936, 24.90], pay: [18.893, 22.87], por: [0.12920, 5.18], sw: [0.53009, 1.05] };
+  Object.keys(BR).forEach(function (k) {
+    const e = breakEven(E, k);
+    add("Value of " + SHORT[k] + " at which the chance of 230 is 50 %", BR[k][0], e ? e.value : NaN, 0.012, "rel", REF);
+    add("Chance that " + SHORT[k] + " lies on the unfavourable side of it, %", BR[k][1], e ? e.unfav : NaN, 0.8, "abs", REF);
+  });
+  add("Bo: no value within 3.5 spreads brings the chance to 50 % (the independent calculation puts it at 1.78)", 1, breakEven(E, "bo") === null ? 1 : 0, 0, "abs", REF);
+  const pin = S({ fixed: ["area", 0] });
+  add("Area pinned at its P50: P90", 169.323, pin.p90, 0.012, "rel", REF);
+  add("Area pinned at its P50: P10", 585.889, pin.p10, 0.012, "rel", REF);
+  const lk = JSON.parse(JSON.stringify(E)); lk.lah = 0.5; const kl = known(lk);
+  add("Area and net pay correlated at 0.5: chance of 230 with area known at its low value, %", 9.705, kl.area.atLow, 0.8, "abs", REF);
+  add("Area and net pay correlated at 0.5: chance of 230 with net pay known at its low value, %", 12.470, kl.pay.atLow, 0.8, "abs", REF);
+  add("Area and net pay correlated at 0.5: chance of 230 with porosity known at its low value, %", 54.061, kl.por.atLow, 0.8, "abs", REF);
+  [["Porosity and Sw correlated at −0.5", { lps: -0.5 }, 129.886, 763.206], ["Porosity and Sw correlated at −0.8", { lps: -0.8 }, 128.170, 771.360],
+   ["Area and net pay correlated at 0.5", { lah: 0.5 }, 111.653, 890.580], ["Area and net pay correlated at 0.8", { lah: 0.8 }, 101.664, 974.700],
+   ["Both pairs correlated, moderately", { lps: -0.5, lah: 0.5 }, 109.567, 904.884],
+   ["Ranges 1.25 times as wide", { widen: 1.25 }, 105.053, 917.858], ["Ranges 1.5 times as wide", { widen: 1.5 }, 82.817, 1124.609], ["Ranges twice as wide", { widen: 2 }, 49.573, 1672.884]
+  ].forEach(function (c) {
+    const r = S(c[1]);
+    add(c[0] + ": P90", c[2], r.p90, 0.012, "rel", REF);
+    add(c[0] + ": P10", c[3], r.p10, 0.012, "rel", REF);
+  });
+  const ew = JSON.parse(JSON.stringify(E)); ew.spec = wsp; const rw = S({}, ew);
+  add("Ranges 1.5 times as wide, entered as the widened low and high values: P90", 82.817, rw.p90, 0.012, "rel", REF);
+  add("Ranges 1.5 times as wide, entered as the widened low and high values: P10", 1124.609, rw.p10, 0.012, "rel", REF);
+  const okN = rows.filter(function (r) { return r.ok; }).length, all = okN === rows.length;
+  const fmt = function (x) { return !isFinite(x) ? "none" : Math.abs(x) >= 100 ? x.toFixed(1) : Math.abs(x) >= 10 ? x.toFixed(2) : x.toFixed(3); };
+  let h = "<thead><tr><th>Check</th><th>Expected</th><th>Page</th><th class=\"tol\">Allowed</th><th class=\"src\">Answer from</th><th></th></tr></thead><tbody>";
+  rows.forEach(function (r) {
+    h += "<tr><td>" + esc(r.what) + "</td><td>" + fmt(r.exp) + "</td><td>" + fmt(r.got) + "</td><td class=\"tol\">" + (r.kind === "abs" ? "± " + r.tol : "± " + (r.tol * 100 < 0.001 ? "0" : +(r.tol * 100).toFixed(3)) + " %") + "</td><td class=\"src\">" + r.src + "</td><td class=\"st " + (r.ok ? "ok" : "no") + "\">" + (r.ok ? "PASS" : "FAIL") + "</td></tr>";
+  });
+  $("checks").innerHTML = h + "</tbody>";
+  const msg = all ? "ALL " + rows.length + " PASS" : okN + " of " + rows.length + " pass";
+  $("checks-sum").textContent = msg; $("checks-sum").className = all ? "pass" : "fail";
+  document.documentElement.setAttribute("data-checks", msg);
+  if (!all) $("checks-box").open = true;
+}
+
+// ---------- start ----------
+const Q = new URLSearchParams(location.search), PROBE = Q.get("probe") === "1";
+if (Q.get("theme") === "light" || Q.get("theme") === "dark") document.documentElement.setAttribute("data-theme", Q.get("theme"));
+function probe() {
+  const f = document.querySelector(".finds").getBoundingClientRect();
+  document.documentElement.setAttribute("data-width", document.documentElement.scrollWidth + "/" + window.innerWidth);
+  document.documentElement.setAttribute("data-finds", Math.round(f.top + window.scrollY) + "/" + Math.round(f.bottom + window.scrollY));
+}
+buildRows(); fill(EXAMPLE);
+let lastUnit = EXAMPLE.unit, timer = 0;
+$("form").addEventListener("input", function (e) {
+  if (e.target.id === "unit" && e.target.value !== lastUnit) {      // keep the minimum the same volume in the new unit
+    const t = parseFloat($("thr").value);
+    if (isFinite(t)) $("thr").value = +(e.target.value === "m3" ? t / C_BBL : t * C_BBL).toPrecision(3);
+    lastUnit = e.target.value;
+  }
+  clearTimeout(timer); timer = setTimeout(render, 120);
+});
+$("reset").addEventListener("click", function () { fill(EXAMPLE); lastUnit = EXAMPLE.unit; render(); });
+let lastW = vw();
+window.addEventListener("resize", function () { if (vw() !== lastW) { lastW = vw(); render(); } });
+render(); runChecks();
+</script>
+</body>
+</html>
