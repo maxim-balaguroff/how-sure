@@ -1,10 +1,10 @@
 cff-version: 1.2.0
 message: "If you use these tools or notes, please cite them as below."
 title: "how-sure: small tools and notes from a petroleum geologist's work"
-abstract: "Small tools and notes from my work as a petroleum geologist. Each one deals with the same question: how sure are we, and what would make us surer? Tool 01 is a post-drill look-back template in Excel (prediction vs. result) with a hand-worked example and 32 checks. Tool 02 is an interactive page that checks a planned magnetic survey against one geological question (a dyke, a sill edge or a plug: visible or not, one anomaly or two, line spacing), with 24 checks against known answers. Tool 03 is an interactive page on planning a shallow stratigraphic drilling campaign when only a few wells are allowed (what each next well buys, how sure each core is to land in the unit it is meant for and date the horizons around it within the errors of the seismic pick, dip, cover and thickness and the chance that each unit gives an age, and how the first cores change the wells still to drill), with 49 checks against hand calculations and an independent count, and a one-page summary. Tool 04 is an interactive page and a Monte Carlo spreadsheet for a prospect's oil in place as a range, P90 to P10 (why the low case is not every input at its low end, which inputs drive the range, and which data could change the decision), with 74 checks on the page against hand calculations and an independent calculation, and a one-page summary."
+abstract: "Small tools and notes from my work as a petroleum geologist. Each one deals with the same question: how sure are we, and what would make us surer? Tool 01 is a post-drill look-back template in Excel (prediction vs. result) with a hand-worked example and 32 checks. Tool 02 is an interactive page that checks a planned magnetic survey against one geological question (a dyke, a sill edge or a plug: visible or not, one anomaly or two, line spacing), with 24 checks against known answers. Tool 03 is an interactive page on planning a shallow stratigraphic drilling campaign when only a few wells are allowed (what each next well buys, how sure each core is to land in the unit it is meant for and date the horizons around it within the errors of the seismic pick, dip, cover and thickness and the chance that each unit gives an age, and how the first cores change the wells still to drill), with 49 checks against hand calculations and an independent count, and a one-page summary. Tool 04 is an interactive page and a Monte Carlo spreadsheet for a prospect's oil in place as a range, P90 to P10 (why the low case is not every input at its low end, which inputs drive the range, and which data could change the decision), with 74 checks on the page against hand calculations and an independent calculation, and a one-page summary. Tool 05 is an interactive page that checks one fault before it goes into a fault framework (which intervals it grew through, which of those calls are larger than the pick uncertainty, and whether the reservoir faces its seal across the fault), with 55 checks against hand calculations and an independent calculation."
 type: software
-version: "1.3"
-date-released: "2026-11-19"
+version: "1.4"
+date-released: "2026-11-20"
 doi: 10.5281/zenodo.24242389
 authors:
   - family-names: Balagurov
@@ -26,3 +26,6 @@ keywords:
   - probabilistic volumetrics
   - Monte Carlo
   - prospect evaluation
+  - fault framework
+  - growth faults
+  - fault juxtaposition
