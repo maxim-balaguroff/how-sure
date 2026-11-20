@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When did the fault move?</title>
+<meta name="description" content="One fault on a depth section, checked before it goes into the fault framework: which intervals it grew through, which of those calls are larger than the pick uncertainty, and whether the reservoir faces its seal across the fault.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="When did the fault move?">
+<meta property="og:description" content="One fault on a depth section, checked before it goes into the fault framework: which intervals it grew through, which of those calls are larger than the pick uncertainty, and whether the reservoir faces its seal across the fault.">
+<meta property="og:url" content="https://maxim-balaguroff.github.io/how-sure/05-fault-timing/fault-timing.html">
+<meta property="og:image" content="https://maxim-balaguroff.github.io/how-sure/05-fault-timing/cover.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1254">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    color-scheme: light;
+    --page: #ffffff; --surface: #fafaf8; --card: #ffffff; --ink: #111110; --ink-2: #52514e; --muted: #6b6963;
+    --rule: #e2e1db; --grid: #ecebe6; --axis: #b9b8ae; --accent: #2a78d6; --accent-soft: #e6f0fb;
+    --ok: #1f8a4c; --ok-soft: #e5f4ea; --warn: #965a00; --warn-soft: #fbf0dc; --bad: #b3261e; --bad-soft: #fbe7e5; --focus: #2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #9a988f;
+      --rule: #34332f; --grid: #2a2a27; --axis: #6a6961; --accent: #6aa7ee; --accent-soft: #1d2b3c;
+      --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f; --bad: #f08a80; --bad-soft: #3a1c19;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #9a988f;
+    --rule: #34332f; --grid: #2a2a27; --axis: #6a6961; --accent: #6aa7ee; --accent-soft: #1d2b3c;
+    --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f; --bad: #f08a80; --bad-soft: #3a1c19;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--page); color: var(--ink); }
+  body { font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif; font-size: 15px; line-height: 1.5; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 40px; }
+  .kicker { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 6px; }
+  h1 { font-size: 32px; line-height: 1.12; margin: 0 0 10px; letter-spacing: -.015em; }
+  .lead { font-size: 19px; max-width: 780px; margin: 0 0 24px; }
+  .why { font-size: 14.5px; color: var(--ink-2); max-width: 780px; margin: -12px 0 24px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 10px; }
+  h2.sec { font-size: 22px; line-height: 1.2; text-transform: none; letter-spacing: -.01em; color: var(--ink); margin: 30px 0 8px; }
+  .card { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; min-width: 0; }
+  .finds { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0 0 8px; }
+  .find { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; min-width: 0; }
+  .find.wide { grid-column: 1 / -1; }
+  .find h2 { font-size: 19px; line-height: 1.25; text-transform: none; letter-spacing: 0; color: var(--ink); margin: 0 0 8px; }
+  .find .fl { display: inline-block; min-width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 6px; background: var(--accent); color: var(--page); font-size: 15px; margin-right: 9px; vertical-align: 1px; }
+  .find .ft { margin: 0 0 10px; }
+  .find .rule { font-size: 13.5px; color: var(--ink-2); margin: 8px 0 0; }
+  .cgrid { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; align-items: start; }
+  .cgrid > * { min-width: 0; }
+  .cgrid p { margin: 0 0 8px; }
+  figure { margin: 0; }
+  figcaption { font-size: 13px; color: var(--ink-2); margin: 4px 0 0; }
+  svg { display: block; width: 100%; height: auto; }
+  svg text { font-family: "Segoe UI", system-ui, Arial, sans-serif; font-size: 12px; fill: var(--ink-2); }
+  svg .b { fill: var(--ink); font-weight: 700; }
+  svg .ax { stroke: var(--axis); stroke-width: 1; fill: none; }
+  svg .gr { stroke: var(--grid); stroke-width: 1; }
+  svg .ln { stroke: var(--accent); stroke-width: 2; fill: none; }
+  svg .dash { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 4 3; fill: none; }
+  svg .need { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 5 3; }
+  svg .bar { fill: var(--accent); }
+  svg .barm { fill: var(--axis); }
+  svg .dot { fill: var(--accent); stroke: var(--card); stroke-width: 2; }
+  svg .dotm { fill: var(--axis); stroke: var(--card); stroke-width: 2; }
+  svg .seg { stroke: var(--accent); stroke-width: 4; stroke-linecap: round; }
+  svg .segm { stroke: var(--axis); stroke-width: 4; stroke-linecap: round; }
+  svg .tri { fill: var(--ink); }
+  svg .halo { paint-order: stroke; stroke: var(--card); stroke-width: 3px; stroke-linejoin: round; }
+  .inrow { display: grid; grid-template-columns: 1fr 340px; gap: 16px; align-items: start; margin-bottom: 16px; }
+  .inrow > * { min-width: 0; }
+  .legend { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 8px; display: block; }
+  .exnote { font-size: 13px; color: var(--ink-2); margin: 0 0 12px; }
+  .rhead, .row { display: grid; grid-template-columns: minmax(130px, 1fr) 96px 96px 132px; gap: 6px; align-items: center; }
+  .rhead { font-size: 12.5px; color: var(--muted); margin-bottom: 4px; align-items: end; }
+  .rhead .r { text-align: right; }
+  .row { margin-bottom: 6px; }
+  .row .nm { font-size: 14px; }
+  .row .cl { display: none; font-size: 12px; color: var(--muted); }
+  .field { display: grid; grid-template-columns: 1fr 150px; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .field label { font-size: 14px; }
+  .field.full { grid-template-columns: 1fr; }
+  .hint { font-size: 12.5px; color: var(--muted); margin: 6px 0 0; }
+  input[type=number], select { width: 100%; font: inherit; font-size: 14px; padding: 5px 7px; border: 1px solid var(--rule); border-radius: 6px; background: var(--page); color: var(--ink); min-width: 0; }
+  input[type=number] { font-variant-numeric: tabular-nums; text-align: right; }
+  input:focus, select:focus { outline: 2px solid var(--focus); outline-offset: 0; border-color: transparent; }
+  input[aria-invalid="true"] { border-color: var(--bad); background: var(--bad-soft); }
+  button { font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; }
+  button:hover { border-color: var(--axis); }
+  button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .errs { border: 1px solid var(--bad); background: var(--bad-soft); color: var(--bad); border-radius: 8px; padding: 10px 14px; margin: 0 0 14px; }
+  .errs ul { margin: 0; padding-left: 18px; }
+  .verdict { border-radius: 10px; padding: 14px 16px; margin: 0 0 14px; border: 1px solid transparent; }
+  .verdict .v { font-size: 20px; font-weight: 700; line-height: 1.25; }
+  .verdict .s { color: var(--ink-2); margin-top: 4px; }
+  .verdict.clear { background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+  .verdict.clear .v { color: var(--ok); }
+  .verdict.marginal { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+  .verdict.marginal .v { color: var(--warn); }
+  .verdict.below { background: var(--bad-soft); border-color: color-mix(in srgb, var(--bad) 35%, transparent); }
+  .verdict.below .v { color: var(--bad); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; }
+  .stat .n { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; overflow-wrap: anywhere; }
+  .stat .l { font-size: 12.5px; color: var(--ink-2); }
+  .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; margin: 14px 0; }
+  .answers > * { min-width: 0; }
+  .answer { border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; }
+  .answer p { margin: 0; }
+  .answer h3 { font-size: 15px; margin: 0 0 4px; }
+  .answer .rule { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--rule); font-size: 14px; vertical-align: top; }
+  th:first-child, td:first-child { text-align: left; }
+  #tbl td { white-space: nowrap; } #tbl td:first-child { white-space: normal; }
+  th { font-size: 12.5px; color: var(--ink-2); font-weight: 600; vertical-align: bottom; }
+  .tablenote { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+  .tag.yes { background: var(--accent-soft); color: var(--accent); }
+  .tag.no { background: var(--surface); color: var(--ink-2); border: 1px solid var(--rule); }
+  details { margin-top: 24px; border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; background: var(--surface); }
+  details > summary + * { margin-top: 12px; }
+  summary { cursor: pointer; font-weight: 700; }
+  summary .pass { color: var(--ok); }
+  summary .fail { color: var(--bad); }
+  .plain ul, .plain ol { margin: 0; padding-left: 18px; }
+  .plain li { margin-bottom: 6px; }
+  .lim { margin: 28px 0 14px; }
+  #checks td.st { font-weight: 700; }
+  #checks td.st.ok { color: var(--ok); }
+  #checks td.st.no { color: var(--bad); }
+  #checks td.src { text-align: left; color: var(--ink-2); font-size: 13px; }
+  footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--rule); color: var(--ink-2); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  a { color: var(--accent); }
+  .nw { white-space: nowrap; }
+  @media (max-width: 1100px) { .inrow { grid-template-columns: 1fr; } }
+  @media (max-width: 980px) { .finds, .cgrid, .answers { grid-template-columns: 1fr; } .stats { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 760px) {
+    h1 { font-size: 26px; }
+    .lead { font-size: 17px; }
+    input[type=number], select { font-size: 16px; min-height: 44px; }
+    button { min-height: 44px; }
+    .rhead { display: none; }
+    .row { grid-template-columns: 1fr 1fr; border: 1px solid var(--rule); border-radius: 8px; padding: 8px; margin-bottom: 8px; align-items: end; }
+    .row .nm { grid-column: 1 / -1; font-weight: 600; }
+    .row .c-shape { grid-column: 1 / -1; }
+    .row .cl { display: block; margin-bottom: 2px; }
+  }
+  @media (max-width: 600px) { #checks .tol, #checks .src { display: none; } }
+  @media (max-width: 420px) { th, td { padding: 6px 4px; font-size: 13.5px; } .stat .n { font-size: 19px; } }
+
+  /* tool 05 */
+  :root { --u-young: #f3e3c3; --u-old: #8f5f2f; --neutral: #eeede8; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --u-young: #6b5638; --u-old: #c08a50; --neutral: #2a2a27; } }
+  :root[data-theme="dark"] { --u-young: #6b5638; --u-old: #c08a50; --neutral: #2a2a27; }
+  input[type=text] { width: 100%; font: inherit; font-size: 14px; padding: 5px 7px; border: 1px solid var(--rule); border-radius: 6px; background: var(--page); color: var(--ink); min-width: 0; }
+  .hhead, .hrow { display: grid; grid-template-columns: 64px 1fr 1fr 74px minmax(110px, 1.3fr) 104px 30px; gap: 6px; align-items: center; }
+  .hhead { font-size: 12.5px; color: var(--muted); margin-bottom: 4px; align-items: end; }
+  .hhead .r { text-align: right; }
+  .hrow { margin-bottom: 6px; }
+  .hrow .cl { display: none; font-size: 12px; color: var(--muted); }
+  .hrow .del { padding: 4px 0; }
+  .hrow input:disabled, .hrow select:disabled { opacity: .35; }
+  button:disabled { opacity: .5; cursor: default; }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag.warn { background: var(--warn-soft); color: var(--warn); }
+  svg .nb { fill: var(--neutral); }
+  svg .strip0 { fill: none; stroke: var(--axis); stroke-width: 1; }
+  .chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 14px; }
+  .chip { background: var(--surface); border: 1px solid var(--rule); border-left: 5px solid var(--accent); border-radius: 8px; padding: 9px 13px; min-width: 0; }
+  .chip b { display: block; font-size: 24px; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .chip span { font-size: 13.5px; color: var(--ink-2); }
+  .chip.c-unsure { border-left-color: var(--axis); } .chip.c-bad { border-left-color: var(--bad); } .chip.c-ok { border-left-color: var(--ok); }
+  .sign { margin: 8px 0 0; }
+  .sign ol { margin: 0; padding-left: 20px; }
+  .sign li { margin-bottom: 8px; }
+  @media (max-width: 760px) { .chips { grid-template-columns: 1fr; } }
+  svg .hz { stroke: var(--card); stroke-width: 1.5; }
+  svg .flt { stroke: var(--ink); stroke-width: 2.5; }
+  svg .barw { fill: var(--warn); }
+  svg .wh { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+  svg .frame { fill: none; stroke: var(--ink); stroke-width: 2.5; }
+  svg .f-seal { fill: var(--ok); } svg .f-res { fill: #d9962b; } svg .f-leak { fill: var(--bad); } svg .f-other { fill: var(--axis); }
+  @media (max-width: 760px) {
+    input[type=text] { font-size: 16px; min-height: 44px; }
+    .hhead { display: none; }
+    .hrow { grid-template-columns: 1fr 1fr 1fr 44px; border: 1px solid var(--rule); border-radius: 8px; padding: 8px; margin-bottom: 8px; align-items: end; }
+    .hrow .cl { display: block; margin-bottom: 2px; }
+    .hrow .c-name { grid-column: 1; grid-row: 1; } .hrow .c-zf { grid-column: 2; grid-row: 1; } .hrow .c-zh { grid-column: 3; grid-row: 1; } .hrow .del { grid-column: 4; grid-row: 1; }
+    .hrow .c-e { grid-column: 1; grid-row: 2; } .hrow .c-in { grid-column: 2 / 4; grid-row: 2; } .hrow .c-role { grid-column: 1 / 4; grid-row: 3; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">how-sure · tool 05 · before signing a fault framework · v1.4</p>
+  <h1>When did the fault move?</h1>
+  <p class="lead">One fault on a depth section, checked before it goes into the fault framework: which intervals it grew through, which of those calls are larger than the pick uncertainty, and whether the reservoir faces its seal across the fault.</p>
+  <p class="why">Maxim Balagurov, petroleum geologist. In my own work I interpret 3D seismic, build fault framework models and co-sign the exploration reports that rest on them. This page works through one check on a fault before it goes into the framework, from the depths of the same horizons on the two sides of a normal fault. The example below is made up.</p>
+  <p class="why">Published work on building a geological model of a structurally complex area: Balagurov et al., 2026, <a href="https://doi.org/10.1007/978-981-95-9869-4_83">Integrated Geophysical Interpretation for Geological Modeling of a Structurally Complex Region Influenced by Salt Tectonics and Magmatism (Eastern Siberia, Russia)</a>, Proceedings of IFEDC 2025, Springer. The example on this page is not taken from that paper.</p>
+
+  <div id="errs" class="errs" hidden></div>
+
+  <div class="chips" id="chips" aria-label="The section in three numbers"></div>
+
+  <section class="finds" aria-label="Three findings on the made-up example">
+    <article class="find" id="find-a">
+      <h2><span class="fl">A</span>The thicker side tells when the fault moved</h2>
+      <p class="ft" id="fa-text"></p>
+      <figure>
+        <svg id="section" viewBox="0 0 680 330" role="img" aria-labelledby="sec-title sec-desc">
+          <title id="sec-title">The section across the fault</title>
+          <desc id="sec-desc">The same horizons on the footwall, left, and on the hanging wall, right, drawn to depth, with the throw at each horizon, the extra thickness of each interval on the hanging wall, and a strip at the right edge that marks the intervals during which the fault moved.</desc>
+        </svg>
+        <figcaption id="sec-cap"></figcaption>
+      </figure>
+      <p class="rule">An interval that is thicker on the downthrown side was laid down while the fault was moving. The extra thickness is the throw added in that time, provided sediment filled the space and nothing was eroded off the footwall. An interval of the same thickness on both sides shows no growth: any offset it has was added after it.</p>
+    </article>
+    <article class="find" id="find-b">
+      <h2><span class="fl">B</span>Some of those calls are inside the pick uncertainty</h2>
+      <p class="ft" id="fb-text"></p>
+      <figure>
+        <svg id="growth" viewBox="0 0 680 330" role="img" aria-labelledby="gr-title gr-desc">
+          <title id="gr-title">Extra thickness on the hanging wall, interval by interval</title>
+          <desc id="gr-desc">One bar per interval, youngest at the top: how much thicker the interval is on the hanging wall, with the range the true value lies in eight times in ten, and the chance that it is above zero.</desc>
+        </svg>
+        <figcaption id="gr-cap"></figcaption>
+      </figure>
+      <p class="rule" id="fb-rule"></p>
+    </article>
+    <article class="find wide" id="find-c">
+      <h2><span class="fl">C</span>Does the reservoir face its seal across the fault?</h2>
+      <p class="ft" id="fc-text"></p>
+      <div class="cgrid">
+        <figure>
+          <svg id="facing" viewBox="0 0 680 300" role="img" aria-labelledby="fc-title fc-desc">
+            <title id="fc-title">What the footwall reservoir is juxtaposed against</title>
+            <desc id="fc-desc">Two columns to the same depth scale: the footwall with its reservoir, and the hanging wall beside it. A strip between them shows what each part of the footwall reservoir lies against: the seal, beds above the seal, or the reservoir itself.</desc>
+          </svg>
+          <figcaption id="fc-cap"></figcaption>
+        </figure>
+        <div id="facing-body"></div>
+      </div>
+      <p class="rule">This is juxtaposition only: which beds lie against which at the fault. Whether the fault rock itself seals is a separate question, and so is the trap away from this section. A fault that moved after the seal was laid down has offset that seal, and the framework should say by how much. Whether it moved after charge is the sharper question, and needs the timing of charge.</p>
+    </article>
+  </section>
+
+  <section class="card sign plain" aria-labelledby="sign-h">
+    <h2 id="sign-h">Before signing: three things to do</h2>
+    <ol id="sign-list"></ol>
+  </section>
+
+  <h2 class="sec">Try your own fault</h2>
+  <form id="form" autocomplete="off" onsubmit="return false">
+    <p class="exnote">The form holds the made-up example: six horizons across a normal fault. Change any number and the findings above and the numbers below update.</p>
+    <div class="inrow">
+      <section class="card" aria-labelledby="lg-in">
+        <span class="legend" id="lg-in">Horizons, youngest first</span>
+        <div class="hhead"><span>Horizon</span><span class="r">Footwall, m</span><span class="r">Hanging wall, m</span><span class="r">Pick ±, m</span><span>Interval below it</span><span>Its role</span><span></span></div>
+        <div id="rows"></div>
+        <div class="btns" style="margin-top:8px"><button type="button" id="add">Add a horizon</button><button type="button" id="reset">Back to the example</button></div>
+        <p class="hint">Depths are the cutoffs: where each horizon meets the fault on the upthrown side (footwall) and on the downthrown side (hanging wall). Pick ± is the most the true depth can differ from your pick on one side, not the typical miss. A constant shift of both sides cancels in the throw; anything that differs across the fault, a velocity difference included, belongs in ±.</p>
+      </section>
+      <section class="card" aria-labelledby="lg-dec">
+        <span class="legend" id="lg-dec">How sure is sure enough</span>
+        <div class="field"><label for="sure">Call a difference real when its chance is at least</label><select id="sure"><option value="80">80 %</option><option value="90">90 %</option><option value="95">95 %</option></select></div>
+        <p class="hint">Below that the page says "too close to call" and leaves it to more data: a better pick, another section along the fault, a well.</p>
+        <span class="legend" style="margin-top:14px">Roles</span>
+        <p class="hint" style="margin-top:0">Mark one interval as the reservoir and the interval directly above it as its seal to get finding C. Leave the roles empty to read the timing only.</p>
+      </section>
+    </div>
+  </form>
+
+  <main id="out">
+    <h2 class="sec">The numbers in full</h2>
+    <div id="verdict" class="verdict"></div>
+    <div class="tablewrap"><table id="tbl-h"></table></div>
+    <div class="tablewrap" style="margin-top:14px"><table id="tbl-i"></table></div>
+    <p class="tablenote" id="tbl-note"></p>
+    <div class="answers" id="answers"></div>
+  </main>
+
+  <section class="card lim plain" aria-labelledby="lim-h">
+    <h2 id="lim-h">Limits</h2>
+    <ul>
+      <li><b>The numbers are made up.</b> No survey, well or company data went into the example.</li>
+      <li><b>One section through the fault.</b> Throw changes along strike. Repeat the check on several sections: throw should vary smoothly, and a sudden change that is not at a branch line or a relay is a pick or a correlation to check again.</li>
+      <li><b>Juxtaposition, and nothing about the fault rock.</b> Smear, gouge and cementation can seal a reservoir-on-reservoir contact; fractures and later movement can make a sealing contact leak. The page does not model them.</li>
+    </ul>
+    <details>
+      <summary>More limits</summary>
+      <ul>
+        <li>Normal faults only. A hanging wall that is thinner than the footwall is flagged, and may mean a wrong correlation across the fault, a fault that dies out downward, inversion, or strike-slip offset of a unit that changes thickness laterally.</li>
+        <li>Depths in metres after depth conversion. In two-way time the thickness ratios also carry the velocity change across the fault.</li>
+        <li>Thicknesses are vertical. Beds that dip 10 to 15° into the fault look 2 to 4 % thicker than they are, which is the size of a small expansion index.</li>
+        <li>Pick ± is taken as a hard limit, equally likely anywhere inside it and independent between picks. A pick on the wrong loop, one cycle out, is a different kind of error, 30 to 50 m, and is not covered. Near a fault the footwall pick is often the worse one.</li>
+        <li>A throw smaller than the data can resolve should be read as too close to call, whatever the arithmetic says.</li>
+        <li>Compaction and erosion are not restored. An interval thinned by erosion on the footwall looks like growth.</li>
+        <li>Each interval and each horizon is judged on its own. Neighbouring intervals share a pick, so their errors are linked; the page does not combine them.</li>
+        <li>The reservoir is read on the footwall side, a common trap against a normal fault. The hanging-wall side is not tested.</li>
+      </ul>
+    </details>
+  </section>
+
+  <details class="plain">
+    <summary>How it works</summary>
+    <ol>
+      <li>Throw at a horizon = its depth on the hanging wall minus its depth on the footwall.</li>
+      <li>Thickness of an interval = depth of its base minus depth of its top, on each side. The difference, hanging wall minus footwall, is the growth; it is also the throw at the base minus the throw at the top. The expansion index is the ratio of the two thicknesses.</li>
+      <li>Each pick may be off by anything within its ±, with equal chance. A throw rests on two picks and a difference in thickness on four, so their errors add. The chance that the true value is above zero is worked out exactly, from the distribution of a sum of such errors; nothing is drawn at random.</li>
+      <li>The line on each bar is the range that holds the true difference eight times in ten, whatever level of sureness is chosen.</li>
+      <li>The footwall reservoir is laid against the hanging wall at the same depths. Because the depths are cutoffs at the fault, the dip of the fault does not enter. The window above the seal is the part of the footwall reservoir that lies above the top of the seal on the hanging wall; its chance rests on two picks.</li>
+    </ol>
+  </details>
+
+  <details class="plain">
+    <summary>Rules it uses</summary>
+    <ul>
+      <li><b>Thicker on the downthrown side means the fault was moving.</b> The extra thickness is the throw added while that interval was deposited.</li>
+      <li><b>A difference in thickness rests on four picks.</b> With the same ± on all four it has to exceed 1.0 times that ± to be resolved at 80 %, 1.5 times at 90 % and 1.9 times at 95 %.</li>
+      <li><b>The expansion index hides the uncertainty.</b> A thin interval can show a large ratio from a difference of a few metres. Read the metres and their range first.</li>
+      <li><b>An offset horizon dates the last movement.</b> The fault was still moving after the youngest horizon it clearly offsets, whether or not the interval above shows growth.</li>
+      <li><b>A fault that moved after the seal offsets the seal.</b> Compare the throw at the top of the reservoir with the thickness of the seal on the hanging wall before calling the trap sealed.</li>
+    </ul>
+  </details>
+
+  <details id="checks-box">
+    <summary>Checks: <span id="checks-sum"></span></summary>
+    <p class="hint">The checks run in your browser each time the page opens, on fixed cases, whatever is in the form. "By hand" answers come from arithmetic and areas written out beside them. "Independent calculation" answers come from <a href="fault_ref.py">fault_ref.py</a>: plain Monte Carlo, 4,000,000 draws per case, sharing no code with this page.</p>
+    <div class="tablewrap"><table id="checks"></table></div>
+  </details>
+
+  <footer>
+    <span>Built with AI assistance; the geology and the checks are mine.</span>
+    <span>Maxim Balagurov, petroleum geologist</span>
+    <span><a href="https://github.com/maxim-balaguroff/how-sure">github.com/maxim-balaguroff/how-sure</a></span>
+    <span>CC BY 4.0</span>
+  </footer>
+</div>
+
+<script>
+"use strict";
+const EXAMPLE = {
+  sure: 90,
+  hz: [
+    { name: "H1", zf: 900, zh: 905, e: 9, iname: "upper mudstone", role: "" },
+    { name: "H2", zf: 1150, zh: 1162, e: 9, iname: "upper sandstone", role: "" },
+    { name: "H3", zf: 1400, zh: 1460, e: 12, iname: "siltstone", role: "" },
+    { name: "H4", zf: 1620, zh: 1725, e: 15, iname: "shale", role: "seal" },
+    { name: "H5", zf: 1700, zh: 1810, e: 18, iname: "sandstone", role: "reservoir" },
+    { name: "H6", zf: 1950, zh: 2100, e: 22, iname: "", role: "" }
+  ]
+};
+
+// ---------- the arithmetic ----------
+// chance that a sum of independent errors, each anywhere within +/- a[k] with equal chance, is at most x
+function cdfSum(x, a) {
+  a = a.filter(function (v) { return v > 0; });
+  const n = a.length;
+  if (!n) return x >= 0 ? 1 : 0;
+  let tot = 0, den = 1, fact = 1;
+  for (let k = 0; k < n; k++) { tot += a[k]; den *= 2 * a[k]; fact *= k + 1; }
+  if (x <= -tot) return 0;
+  if (x >= tot) return 1;
+  let sum = 0;
+  for (let mask = 0; mask < (1 << n); mask++) {
+    let s = 0, bits = 0;
+    for (let k = 0; k < n; k++) if (mask & (1 << k)) { s += a[k]; bits++; }
+    const v = x + tot - 2 * s;
+    if (v > 0) sum += (bits % 2 ? -1 : 1) * Math.pow(v, n);
+  }
+  return Math.min(1, Math.max(0, sum / (fact * den)));
+}
+function quantSum(p, a) {                // the value the sum stays below with chance p
+  let tot = 0; a.forEach(function (v) { tot += Math.max(v, 0); });
+  if (!tot) return 0;
+  let lo = -tot, hi = tot;
+  for (let i = 0; i < 60; i++) { const mid = (lo + hi) / 2; if (cdfSum(mid, a) < p) lo = mid; else hi = mid; }
+  return (lo + hi) / 2;
+}
+function chanceAbove0(obs, a) {          // chance that obs + error is above zero, %
+  if (!a.some(function (v) { return v > 0; })) return obs > 0 ? 100 : obs < 0 ? 0 : 50;
+  return (1 - cdfSum(-obs, a)) * 100;
+}
+
+// by what factor the four pick uncertainties must shrink for a difference g to be called real; null if nothing would do it
+function needScale(g, a, sure) {
+  if (g <= 0) return null;
+  if (chanceAbove0(g, a) >= sure) return 1;
+  let lo = 0, hi = 1;
+  for (let i = 0; i < 50; i++) { const mid = (lo + hi) / 2; if (chanceAbove0(g, a.map(function (x) { return x * mid; })) >= sure) lo = mid; else hi = mid; }
+  return lo;
+}
+
+function solve(m) {
+  const h = m.hz, n = h.length, sure = m.sure;
+  const call = function (p) { return p >= sure ? "yes" : p <= 100 - sure ? "no" : "unsure"; };
+  const hor = h.map(function (x) {
+    const t = x.zh - x.zf, p = chanceAbove0(t, [x.e, x.e]);
+    return { name: x.name, zf: x.zf, zh: x.zh, e: x.e, throw: t, p: p, call: call(p) };
+  });
+  const iv = [];
+  for (let i = 0; i < n - 1; i++) {
+    const a = [h[i].e, h[i].e, h[i + 1].e, h[i + 1].e];
+    const tf = h[i + 1].zf - h[i].zf, th = h[i + 1].zh - h[i].zh, g = th - tf, p = chanceAbove0(g, a);
+    iv.push({ i: i, name: h[i].iname || ("interval " + h[i].name + " to " + h[i + 1].name), role: h[i].role, tf: tf, th: th, g: g, ei: tf > 0 ? th / tf : NaN,
+              p: p, call: call(p), lo: g + quantSum(0.1, a), hi: g + quantSum(0.9, a), top: h[i].name, base: h[i + 1].name });
+  }
+  const grew = iv.filter(function (v) { return v.call === "yes"; }), unsure = iv.filter(function (v) { return v.call === "unsure"; }), thin = iv.filter(function (v) { return v.call === "no"; });
+  const lastOff = hor.findIndex(function (x) { return x.call === "yes"; });      // the youngest horizon clearly offset
+  const R = { hor: hor, iv: iv, grew: grew, unsure: unsure, thin: thin, total: hor[n - 1].throw, sure: sure, lastOff: lastOff };
+  // the footwall reservoir against the hanging wall; the seal is the interval directly above the reservoir
+  const r = iv.findIndex(function (v) { return v.role === "reservoir"; }), s = iv.findIndex(function (v) { return v.role === "seal"; });
+  if (r >= 1 && s === r - 1) {
+    const top = h[r].zf, base = h[r + 1].zf, face = [];
+    const cut = function (a, b, label, kind) { const lo = Math.max(a, top), hi = Math.min(b, base); if (hi - lo > 1e-9) face.push({ from: lo, to: hi, len: hi - lo, label: label, kind: kind }); };
+    cut(-Infinity, h[0].zh, "beds above " + h[0].name, "above");
+    iv.forEach(function (v, j) { cut(h[j].zh, h[j + 1].zh, v.name + (v.role ? " (" + v.role + ")" : ""), v.role === "seal" ? "seal" : v.role === "reservoir" ? "reservoir" : (j < s ? "above" : "other")); });
+    cut(h[n - 1].zh, Infinity, "beds below " + h[n - 1].name, "other");
+    const win = h[s].zh - h[r].zf, pWin = chanceAbove0(win, [h[s].e, h[r].e]);
+    R.trap = { r: r, s: s, top: top, base: base, face: face, win: win, pWin: pWin, call: call(pWin), sealTh: iv[s].th, whole: win >= base - top, above: face.filter(function (f) { return f.kind === "above"; }), throwRes: hor[r].throw, throwSeal: hor[s].throw,
+               sand: h[r].zh < base, sandFrom: h[r].zh,
+               after: grew.filter(function (v) { return v.i < s; }), topSealOffset: hor[s].call === "yes" };
+  }
+  return R;
+}
+
+// ---------- the form ----------
+const $ = function (id) { return document.getElementById(id); };
+function rowHtml(x) {
+  const role = function (v, t) { return '<option value="' + v + '"' + (x.role === v ? " selected" : "") + ">" + t + "</option>"; };
+  return '<div class="hrow">' +
+    '<label class="c-name"><span class="cl">Horizon</span><input type="text" class="nm" value="' + esc(x.name) + '" aria-label="Horizon name"></label>' +
+    '<label class="c-zf"><span class="cl">Footwall, m</span><input type="number" step="any" class="zf" value="' + x.zf + '" aria-label="Depth on the footwall"></label>' +
+    '<label class="c-zh"><span class="cl">Hanging wall, m</span><input type="number" step="any" class="zh" value="' + x.zh + '" aria-label="Depth on the hanging wall"></label>' +
+    '<label class="c-e"><span class="cl">Pick ±, m</span><input type="number" step="any" min="0" class="e" value="' + x.e + '" aria-label="Pick uncertainty"></label>' +
+    '<label class="c-in"><span class="cl">Interval below it</span><input type="text" class="in" value="' + esc(x.iname) + '" aria-label="Name of the interval below this horizon"></label>' +
+    '<label class="c-role"><span class="cl">Its role</span><select class="role" aria-label="Role of the interval below this horizon">' + role("", "none") + role("seal", "seal") + role("reservoir", "reservoir") + "</select></label>" +
+    '<button type="button" class="del" aria-label="Remove this horizon">×</button></div>';
+}
+function fill(e) { $("rows").innerHTML = e.hz.map(rowHtml).join(""); $("sure").value = String(e.sure); tidy(); }
+function tidy() {                         // the last horizon has no interval below it
+  const rows = [...document.querySelectorAll(".hrow")];
+  rows.forEach(function (r, i) { const last = i === rows.length - 1; r.querySelector(".in").disabled = last; r.querySelector(".role").disabled = last; r.querySelector(".del").disabled = rows.length <= 3; });
+  $("add").disabled = rows.length >= 8;
+}
+function read() {
+  const errs = [], hz = [];
+  document.querySelectorAll("#form [aria-invalid]").forEach(function (x) { x.removeAttribute("aria-invalid"); });
+  const rows = [...document.querySelectorAll(".hrow")];
+  rows.forEach(function (r, i) {
+    const g = function (c) { return r.querySelector("." + c); }, nm = g("nm").value.trim() || "H" + (i + 1);
+    const zf = parseFloat(g("zf").value), zh = parseFloat(g("zh").value), e = parseFloat(g("e").value);
+    if (!isFinite(zf)) { errs.push(nm + ": enter the depth on the footwall."); g("zf").setAttribute("aria-invalid", "true"); }
+    if (!isFinite(zh)) { errs.push(nm + ": enter the depth on the hanging wall."); g("zh").setAttribute("aria-invalid", "true"); }
+    if (!isFinite(e) || e < 0) { errs.push(nm + ": the pick uncertainty must be zero or more."); g("e").setAttribute("aria-invalid", "true"); }
+    hz.push({ name: nm, zf: zf, zh: zh, e: e, iname: i < rows.length - 1 ? g("in").value.trim() : "", role: i < rows.length - 1 ? g("role").value : "" });
+  });
+  if (!errs.length) {
+    for (let i = 1; i < hz.length; i++) {
+      if (hz[i].zf <= hz[i - 1].zf) { errs.push(hz[i].name + ": on the footwall it must lie deeper than " + hz[i - 1].name + ". Horizons go youngest first."); rows[i].querySelector(".zf").setAttribute("aria-invalid", "true"); }
+      if (hz[i].zh <= hz[i - 1].zh) { errs.push(hz[i].name + ": on the hanging wall it must lie deeper than " + hz[i - 1].name + "."); rows[i].querySelector(".zh").setAttribute("aria-invalid", "true"); }
+    }
+    const neg = hz.filter(function (x) { return x.zh < x.zf; }).length;
+    if (neg > hz.length / 2) errs.push("Most horizons are shallower on the hanging wall than on the footwall. Swap the two columns: the hanging wall is the downthrown side.");
+    const roles = hz.map(function (x) { return x.role; }), s = roles.indexOf("seal"), r = roles.indexOf("reservoir");
+    if (roles.filter(function (x) { return x === "seal"; }).length > 1 || roles.filter(function (x) { return x === "reservoir"; }).length > 1) errs.push("Mark one seal and one reservoir at most.");
+    else if (s >= 0 && r >= 0 && s !== r - 1) errs.push("The seal has to be the interval directly above the reservoir.");
+  }
+  return { m: { hz: hz, sure: parseFloat($("sure").value) }, errs: errs };
+}
+
+// ---------- words and numbers ----------
+function fm(x) { return (Math.abs(x) >= 100 ? Math.round(x) : Math.round(x * 10) / 10).toLocaleString("en-US") + " m"; }
+function fn(x) { return (Math.abs(x) >= 100 ? Math.round(x) : Math.round(x * 10) / 10).toLocaleString("en-US"); }
+function fp(x) { return (x > 99.5 ? "over 99" : x < 0.5 ? "under 1" : Math.round(x).toString()) + " %"; }
+function list(a) { return a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;"); }
+function shade(i, n) { return "fill:color-mix(in srgb, var(--u-old) " + Math.round(n > 1 ? i / (n - 1) * 100 : 50) + "%, var(--u-young))"; }
+function tagged(v) { return v.name + (v.role ? " (" + v.role + ")" : ""); }
+
+// ---------- pictures ----------
+function vw() { return window.matchMedia("(max-width: 600px)").matches ? 420 : 680; }
+function drawSection(m, R) {
+  const W = vw(), h = R.hor, n = h.length, top = 22, bot = 300, xL = 58, xR = W - 36;
+  const zMin = Math.min(h[0].zf, h[0].zh), zMax = Math.max(h[n - 1].zf, h[n - 1].zh), pad = (zMax - zMin) * 0.07;
+  const Y = function (z) { return top + (z - (zMin - pad)) / (zMax - zMin + 2 * pad) * (bot - top); };
+  const xc = (xL + xR) / 2, lean = W < 500 ? 34 : 52, XF = function (y) { return xc - lean / 2 + (y - top) / (bot - top) * lean; };
+  let s = "";
+  const block = function (side, za, zb, style) {
+    const ya = Y(za), yb = Y(zb), a = style ? 'style="' + style + '"' : 'class="nb"';
+    return side === "f" ? '<polygon points="' + xL + "," + ya + " " + XF(ya) + "," + ya + " " + XF(yb) + "," + yb + " " + xL + "," + yb + '" ' + a + "/>"
+                        : '<polygon points="' + XF(ya) + "," + ya + " " + xR + "," + ya + " " + xR + "," + yb + " " + XF(yb) + "," + yb + '" ' + a + "/>";
+  };
+  s += block("f", zMin - pad, h[0].zf) + block("h", zMin - pad, h[0].zh);
+  R.iv.forEach(function (v, i) {
+    s += block("f", h[i].zf, h[i + 1].zf, shade(i, n - 1)) + block("h", h[i].zh, h[i + 1].zh, shade(i, n - 1));
+    const room = Y(h[i + 1].zf) - Y(h[i].zf), tag = W < 500 ? (v.role || "") : (room > 15 ? tagged(v) : v.role);
+    if (tag && room > 11) s += '<text class="halo' + (v.role ? " b" : "") + '" x="' + (xL + 10) + '" y="' + ((Y(h[i].zf) + Y(h[i + 1].zf)) / 2 + 4) + '">' + esc(tag) + "</text>";
+    const ya = Y(h[i].zh), yb = Y(h[i + 1].zh), ym = (ya + yb) / 2, word = v.call === "yes" ? "the fault moved" : v.call === "unsure" ? "too close to call" : "clearly thinner on the hanging wall: check the correlation";
+    s += '<rect class="' + (v.call === "yes" ? "bar" : v.call === "unsure" ? "barm" : "barw") + '" x="' + (xR + 8) + '" y="' + (ya + 1) + '" width="14" height="' + Math.max(1, yb - ya - 2) + '" rx="2"><title>' + esc(cap(v.name)) + ": " + word + "</title></rect>";
+    if (yb - ya > 13) s += '<text class="halo' + (v.call === "yes" ? " b" : "") + '" x="' + ((XF(ym) + xR) / 2) + '" y="' + (ym + 4) + '" text-anchor="middle">' + (v.g >= 0 ? "+" : "−") + fn(Math.abs(v.g)) + " m" + (v.call === "unsure" ? "?" : "") + "</text>";
+  });
+  s += block("f", h[n - 1].zf, zMax + pad) + block("h", h[n - 1].zh, zMax + pad);
+  h.forEach(function (x) {
+    const yf = Y(x.zf), yh = Y(x.zh);
+    s += '<line class="hz" x1="' + xL + '" x2="' + XF(yf) + '" y1="' + yf + '" y2="' + yf + '"/><line class="hz" x1="' + XF(yh) + '" x2="' + xR + '" y1="' + yh + '" y2="' + yh + '"/>';
+    s += '<text x="' + (xL - 6) + '" y="' + (yf + 4) + '" text-anchor="end">' + esc(x.name) + "</text>";
+    s += '<text class="b halo" x="' + (xR - 8) + '" y="' + (yh - 5) + '" text-anchor="end">' + fn(x.throw) + " m</text>";
+  });
+  s += '<line class="flt" x1="' + XF(top) + '" x2="' + XF(bot) + '" y1="' + top + '" y2="' + bot + '"/>';
+  s += '<text x="' + (xL + 4) + '" y="14">footwall</text><text x="' + (xR - 34) + '" y="14" text-anchor="end">hanging wall, throw at each horizon</text><text class="b" x="' + (xR + 22) + '" y="14" text-anchor="end">moved?</text>';
+  $("section").setAttribute("viewBox", "0 0 " + W + " 312");
+  $("section").innerHTML = '<title id="sec-title">The section across the fault</title><desc id="sec-desc">The same horizons on the footwall, left, and on the hanging wall, right, drawn to depth, with the throw at each horizon, the extra thickness of each interval on the hanging wall, and a strip at the right edge that marks the intervals during which the fault moved.</desc>' + s;
+  $("sec-cap").textContent = "Depth is to scale; width is schematic. On each horizon: its throw. Inside each hanging-wall interval: how much thicker it is there. The strip on the right answers the title: blue where the fault moved, grey where the difference is too close to call (it carries a question mark), orange where the interval is clearly thinner on the hanging wall. Orange is a warning about the correlation, not a quiet fault. Movement after the youngest horizon is in the text above, not on the strip.";
+}
+function drawGrowth(m, R) {
+  const W = vw(), iv = R.iv, x0 = W < 500 ? 118 : 150, x1 = W - (W < 500 ? 74 : 78), top = 30, rowH = Math.min(46, 250 / iv.length), y0 = top + rowH * iv.length;
+  let lo = 0, hi = 0; iv.forEach(function (v) { lo = Math.min(lo, v.lo, v.g); hi = Math.max(hi, v.hi, v.g); });
+  const span = (hi - lo) || 1; lo -= span * 0.06; hi += span * 0.06;
+  const X = function (v) { return x0 + (v - lo) / (hi - lo) * (x1 - x0); };
+  const step = [1, 2, 5, 10, 20, 50, 100, 200, 500].find(function (q) { return (hi - lo) / q <= 6; }) || 1000;
+  let s = "";
+  for (let v = Math.ceil(lo / step) * step; v <= hi; v += step) s += '<line class="gr" x1="' + X(v) + '" x2="' + X(v) + '" y1="' + top + '" y2="' + y0 + '"/><text x="' + X(v) + '" y="' + (y0 + 15) + '" text-anchor="middle">' + v + "</text>";
+  s += '<line class="ax" x1="' + X(0) + '" x2="' + X(0) + '" y1="' + (top - 4) + '" y2="' + y0 + '"/>';
+  iv.forEach(function (v, i) {
+    const y = top + rowH * i + rowH / 2, cls = v.call === "yes" ? "bar" : v.call === "no" ? "barw" : "barm";
+    s += '<text class="b" x="' + (x0 - 10) + '" y="' + (y + 4) + '" text-anchor="end">' + esc(W < 500 && v.name.length > 16 ? v.top + " to " + v.base : v.name) + "</text>";
+    s += '<rect class="' + cls + '" x="' + Math.min(X(0), X(v.g)) + '" y="' + (y - 8) + '" width="' + Math.max(2, Math.abs(X(v.g) - X(0))) + '" height="16" rx="3"><title>' + esc(cap(v.name)) + ": " + fn(v.g) + " m thicker on the hanging wall as picked; eight times in ten the true difference lies between " + fn(v.lo) + " and " + fn(v.hi) + " m</title></rect>";
+    s += '<path class="wh" d="M' + X(v.lo) + "," + (y - 5) + " V" + (y + 5) + " M" + X(v.lo) + "," + y + " H" + X(v.hi) + " M" + X(v.hi) + "," + (y - 5) + " V" + (y + 5) + '"/>';
+    s += '<text class="' + (v.call === "unsure" ? "" : "b") + '" x="' + (x1 + 8) + '" y="' + (y + 4) + '">' + fp(v.p) + "</text>";
+  });
+  s += '<text x="' + (W - 4) + '" y="' + (top - 12) + '" text-anchor="end">chance it is thicker</text>';
+  s += '<text x="' + ((x0 + x1) / 2) + '" y="' + (y0 + 33) + '" text-anchor="middle">extra thickness on the hanging wall, m</text>';
+  $("growth").setAttribute("viewBox", "0 0 " + W + " " + (y0 + 42));
+  $("growth").innerHTML = "<title>Extra thickness on the hanging wall, interval by interval</title>" + s;
+  $("gr-cap").textContent = "Bars: the difference as picked. Lines: where the true difference lies eight times in ten, whatever level is chosen. Right: the chance that the hanging wall really is thicker. Grey bars are too close to call.";
+}
+function drawFacing(m, R) {
+  const W = vw(), T = R.trap, svg = $("facing");
+  if (!T) { svg.setAttribute("viewBox", "0 0 " + W + " 60"); svg.innerHTML = '<title>What the footwall reservoir is juxtaposed against</title><text x="' + (W / 2) + '" y="34" text-anchor="middle">Mark a reservoir and the seal directly above it.</text>'; $("fc-cap").textContent = ""; return; }
+  const h = m.hz, n = h.length, top = 28, bot = 262, zA = Math.min(T.top, h[T.s].zh, h[T.s].zf) - 30, zB = T.base + 30;
+  const Y = function (z) { return top + (Math.min(Math.max(z, zA), zB) - zA) / (zB - zA) * (bot - top); };
+  const cw = W < 500 ? 118 : 190, gap = 30, xa = (W - 2 * cw - gap) / 2 - (W < 500 ? 0 : 70), xb = xa + cw + gap;
+  let s = '<rect class="nb" x="' + xa + '" y="' + top + '" width="' + cw + '" height="' + (bot - top) + '"/><rect class="nb" x="' + xb + '" y="' + top + '" width="' + cw + '" height="' + (bot - top) + '"/>';
+  const col = function (x, key) {
+    let o = "";
+    R.iv.forEach(function (v, i) {
+      const ya = Y(h[i][key]), yb = Y(h[i + 1][key]);
+      if (yb - ya < 0.5) return;
+      o += '<rect x="' + x + '" y="' + ya + '" width="' + cw + '" height="' + (yb - ya) + '" style="' + shade(i, n - 1) + '"/>';
+      if (yb - ya > 14) o += '<text class="halo' + (v.role ? " b" : "") + '" x="' + (x + cw / 2) + '" y="' + ((ya + yb) / 2 + 4) + '" text-anchor="middle">' + esc(W < 500 ? (v.role || v.name) : tagged(v)) + "</text>";
+    });
+    return o;
+  };
+  s += col(xa, "zf") + col(xb, "zh");
+  s += '<rect class="frame" x="' + xa + '" y="' + Y(T.top) + '" width="' + cw + '" height="' + (Y(T.base) - Y(T.top)) + '"/>';
+  T.face.forEach(function (f) {
+    const cls = f.kind === "seal" ? "f-seal" : f.kind === "reservoir" ? "f-res" : f.kind === "above" ? "f-leak" : "f-other";
+    s += '<rect class="' + cls + '" x="' + (xa + cw + 4) + '" y="' + Y(f.from) + '" width="' + (gap - 8) + '" height="' + Math.max(2.5, Y(f.to) - Y(f.from)) + '"><title>' + fn(f.len) + " m of the footwall reservoir lie against " + esc(f.label) + "</title></rect>";
+    if (W >= 500) s += '<text class="' + (f.kind === "above" ? "b" : "") + '" x="' + (xb + cw + 12) + '" y="' + ((Y(f.from) + Y(f.to)) / 2 + 4) + '">' + fn(f.len) + " m against " + esc(f.label) + "</text>";
+  });
+  s += '<text x="' + (xa + cw / 2) + '" y="' + (top - 9) + '" text-anchor="middle">footwall</text><text x="' + (xb + cw / 2) + '" y="' + (top - 9) + '" text-anchor="middle">hanging wall</text>';
+  s += '<text x="' + (xa - 6) + '" y="' + (Y(T.top) + 4) + '" text-anchor="end">' + fn(T.top) + '</text><text x="' + (xa - 6) + '" y="' + (Y(T.base) + 4) + '" text-anchor="end">' + fn(T.base) + " m</text>";
+  svg.setAttribute("viewBox", "0 0 " + W + " " + (bot + 12));
+  svg.innerHTML = "<title>What the footwall reservoir is juxtaposed against</title>" + s;
+  $("fc-cap").textContent = "The two sides at the fault, to the same depth scale; the footwall reservoir is outlined. The strip between them shows what each part of it lies against. Green: the seal. Red: beds above the seal. Amber: the same reservoir on the other side.";
+}
+
+// ---------- the page ----------
+function render() {
+  const got = read(), m = got.m, box = $("errs");
+  if (got.errs.length) { box.hidden = false; box.innerHTML = "<b>The findings below still show the last valid inputs.</b><ul>" + got.errs.map(function (e) { return "<li>" + esc(e) + "</li>"; }).join("") + "</ul>"; return; }
+  box.hidden = true;
+  const R = solve(m), h = R.hor, n = h.length, deep = h[n - 1], topH = h[0], nI = R.iv.length;
+  drawSection(m, R); drawGrowth(m, R); drawFacing(m, R);
+  // A
+  let fa = "<b>" + (R.grew.length ? "The fault moved while " + R.grew.length + " of the " + nI + " intervals " + (R.grew.length === 1 ? "was" : "were") + " laid down." : "No interval is clearly thicker on the hanging wall.") + "</b> ";
+  if (R.grew.length) {
+    const big = R.grew.slice().sort(function (a, b) { return b.g - a.g; }).slice(0, 3);
+    fa += "Of the " + fm(deep.throw) + " of throw at " + esc(deep.name) + ", " + list(big.map(function (v, j) { return fm(v.g) + (j ? " during the " : " built up during the ") + esc(v.name); })) + ". ";
+  }
+  if (R.lastOff === 0) fa += "Even the youngest horizon, " + esc(topH.name) + ", is clearly offset, by " + fm(topH.throw) + ": the fault moved after everything picked here.";
+  else if (R.lastOff > 0) {
+    fa += "The youngest horizon clearly offset is " + esc(h[R.lastOff].name) + ", by " + fm(h[R.lastOff].throw) + ", so the fault was still moving after it. ";
+    fa += topH.call === "no" ? esc(topH.name) + " is " + fm(-topH.throw) + " shallower on the hanging wall: check the correlation." : "Whether it outlived " + esc(topH.name) + " is too close to call: " + fm(Math.abs(topH.throw)) + " of throw there, " + fp(topH.p) + ".";
+  } else fa += "No horizon is clearly offset at the level of sureness chosen.";
+  $("fa-text").innerHTML = fa;
+  // B
+  const k4 = quantSum(R.sure / 100, [1, 1, 1, 1]);
+  let fb = "<b>" + (R.unsure.length ? R.unsure.length + " of the " + nI + " differences " + (R.unsure.length === 1 ? "is" : "are") + " inside the pick uncertainty." : "All " + nI + " differences stand clear of the pick uncertainty.") + "</b> ";
+  R.unsure.forEach(function (v) {
+    fb += cap(esc(v.name)) + ": " + fm(Math.abs(v.g)) + (v.g >= 0 ? " thicker" : " thinner") + " as picked, " + fp(v.p) + " chance that it is really thicker, and no more than " + fm(v.hi) + " nine times in ten. ";
+  });
+  if (R.thin.length) fb += cap(list(R.thin.map(function (v) { return "the " + esc(v.name); }))) + (R.thin.length === 1 ? " is" : " are") + " clearly thinner on the hanging wall: check the correlation across the fault before anything else. ";
+  fb += "The page asks for " + R.sure + " % before it calls a difference real.";
+  $("fb-text").innerHTML = fb;
+  $("fb-rule").textContent = "A difference in thickness rests on four picks, two on each side, so their uncertainties add. With the same ± on all four, the difference has to exceed " + k4.toFixed(1) + " times that ± to be resolved at " + R.sure + " %. A better pick settles these calls; the expansion index cannot.";
+  // C
+  const T = R.trap;
+  let fc = "", kb = "";
+  if (!T) fc = "<b>No reservoir with its seal is marked.</b> Mark one interval as the reservoir and the interval directly above it as its seal in the form below.";
+  else {
+    const res = R.iv[T.r], seal = R.iv[T.s];
+    if (T.win > 0) fc = "<b>" + (T.call === "yes" ? (T.whole ? "The whole footwall reservoir lies" : "The top " + fm(T.win) + " of the footwall reservoir lies") + " against beds above the seal." : "The top of the footwall reservoir may lie against beds above the seal.") + "</b> The throw at the top of the reservoir is " + fm(T.throwRes) + ", more than the " + fm(T.sealTh) + " of " + esc(seal.name) + " on the hanging wall, so the top of the " + esc(res.name) + " lies above the seal there. The chance that this window is real is " + fp(T.pWin) + ".";
+    else fc = "<b>" + (T.call === "no" ? "The top of the footwall reservoir lies against the seal." : "The top of the footwall reservoir probably lies against the seal.") + "</b> The throw at the top of the reservoir is " + fm(T.throwRes) + ", less than the " + fm(T.sealTh) + " of " + esc(seal.name) + " on the hanging wall, with " + fm(-T.win) + " to spare. The chance of a window above the seal is " + fp(T.pWin) + ".";
+    kb += "<p><b>From the top.</b> " + cap(list(T.face.map(function (f) { return fm(f.len) + " against " + esc(f.label); }))) + ".</p>";
+    if (T.sand) kb += "<p><b>Reservoir against reservoir.</b> From " + fm(T.sandFrom - T.top) + " below its top the footwall reservoir lies against the same reservoir on the hanging wall.</p>";
+    kb += "<p><b>How tall a column.</b> The contact cannot lie deeper than the shallowest juxtaposition that does not seal: " + (T.win > 0 ? "the window at the crest, if those beds do not seal" + (T.sand ? "; otherwise where reservoir meets reservoir, " + fm(T.sandFrom - T.top) + " down" : "") : (T.sand ? "where reservoir meets reservoir, " + fm(T.sandFrom - T.top) + " down, unless the fault rock seals" : "none is seen on this section")) + ".</p>";
+    kb += "<p><b>After the seal.</b> " + (T.after.length ? "The fault moved during the " + list(T.after.map(function (v) { return esc(v.name); })) + ", after the " + esc(seal.name) + " was laid down, and offsets its top by " + fm(T.throwSeal) + "." : (T.topSealOffset ? "No younger interval clearly grew, but the top of the " + esc(seal.name) + " is offset by " + fm(T.throwSeal) + ": the fault cut it later." : "Nothing shows that the fault moved after the " + esc(seal.name) + " was laid down.")) + "</p>";
+  }
+  $("fc-text").innerHTML = fc; $("facing-body").innerHTML = kb;
+  // in full
+  const vd = $("verdict"), bad = R.thin.length > 0, warn = R.unsure.length > 0 || (T && T.win > 0);
+  vd.className = "verdict " + (bad ? "below" : warn ? "marginal" : "clear");
+  vd.innerHTML = '<div class="v">' + (bad ? "Check the correlation first: " + R.thin.length + (R.thin.length === 1 ? " interval is" : " intervals are") + " thinner on the hanging wall." : R.grew.length + " of " + nI + (nI === 1 ? " interval" : " intervals") + " clearly grew; " + (R.unsure.length ? R.unsure.length + (R.unsure.length === 1 ? " is" : " are") + " too close to call" : "none is in doubt") + ".") + "</div>" +
+    '<div class="s">' + (T ? (T.win > 0 ? (T.whole ? "The whole footwall reservoir lies" : "The top " + fm(T.win) + " of the footwall reservoir lies") + " above the seal on the hanging wall (" + fp(T.pWin) + ")." : "The top of the footwall reservoir lies against the seal with " + fm(-T.win) + " to spare.") : "No reservoir with its seal marked.") + "</div>";
+  const tag = function (c, y, u, no) { return '<span class="tag ' + (c === "yes" ? "yes" : c === "no" ? "warn" : "no") + '">' + (c === "yes" ? y : c === "no" ? no : u) + "</span>"; };
+  let t = "<thead><tr><th>Horizon</th><th>Footwall, m</th><th>Hanging wall, m</th><th>Pick ±, m</th><th>Throw, m</th><th>Chance it is offset</th><th></th></tr></thead><tbody>";
+  h.forEach(function (x) { t += "<tr><td>" + esc(x.name) + "</td><td>" + fn(x.zf) + "</td><td>" + fn(x.zh) + "</td><td>" + fn(x.e) + "</td><td>" + fn(x.throw) + "</td><td>" + fp(x.p) + "</td><td>" + tag(x.call, "offset", "too close to call", "reversed") + "</td></tr>"; });
+  $("tbl-h").innerHTML = t + "</tbody>";
+  t = "<thead><tr><th>Interval</th><th>Footwall thickness, m</th><th>Hanging-wall thickness, m</th><th>Extra thickness, m</th><th>80 % range, m</th><th>Expansion index</th><th>Chance it grew</th><th></th></tr></thead><tbody>";
+  R.iv.forEach(function (v) { t += "<tr><td>" + esc(cap(tagged(v))) + "</td><td>" + fn(v.tf) + "</td><td>" + fn(v.th) + "</td><td>" + fn(v.g) + "</td><td>" + fn(v.lo) + " to " + fn(v.hi) + "</td><td>" + (isFinite(v.ei) ? v.ei.toFixed(2) : "–") + "</td><td>" + fp(v.p) + "</td><td>" + tag(v.call, "grew", "too close to call", "thinner") + "</td></tr>"; });
+  $("tbl-i").innerHTML = t + "</tbody>";
+  $("tbl-note").textContent = "Called real at " + R.sure + " % or more. A throw rests on two picks, a difference in thickness on four. Pick ± is taken as the most a pick can be off.";
+  // other answers
+  const scaled = function (f) { const c = JSON.parse(JSON.stringify(m)); c.hz.forEach(function (x) { x.e *= f; }); return solve(c); };
+  const half = scaled(0.5), dbl = scaled(2);
+  const moved = function (S) { const out = []; S.iv.forEach(function (v, i) { if (v.call !== R.iv[i].call) out.push("the " + esc(v.name) + " becomes " + (v.call === "yes" ? "a clear call" : v.call === "no" ? "a clear thinning" : "too close to call") + " (" + fp(v.p) + ")"); }); return out; };
+  const winSay = function (S) { return T && S.trap ? " The chance of a window above the seal would be " + fp(S.trap.pWin) + (S.trap.pWin >= R.sure ? ", still clear." : S.trap.pWin <= 100 - R.sure ? ", clearly none." : ", short of the " + R.sure + " % asked for.") : ""; };
+  const mh = moved(half), md = moved(dbl);
+  let an = '<div class="answer"><h3>If the picks were twice as good</h3><p>' + (mh.length ? cap(list(mh)) + "." : "No interval call changes.") + winSay(half) + '</p><p class="rule">This is what a reprocessed line, a tighter well tie or a pick on a better reflector buys.</p></div>';
+  an += '<div class="answer"><h3>If the picks were twice as bad</h3><p>' + (md.length ? cap(list(md)) + "." : "No interval call changes.") + winSay(dbl) + '</p><p class="rule">Worth asking of any pick made in the fault shadow.</p></div>';
+  const eiTop = R.iv.slice().sort(function (a, b) { return b.ei - a.ei; })[0], eiUns = R.unsure.filter(function (v) { return v.g > 0; }).sort(function (a, b) { return b.ei - a.ei; })[0];
+  an += '<div class="answer"><h3>What the expansion index says, and hides</h3><p>The largest ratio is ' + eiTop.ei.toFixed(2) + " in the " + esc(eiTop.name) + "." + (eiUns ? " The " + esc(eiUns.name) + " shows " + eiUns.ei.toFixed(2) + ", which reads as growth, yet its " + fm(eiUns.g) + " cannot be told from zero." : "") + '</p><p class="rule">A ratio carries no range. The metres do.</p></div>';
+  const sumG = R.grew.reduce(function (a, v) { return a + v.g; }, 0);
+  an += '<div class="answer"><h3>How much of the throw is accounted for</h3><p>' + (R.grew.length ? "The " + (R.grew.length === 1 ? "interval that clearly grew accounts for " : "intervals that clearly grew account for ") + fm(sumG) + " of the " + fm(deep.throw) + " of throw at " + esc(deep.name) : "No interval clearly grew, so none of the " + fm(deep.throw) + " of throw at " + esc(deep.name) + " is dated") + "; " + fm(topH.throw) + " sits at the youngest horizon" + (R.unsure.length ? " and the rest in intervals too close to call" : "") + '.</p><p class="rule">Throw below the deepest horizon picked is not in this sum.</p></div>';
+  $("answers").innerHTML = an;
+  // the example in three numbers
+  const chip = function (big, small, cls) { return '<div class="chip ' + cls + '"><b>' + big + "</b><span>" + small + "</span></div>"; };
+  $("chips").innerHTML = chip(R.grew.length + " of " + nI, (nI === 1 ? "interval" : "intervals") + " laid down while the fault moved", "c-yes") +
+    (R.thin.length ? chip(R.thin.length + " of " + nI, "clearly thinner on the hanging wall: check the correlation first", "c-bad")
+                   : chip(R.unsure.length + " of " + nI, (R.unsure.length === 1 ? "difference" : "differences") + " too close to call at " + R.sure + " %", R.unsure.length ? "c-unsure" : "c-yes")) +
+    (T ? (T.win > 0 ? chip(T.whole ? "All" : fm(T.win), "of the footwall reservoir against beds above the seal, " + fp(T.pWin), T.call === "yes" ? "c-bad" : "c-unsure")
+                    : chip(fm(-T.win), "of seal to spare at the top of the reservoir; chance of a window " + fp(T.pWin), T.call === "no" ? "c-ok" : "c-unsure"))
+       : chip("–", "no reservoir with its seal marked", "c-unsure"));
+  // before signing
+  const hz = m.hz, need = [];
+  R.unsure.forEach(function (v) {
+    const f = needScale(v.g, [hz[v.i].e, hz[v.i].e, hz[v.i + 1].e, hz[v.i + 1].e], R.sure);
+    if (f) need.push({ v: v, f: f, a: hz[v.i].e, b: hz[v.i + 1].e });
+  });
+  need.sort(function (x, y) { return y.f - x.f; });
+  const pm = function (x) { return "±" + fn(x) + " m"; }, pmd = function (x) { return pm(Math.floor(x * 10 + 1e-9) / 10); };
+  const flat = R.unsure.filter(function (v) { return v.g <= 0; });
+  let st = "<li><b>" + (R.thin.length ? "Check the correlation across the fault first." : need.length ? "Re-pick the horizons that decide a call." : R.unsure.length ? "Do not date the fault from the intervals in doubt." : "No call is inside the pick uncertainty.") + "</b> ";
+  if (R.thin.length) st += cap(list(R.thin.map(function (v) { return "the " + esc(v.name); }))) + (R.thin.length === 1 ? " is" : " are") + " clearly thinner on the hanging wall as picked. Growth on a normal fault does not do that; nothing below stands until the correlation is checked. ";
+  if (need.length) st += need.map(function (x) {
+    const to = x.a === x.b ? pmd(x.a * x.f) : pmd(x.a * x.f) + " and " + pmd(x.b * x.f), now = x.a === x.b ? pm(x.a) : pm(x.a) + " and " + pm(x.b);
+    return x.f >= 0.35 ? "The " + fm(x.v.g) + " in the " + esc(x.v.name) + " would count as growth only if it held up with " + esc(x.v.top) + " and " + esc(x.v.base) + " picked to " + to + " on both sides (" + now + " now)."
+                       : "The " + fm(x.v.g) + " in the " + esc(x.v.name) + " would need " + to + " (" + now + " now), which seismic picks alone will not give: treat it as no resolvable growth unless well ties on both sides say otherwise.";
+  }).join(" ") + " A better pick can settle a call either way. Until then, leave " + (need.length === 1 ? "it" : "them") + " out of the timing.";
+  if (flat.length) st += (need.length ? " " : "") + "As picked, " + list(flat.map(function (v) { return "the " + esc(v.name); })) + (flat.length === 1 ? " is" : " are") + " not thicker on the hanging wall, so tighter picks alone will not make " + (flat.length === 1 ? "it" : "them") + " growth.";
+  if (!R.unsure.length && !R.thin.length) st += "Every difference is clear at " + R.sure + " %. Say so in the report, with the pick uncertainty you assumed.";
+  st += "</li><li><b>Repeat the check on the neighbouring sections.</b> The throw at " + esc(deep.name) + " is " + fm(deep.throw) + " here and should change smoothly along the fault; a sudden change that is not at a branch line or a relay is a pick or a correlation to check again. The same intervals should show growth on the neighbouring sections." + (T ? " The top of the reservoir lies against beds above the seal wherever the throw at the top of the reservoir (" + esc(h[T.r].name) + ") exceeds the thickness of the seal on the hanging wall, " + fm(T.sealTh) + " here." : "") + "</li>";
+  if (!T) st += "<li><b>Mark the reservoir and its seal.</b> The third step needs them.</li>";
+  else if (T.win > 0) st += "<li><b>Name the beds above the seal.</b> " + (T.whole ? "The whole reservoir" : "The top " + fm(T.win) + " of the reservoir") + " lies against " + (T.above.length === 1 ? esc(T.above[0].label) : list(T.above.map(function (f) { return fm(f.len) + " of " + esc(f.label); }))) + ". Say whether those beds seal. If they do not, and the fault rock does not seal either, juxtaposition holds no column against the fault on this section" + (T.sand ? "; if they do, the next possible leak is where reservoir meets reservoir, " + fm(T.sandFrom - T.top) + " below the top of the reservoir." : ".") + (T.call === "yes" ? "" : " The window itself is in doubt, " + fp(T.pWin) + ": check the two picks it rests on first.") + "</li>";
+  else st += "<li><b>State the margin.</b> The top of the reservoir lies against the seal with " + fm(-T.win) + " to spare. The margin rests on two picks: if together they are off by more than " + fm(-T.win) + ", the top of the reservoir lies against beds above the seal. The chance of that is " + fp(T.pWin) + "." + (T.sand ? " Reservoir meets reservoir from " + fm(T.sandFrom - T.top) + " below the top of the reservoir: say so in the report." : "") + "</li>";
+  $("sign-list").innerHTML = st;
+  if (PROBE) probe();
+}
+
+// ---------- checks ----------
+function runChecks() {
+  const E = JSON.parse(JSON.stringify(EXAMPLE)), R = solve(E), rows = [];
+  const add = function (what, exp, got, tol, src) { rows.push({ what: what, exp: exp, got: got, tol: tol, src: src, ok: Math.abs(got - exp) <= tol }); };
+  const HAND = "by hand", REF = "independent calculation";
+  add("Throw at H4: 1725 − 1620", 105, R.hor[3].throw, 1e-9, HAND);
+  add("Footwall thickness of the siltstone: 1620 − 1400", 220, R.iv[2].tf, 1e-9, HAND);
+  add("Hanging-wall thickness of the siltstone: 1725 − 1460", 265, R.iv[2].th, 1e-9, HAND);
+  add("Extra thickness of the siltstone: 265 − 220, also 105 − 60", 45, R.iv[2].g, 1e-9, HAND);
+  add("Expansion index of the sandstone: 290 ÷ 250", 1.16, R.iv[4].ei, 1e-9, HAND);
+  add("The five differences and the throw at H1 add up to the throw at H6: 7 + 48 + 45 + 5 + 40 + 5", 150, R.iv.reduce(function (a, v) { return a + v.g; }, 0) + R.hor[0].throw, 1e-9, HAND);
+  add("Two picks of ±9: chance that a throw of 5 is real, 1 − (18 − 5)² ÷ (2 × 18 × 18), %", 73.920, R.hor[0].p, 0.001, HAND);
+  add("Two picks of ±9: chance that a throw of 12 is real, 1 − (18 − 12)² ÷ (2 × 18 × 18), %", 94.444, R.hor[1].p, 0.001, HAND);
+  add("The youngest horizon clearly offset is the second one, H2", 1, R.lastOff, 0, HAND);
+  add("Two picks of ±1: chance that the sum of the two errors stays below 0, %", 50, cdfSum(0, [1, 1]) * 100, 1e-9, HAND);
+  add("Two picks of ±1: chance that the sum stays below 1, 1 − 1 ÷ 8, %", 87.5, cdfSum(1, [1, 1]) * 100, 1e-9, HAND);
+  add("Four picks of ±1: chance that the sum stays below −2, 1 ÷ 24, %", 4.1667, cdfSum(-2, [1, 1, 1, 1]) * 100, 0.0001, HAND);
+  add("Four picks of ±1: chance that a difference of 2 is real, 1 − 1 ÷ 24, %", 95.8333, chanceAbove0(2, [1, 1, 1, 1]), 0.0001, HAND);
+  add("Four picks of ±1: the sum cannot go beyond 4, %", 100, cdfSum(4, [1, 1, 1, 1]) * 100, 1e-9, HAND);
+  add("No pick uncertainty: a difference of 5 m is certain, %", 100, chanceAbove0(5, [0, 0, 0, 0]), 1e-9, HAND);
+  add("No pick uncertainty: a thinning of 5 m is certainly not growth, %", 0, chanceAbove0(-5, [0, 0, 0, 0]), 1e-9, HAND);
+  add("No pick uncertainty and no difference: an even chance, %", 50, chanceAbove0(0, [0, 0, 0, 0]), 1e-9, HAND);
+  add("The middle of the range of a sum of errors is zero", 0, quantSum(0.5, [9, 9, 12, 12]), 1e-6, HAND);
+  add("Window above the seal: top of the seal on the hanging wall below the top of the footwall reservoir, 1725 − 1700", 25, R.trap.win, 1e-9, HAND);
+  add("Picks of ±15 and ±18: chance that the 25 m window is real, 1 − (33 − 25)² ÷ (2 × 30 × 36), %", 97.037, R.trap.pWin, 0.001, HAND);
+  add("Footwall reservoir against the siltstone, 1725 − 1700, m", 25, R.trap.face[0].len, 1e-9, HAND);
+  add("Footwall reservoir against the seal, 1810 − 1725, m", 85, R.trap.face[1].len, 1e-9, HAND);
+  add("Footwall reservoir against the same reservoir, 1950 − 1810, m", 140, R.trap.face[2].len, 1e-9, HAND);
+  add("Reservoir meets reservoir below the top of the footwall reservoir by the throw there, 1810 − 1700, m", 110, R.trap.sandFrom - R.trap.top, 1e-9, HAND);
+  const deepT = JSON.parse(JSON.stringify(E)); deepT.hz[4].zh = 1960; deepT.hz[5].zh = 2250;
+  add("Throw larger than the reservoir is thick (260 against 250 m): no reservoir against reservoir", 0, solve(deepT).trap.sand ? 1 : 0, 0, HAND);
+  // against the independent calculation
+  const B = { gc: [74.24925, 100, 99.94675, 59.972625, 95.72965], lo: [-6.5582, 31.9861, 24.4944, -19.9685, 9.6591], hi: [20.5736, 64.0149, 65.4627, 29.9732, 70.3016] };
+  R.iv.forEach(function (v, i) {
+    add("Chance that the " + v.name + " grew, %", B.gc[i], v.p, 0.1, REF);
+    add("The " + v.name + ": lower end of the 80 % range, m", B.lo[i], v.lo, 0.2, REF);
+    add("The " + v.name + ": upper end of the 80 % range, m", B.hi[i], v.hi, 0.2, REF);
+  });
+  add("Chance that H1 is offset, %", 73.92885, R.hor[0].p, 0.1, REF);
+  add("Chance that H2 is offset, %", 94.436375, R.hor[1].p, 0.1, REF);
+  add("Chance of a window above the seal, %", 97.034775, R.trap.pWin, 0.1, REF);
+  const sc = function (f) { const c = JSON.parse(JSON.stringify(E)); c.hz.forEach(function (x) { x.e *= f; }); return solve(c); };
+  const H = sc(0.5), D = sc(2);
+  add("Half the pick uncertainty: chance that the upper mudstone grew, %", 90.757875, H.iv[0].p, 0.1, REF);
+  add("Half the pick uncertainty: chance that the shale grew, %", 69.242325, H.iv[3].p, 0.1, REF);
+  add("Half the pick uncertainty: chance that H1 is offset, %", 90.0995, H.hor[0].p, 0.1, REF);
+  add("Twice the pick uncertainty: chance that the upper sandstone grew, %", 97.655375, D.iv[1].p, 0.1, REF);
+  add("Twice the pick uncertainty: chance that the siltstone grew, %", 92.157375, D.iv[2].p, 0.1, REF);
+  add("Twice the pick uncertainty: chance that the sandstone grew, %", 79.79795, D.iv[4].p, 0.1, REF);
+  add("Twice the pick uncertainty: chance that H2 is offset, %", 77.774625, D.hor[1].p, 0.1, REF);
+  add("Twice the pick uncertainty: chance of a window above the seal, %", 80.5574, D.trap.pWin, 0.1, REF);
+  add("Four equal picks: difference needed to be 90 % sure, in units of the pick ±", 1.50763, quantSum(0.9, [1, 1, 1, 1]), 0.004, REF);
+  add("Four equal picks: difference needed to be 80 % sure", 1.00269, quantSum(0.8, [1, 1, 1, 1]), 0.004, REF);
+  add("Four equal picks: difference needed to be 95 % sure", 1.90709, quantSum(0.95, [1, 1, 1, 1]), 0.004, REF);
+  add("Two equal picks: throw needed to be 90 % sure, in units of the pick ±", 1.10539, quantSum(0.9, [1, 1]), 0.004, REF);
+  add("Upper mudstone, 7 m on four picks of ±9: the ± at which it becomes 90 % sure, 7 ÷ 1.5076, m", 4.6431, needScale(7, [9, 9, 9, 9], 90) * 9, 0.02, REF);
+  add("A difference that is already clear needs no better pick: the factor is 1", 1, needScale(48, [9, 9, 12, 12], 90), 1e-9, HAND);
+  add("A thinning cannot be made into growth by better picks", 0, needScale(-5, [9, 9, 9, 9], 90) === null ? 0 : 1, 0, HAND);
+  const okN = rows.filter(function (r) { return r.ok; }).length, all = okN === rows.length;
+  const fmt = function (x) { return Math.abs(x) >= 100 ? x.toFixed(1) : Math.abs(x) >= 10 ? x.toFixed(2) : x.toFixed(3); };
+  let t = '<thead><tr><th>Check</th><th>Expected</th><th>Page</th><th class="tol">Allowed ±</th><th class="src">Answer from</th><th></th></tr></thead><tbody>';
+  rows.forEach(function (r) { t += "<tr><td>" + esc(r.what) + "</td><td>" + fmt(r.exp) + "</td><td>" + fmt(r.got) + '</td><td class="tol">' + (r.tol < 1e-6 ? "0" : r.tol) + '</td><td class="src">' + r.src + '</td><td class="st ' + (r.ok ? "ok" : "no") + '">' + (r.ok ? "PASS" : "FAIL") + "</td></tr>"; });
+  $("checks").innerHTML = t + "</tbody>";
+  const msg = all ? "ALL " + rows.length + " PASS" : okN + " of " + rows.length + " pass";
+  $("checks-sum").textContent = msg; $("checks-sum").className = all ? "pass" : "fail";
+  document.documentElement.setAttribute("data-checks", msg);
+  if (!all) $("checks-box").open = true;
+}
+
+// ---------- start ----------
+const Q = new URLSearchParams(location.search), PROBE = Q.get("probe") === "1";
+if (Q.get("theme") === "light" || Q.get("theme") === "dark") document.documentElement.setAttribute("data-theme", Q.get("theme"));
+function probe() {
+  const f = document.querySelector(".finds").getBoundingClientRect(), c = $("chips").getBoundingClientRect();
+  document.documentElement.setAttribute("data-width", document.documentElement.scrollWidth + "/" + window.innerWidth);
+  document.documentElement.setAttribute("data-finds", Math.round(c.top + window.scrollY) + "/" + Math.round(f.bottom + window.scrollY));
+}
+fill(EXAMPLE);
+let timer = 0;
+$("form").addEventListener("input", function () { clearTimeout(timer); timer = setTimeout(render, 120); });
+$("rows").addEventListener("click", function (e) { if (e.target.classList.contains("del")) { e.target.closest(".hrow").remove(); tidy(); render(); } });
+$("add").addEventListener("click", function () {
+  const rows = [...document.querySelectorAll(".hrow")], last = rows[rows.length - 1];
+  const zf = parseFloat(last.querySelector(".zf").value) || 0, zh = parseFloat(last.querySelector(".zh").value) || 0, e = parseFloat(last.querySelector(".e").value) || 10;
+  $("rows").insertAdjacentHTML("beforeend", rowHtml({ name: "H" + (rows.length + 1), zf: zf + 200, zh: zh + 200, e: e, iname: "", role: "" }));
+  tidy(); render();
+});
+$("reset").addEventListener("click", function () { fill(EXAMPLE); render(); });
+let lastW = vw();
+window.addEventListener("resize", function () { if (vw() !== lastW) { lastW = vw(); render(); } });
+render(); runChecks();
+</script>
+</body>
+</html>
