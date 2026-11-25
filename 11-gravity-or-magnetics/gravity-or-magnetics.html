@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gravity, magnetics or both?</title>
+<meta name="description" content="A dolerite sill, its top known from seismic. What gravity and magnetics each see from the ground, a UAV or an aircraft, what one field alone cannot tell apart, and which pair of field and data pins the thickness.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Gravity, magnetics or both?">
+<meta property="og:description" content="A dolerite sill, its top known from seismic. What gravity and magnetics each see from the ground, a UAV or an aircraft, what one field alone cannot tell apart, and which pair of field and data pins the thickness.">
+<meta property="og:url" content="https://maxim-balaguroff.github.io/how-sure/11-gravity-or-magnetics/gravity-or-magnetics.html">
+<meta property="og:image" content="https://maxim-balaguroff.github.io/how-sure/11-gravity-or-magnetics/cover.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1254">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    --page: #ffffff; --surface: #fafaf8; --card: #ffffff; --ink: #111110; --ink-2: #52514e; --muted: #8a8882;
+    --rule: #e2e1db; --grid: #ecebe6; --axis: #b9b8ae; --band: #efeee9; --accent: #2a78d6; --accent-soft: #e6f0fb;
+    --grav: #2a78d6; --mag: #c2410c; --alt: #52514e; --sill: #4a4a46; --ground: #9a988f; --well: #1f8a4c;
+    --ok: #1f8a4c; --ok-soft: #e5f4ea; --warn: #b06a00; --warn-soft: #fbf0dc; --bad: #b3261e; --bad-soft: #fbe7e5; --focus: #2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #8f8d84;
+      --rule: #34332f; --grid: #2a2a27; --axis: #55544d; --band: #2b2b28; --accent: #6aa7ee; --accent-soft: #1d2b3c;
+      --grav: #6aa7ee; --mag: #f08a4b; --alt: #c4c2b8; --sill: #c9c7bd; --ground: #8f8d84; --well: #5cc68a;
+      --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f; --bad: #f08a80; --bad-soft: #3a1c19;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #8f8d84;
+    --rule: #34332f; --grid: #2a2a27; --axis: #55544d; --band: #2b2b28; --accent: #6aa7ee; --accent-soft: #1d2b3c;
+    --grav: #6aa7ee; --mag: #f08a4b; --alt: #c4c2b8; --sill: #c9c7bd; --ground: #8f8d84; --well: #5cc68a;
+    --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f; --bad: #f08a80; --bad-soft: #3a1c19;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--page); color: var(--ink); }
+  body { font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif; font-size: 15px; line-height: 1.5; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 40px; }
+  .kicker { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 6px; }
+  h1 { font-size: 32px; line-height: 1.12; margin: 0 0 10px; letter-spacing: -.015em; }
+  .lead { font-size: 17px; max-width: 780px; margin: 0 0 12px; }
+  .why { font-size: 14.5px; color: var(--ink-2); max-width: 780px; margin: 0 0 24px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 10px; }
+  h3 { font-size: 15px; margin: 0 0 8px; }
+  .grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
+  .grid > *, .notes > *, .answers > * { min-width: 0; }
+  .card { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; overflow-x: auto; margin-bottom: 14px; }
+  .inputs { position: sticky; top: 12px; margin-bottom: 0; }
+  fieldset { border: 0; padding: 0; margin: 0 0 14px; min-width: 0; }
+  legend { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); padding: 0; margin-bottom: 8px; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg label { text-align: center; padding: 7px 4px; font-size: 14px; cursor: pointer; border-right: 1px solid var(--rule); background: var(--surface); }
+  .seg label:last-of-type { border-right: 0; }
+  .seg input:checked + label { background: var(--accent); color: #fff; }
+  .seg input:focus-visible + label { outline: 2px solid var(--focus); outline-offset: -3px; }
+  .seglabel { font-size: 14px; margin: 0 0 4px; }
+  .field { display: grid; grid-template-columns: 1fr 100px; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .field label { font-size: 14px; }
+  .field .hint, .hint { grid-column: 1 / -1; font-size: 12.5px; color: var(--muted); margin-top: -4px; }
+  input[type=number] { width: 100%; font: inherit; font-variant-numeric: tabular-nums; text-align: right; padding: 6px 8px; border: 1px solid var(--rule); border-radius: 6px; background: var(--page); color: var(--ink); }
+  input[type=number]:focus { outline: 2px solid var(--focus); outline-offset: 0; border-color: transparent; }
+  input[aria-invalid="true"] { border-color: var(--bad); background: var(--bad-soft); }
+  table.pl { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+  table.pl th { font-size: 12.5px; color: var(--ink-2); font-weight: 600; text-align: center; padding: 2px 2px 6px; border: 0; }
+  table.pl th:first-child { text-align: left; }
+  table.pl td { padding: 3px 2px; border: 0; font-size: 13.5px; text-align: left; }
+  table.pl td input { padding: 5px 5px; }
+  table.pl td:first-child { padding-right: 6px; }
+  button { font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; }
+  button:hover { border-color: var(--axis); }
+  button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .verdict { border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; border: 1px solid transparent; }
+  .verdict .v { font-size: 20px; font-weight: 700; line-height: 1.25; }
+  .verdict .s { color: var(--ink-2); margin-top: 4px; }
+  .verdict.clear { background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+  .verdict.clear .v { color: var(--ok); }
+  .verdict.marginal { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+  .verdict.marginal .v { color: var(--warn); }
+  .verdict.below { background: var(--bad-soft); border-color: color-mix(in srgb, var(--bad) 35%, transparent); }
+  .verdict.below .v { color: var(--bad); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; }
+  .stat .n { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; overflow-wrap: anywhere; }
+  .stat .l { font-size: 12.5px; color: var(--ink-2); }
+  figure { margin: 0 0 14px; }
+  svg { display: block; width: 100%; height: auto; }
+  svg text { font-family: "Segoe UI", system-ui, Arial, sans-serif; }
+  .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
+  .answer { border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; }
+  .answer.g { border-left-color: var(--grav); }
+  .answer.m { border-left-color: var(--mag); }
+  .answer p { margin: 0; }
+  .answer .rule { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--rule); font-size: 14px; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 12.5px; color: var(--ink-2); font-weight: 600; }
+  tr.here td { background: var(--accent-soft); font-weight: 600; }
+  tr.best td { background: var(--ok-soft); font-weight: 600; }
+  td .pl2 { color: var(--muted); font-weight: 400; font-size: 13px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+  .tag.clear { background: var(--ok-soft); color: var(--ok); }
+  .tag.marginal { background: var(--warn-soft); color: var(--warn); }
+  .tag.below { background: var(--bad-soft); color: var(--bad); }
+  .tablewrap { overflow-x: auto; }
+  .tablenote { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+  .notes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 28px; }
+  .notes ul { margin: 0; padding-left: 18px; }
+  .notes li { margin-bottom: 6px; }
+  details { margin-top: 24px; border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; background: var(--surface); }
+  summary { cursor: pointer; font-weight: 700; }
+  summary .pass { color: var(--ok); }
+  summary .fail { color: var(--bad); }
+  #checks td.st { font-weight: 700; }
+  #checks td.st.ok { color: var(--ok); }
+  #checks td.st.no { color: var(--bad); }
+  #checks td.src { text-align: left; color: var(--ink-2); font-size: 13px; }
+  .role { font-size: 14px; color: var(--ink-2); max-width: 780px; margin: 24px 0 0; }
+  footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--rule); color: var(--ink-2); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  a { color: var(--accent); }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--ink-2); margin: 4px 0 0; }
+  .legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 6px; }
+  .legend i.d { border-top-style: dashed; }
+  .legend i.b { height: 10px; border: 0; background: var(--band); }
+  .mini { display: none; }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    .inputs { position: static; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .answers, .notes { grid-template-columns: 1fr; }
+    h1 { font-size: 26px; }
+    input[type=number] { font-size: 16px; min-height: 44px; }
+    button { min-height: 44px; }
+    .seg label { min-height: 44px; display: flex; align-items: center; justify-content: center; }
+    .mini.show { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; padding: 12px 16px; background: var(--card); border-top: 1px solid var(--rule); box-shadow: 0 -2px 10px rgba(0, 0, 0, .08); font-weight: 700; font-size: 15px; cursor: pointer; }
+    .mini.clear { color: var(--ok); }
+    .mini.marginal { color: var(--warn); }
+    .mini.below { color: var(--bad); }
+    body { padding-bottom: 56px; }
+  }
+  @media (max-width: 600px) { #checks .tol, #checks .src, .hcol { display: none; } .card { padding: 14px 12px; } }
+  @media (max-width: 420px) { th, td { padding: 6px 4px; font-size: 13.5px; } td .pl2 { display: block; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">how-sure · tool 11 · gravity and magnetics · proposed programme · v1.6</p>
+  <h1>Gravity, magnetics or both?</h1>
+  <p class="lead">A dolerite sill sits in a sedimentary basin, and seismic shows its top. Before a survey is ordered, the page tells you what gravity and magnetics will each see from the ground, a UAV or an aircraft; what one field alone cannot tell apart; and which pair of field and data pins the thickness.</p>
+  <p class="why">Why it matters in petroleum work: the sills of trap provinces lie inside sedimentary basins. Their strong top reflection is easy to pick on seismic; the base, and so the thickness, often is not. Thickness changes the velocity model, the depth of every horizon below, and the drilling plan through hard rock. Gravity and magnetics see the sill from different sides.</p>
+
+  <div class="grid">
+    <form class="card inputs" id="form" autocomplete="off" onsubmit="return false">
+      <fieldset>
+        <legend>The sill</legend>
+        <div class="field"><label for="depth">Depth to top below ground, m</label><input type="number" id="depth" min="0" step="50" value="1500">
+          <div class="hint">From seismic, after depth conversion.</div></div>
+        <div class="field"><label for="t">Thickness, m</label><input type="number" id="t" min="1" step="10" value="150"></div>
+        <div class="field"><label for="W">Width across the line, m</label><input type="number" id="W" min="10" step="500" value="6000"></div>
+        <div class="field"><label for="drho">Density contrast, g/cm³</label><input type="number" id="drho" min="0.001" step="0.01" value="0.25">
+          <div class="hint">Dolerite is often 2.9 to 3.0 g/cm³; carbonate and clastic host rocks about 2.6 to 2.7, salt about 2.2. Density logs beat any table.</div></div>
+        <div class="field"><label for="k">Susceptibility contrast, SI</label><input type="number" id="k" min="0.0001" step="0.005" value="0.02">
+          <div class="hint">Dolerite is often 0.01 to 0.05 SI; altered dolerite can be ten times weaker. Measure it on core.</div></div>
+        <div class="field"><label for="Fe">Earth's field at the site, nT</label><input type="number" id="Fe" min="20000" max="70000" step="500" value="58000"></div>
+      </fieldset>
+      <fieldset>
+        <legend>The surveys</legend>
+        <p class="seglabel">Gravity by</p>
+        <div class="seg" role="radiogroup" aria-label="Gravity platform">
+          <input type="radio" name="gp" id="gp-ground" value="ground" checked><label for="gp-ground">Ground</label>
+          <input type="radio" name="gp" id="gp-uav" value="uav"><label for="gp-uav">UAV</label>
+          <input type="radio" name="gp" id="gp-fw" value="fw"><label for="gp-fw">Fixed-wing</label>
+        </div>
+        <p class="seglabel">Magnetics by</p>
+        <div class="seg" role="radiogroup" aria-label="Magnetics platform">
+          <input type="radio" name="mp" id="mp-ground" value="ground"><label for="mp-ground">Ground</label>
+          <input type="radio" name="mp" id="mp-uav" value="uav" checked><label for="mp-uav">UAV</label>
+          <input type="radio" name="mp" id="mp-fw" value="fw"><label for="mp-fw">Fixed-wing</label>
+        </div>
+        <table class="pl" aria-label="Platform settings">
+          <thead><tr><th></th><th>Ground</th><th>UAV</th><th>Fixed-wing</th></tr></thead>
+          <tbody id="pl-body"></tbody>
+        </table>
+        <div class="hint" style="margin-top:2px">Typical starting values; their sources, or the mark that a value is my assumption, stand below the table of fields; use the figures in the operator's specification. Gravity resolution is the half-wavelength of the final filter.</div>
+      </fieldset>
+      <fieldset>
+        <legend>Other data</legend>
+        <div class="field"><label for="seis">Seismic top, ± m</label><input type="number" id="seis" min="1" step="5" value="40"></div>
+        <div class="field"><label for="wrho">Well: density contrast, ± %</label><input type="number" id="wrho" min="1" step="1" value="10"></div>
+        <div class="field"><label for="wk">Well: susceptibility, ± %</label><input type="number" id="wk" min="1" step="1" value="20">
+          <div class="hint">One well through the sill: density log and susceptibility on core.</div></div>
+      </fieldset>
+      <button type="button" id="reset">Back to the example</button>
+    </form>
+
+    <main>
+      <div class="verdict" id="verdict" aria-live="polite"><div class="v" id="v-main"></div><div class="s" id="v-sub"></div></div>
+      <div class="stats">
+        <div class="stat"><div class="n" id="s-g"></div><div class="l" id="s-g-l">gravity peak, mGal</div></div>
+        <div class="stat"><div class="n" id="s-gr"></div><div class="l">gravity peak ÷ noise</div></div>
+        <div class="stat"><div class="n" id="s-m"></div><div class="l" id="s-m-l">magnetic peak, nT</div></div>
+        <div class="stat"><div class="n" id="s-mr"></div><div class="l">magnetic peak ÷ noise</div></div>
+      </div>
+      <figure>
+        <svg id="chart" viewBox="0 0 680 540" role="img" aria-labelledby="chart-title chart-desc">
+          <title id="chart-title">Gravity and magnetic profiles across the sill, with a cross-section below</title>
+          <desc id="chart-desc">Upper panel: gravity along a line across the sill for the chosen platform, an alternative sill with the same mass, and the noise band. Middle panel: the magnetic profile and an alternative with the same susceptibility times thickness. Lower panel: the sill in cross-section, the seismic top and the well.</desc>
+        </svg>
+        <div class="legend"><span><i style="border-color:var(--grav)"></i>gravity</span><span><i style="border-color:var(--mag)"></i>magnetics</span><span><i class="d" style="border-color:var(--alt)"></i>thickness × 1.5, contrast ÷ 1.5</span><span><i class="b"></i>± noise of one reading</span></div>
+      </figure>
+
+      <div class="card">
+        <h3>1. What each field sees</h3>
+        <div class="tablewrap"><table id="fields" aria-label="Signal against noise for each field and platform">
+          <thead><tr><th>Field and platform</th><th class="hcol">Height, m</th><th>Peak</th><th>Noise</th><th>÷ noise</th><th>Verdict</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <p class="tablenote" id="noise-src">Ground gravity: about 0.03 mGal when station heights come from GNSS to ±10 cm (Seigel, 1995). Moving-platform gravity is far noisier: one airborne system quotes 0.2 mGal at 2.2 to 4 km resolution from fixed-wing aircraft (Sander Geophysics); strapdown systems on aircraft and UAVs report sub-mGal up to 2 mGal (Vyazmin and Golovan, 2023). The UAV preset, 2 mGal at 1 km, is my assumption for a small, low, slow UAV: a quadcopter reached 2–3 mGal RMS along repeated lines (Dale et al., 2026; resolution not given in the abstract), and a large helicopter-type UAV at 25 m/s, flown at 340–420 m above the ellipsoid, gave a repeat-line scatter of 0.61 mGal at 1.25 km (Vyazmin and Golovan, 2023). Magnetic presets follow tool 02 and are my assumption, not from a source. For comparison: a noise envelope of about ±0.05 nT in one fixed-wing UAV survey (reviewed by Zheng et al., 2021), and noise limits of &lt; 1 to &lt; 10 nT set in earlier UAV studies (listed by Tuck et al., 2021).</p>
+      </div>
+
+      <div class="card">
+        <h3>2. What one field alone cannot tell apart</h3>
+        <div class="answers">
+          <div class="answer g" id="a-g1"></div>
+          <div class="answer g" id="a-g2"></div>
+          <div class="answer m" id="a-m1"></div>
+          <div class="answer m" id="a-m2"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>3. Which pair pins it</h3>
+        <div class="tablewrap"><table id="pairs" aria-label="Spread of each unknown for each set of data">
+          <thead><tr><th>Data used</th><th>Top, ± m</th><th>Edge, ± m</th><th>Mass, ± %</th><th>Thickness, ± %</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <p class="tablenote">Spreads are one standard deviation, after the data, starting from what a geologist would assume without them (see Rules). Mass is density contrast × thickness. Thickness: ±15 % or better is pinned, to ±30 % is loose, beyond that not resolved.</p>
+        <p id="pair-text" style="margin:10px 0 0"></p>
+      </div>
+      <p style="margin:0;font-size:14px;color:var(--ink-2)">Magnetics on its own, with line spacing, sensor height and two bodies side by side: <a href="https://maxim-balaguroff.github.io/how-sure/02-magnetic-survey-check/magnetic-survey-check.html">tool 02, What must the survey resolve?</a></p>
+    </main>
+  </div>
+
+  <div class="notes">
+    <section>
+      <h2>How it works</h2>
+      <ul>
+        <li>The sill is a horizontal slab, long along strike, with a flat top and base. Gravity is the textbook closed form for a 2D rectangle (Blakely, 1995). Over the middle of a wide sill it tends to the Bouguer slab, 2πGΔρt: 0.042 mGal per metre of sill per g/cm³ of contrast.</li>
+        <li>Magnetics uses the same slab in a vertical field with induced magnetisation, as in tool 02: k F / 2π times the angle the top subtends at the sensor minus the angle the base subtends. Over a sill many times wider than its depth the two cancel in the middle and the signal sits at the edges; the width of the edge anomaly carries the depth.</li>
+        <li>Moving-platform gravity is filtered. The page smooths the profile with a Gaussian filter that keeps half the amplitude at twice the resolution length, and counts one independent reading per resolution length or reading spacing, whichever is longer.</li>
+        <li>Which pair pins it: a linearised least-squares analysis with six unknowns (top, thickness, density contrast, susceptibility contrast, two edges), the readings with their noise, and what is known beforehand. The table shows how far each unknown can still move.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Rules it uses</h2>
+      <ul>
+        <li><b>Visible:</b> peak at least 5 × the noise of one reading is clear, 2 to 5 × marginal, under 2 × lost, as in tool 02. Gravity peak: over the middle of the sill. Magnetic peak: the largest value along the line; the low beyond the edge adds to the swing.</li>
+        <li><b>Same data:</b> two sills whose profiles differ by less than 2 × the noise of one reading are counted as the same data on one reading; table 3 shows what the whole line of readings can still tell. Tests: thickness × 1.5 with the contrast ÷ 1.5; top 20 % deeper with the contrast refitted by least squares.</li>
+        <li><b>Before the data:</b> top ±25 % of its depth; thickness, density contrast and susceptibility ±50 %; edges ±1 km. Seismic replaces the top with its own ± m. A well replaces the density contrast and the susceptibility with its own ± %. Its top and thickness hold only at the well, so the page does not carry them across the sill.</li>
+        <li><b>Readings:</b> gravity one per reading spacing or resolution length, whichever is longer; magnetics one per 100 m. Profile: the sill and five times its depth on each side.</li>
+        <li>The thresholds 5 × and 2 ×, the tests and the ±15 % and ±30 % bands are my conventions.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Limits</h2>
+      <ul>
+        <li>A 2D sill with flat top and base, uniform rock, flat ground. Real sills step between levels, thin out and have feeders; the page shows the trade-offs, not a model of a real sill.</li>
+        <li>Vertical field and induced magnetisation only, which suits high magnetic latitudes. Dolerites often carry strong remanence, which can change the sign of the magnetic anomaly; core measurements tell.</li>
+        <li>The magnetic noise is instrument and survey noise only. In trap provinces, shallow lavas, tuffs and other sills add geological magnetic noise, which can be much larger. The UAV itself makes interference near the sensor, with peaks of 21.4 to 574.2 nT on four mapped UAVs (Tuck et al., 2021); the sensor is moved away from it or the interference is compensated.</li>
+        <li>The regional field and other density contrasts (salt, basement) are not modelled. In practice the sill is separated from a regional trend, which adds its own error; the noise figures do not include it.</li>
+        <li>Noise is independent between readings. Levelling errors and other correlated noise make things worse.</li>
+        <li>Linearised: the spreads hold for small changes around the sill you describe. A real design and inversion run in 3D with all wells and horizons. The page frames the question; it does not replace the operator's design.</li>
+      </ul>
+    </section>
+  </div>
+
+  <p class="role">Stage: proposed programme. The example is made up and the page reports no survey. In a project, the geologist sets the geological question and interprets the data; a licensed operator designs and runs the survey. The check builds on the author's experience integrating potential-field and field data in Arctic and East Siberian regional projects; UAV acquisition is the proposed extension.</p>
+
+  <details id="checks-box">
+    <summary>Checks against known answers: <span id="checks-sum"></span></summary>
+    <p>Each check compares the page with an answer worked out another way: by hand from textbook relations, or by an independent calculation that sums line masses and line dipoles over the sill instead of using the page's closed forms (<a href="https://github.com/maxim-balaguroff/how-sure/blob/main/11-gravity-or-magnetics/physics_ref.py"><code>physics_ref.py</code></a> in the repository). Change the code and break a formula, and a row turns FAIL.</p>
+    <div class="tablewrap"><table id="checks"><thead><tr><th>Check</th><th>Expected</th><th>Page</th><th class="tol">Tolerance</th><th class="src">Source</th><th></th></tr></thead><tbody></tbody></table></div>
+  </details>
+
+  <footer>
+    <span>Built with AI assistance; the geology and the checks are mine.</span>
+    <span>The example is made up; no survey data.</span>
+    <span>References: Blakely (1995), <i>Potential Theory in Gravity and Magnetic Applications</i>; Seigel (1995), <i>A Guide to High Precision Land Gravimeter Surveys</i>, Scintrex; Sander Geophysics, AIRGrav specifications, sgl.com; Vyazmin and Golovan (2023), doi:10.1007/1345_2023_219; Dale et al. (2026), <i>IAG Symposia</i> 158, doi:10.1007/1345_2025_303; Zheng et al. (2021), MDPI 5(3):93, mdpi.com/2504-446X/5/3/93; Tuck et al. (2021), <i>Geoscientific Instrumentation, Methods and Data Systems</i> 10, doi:10.5194/gi-10-101-2021.</span>
+    <span>CC BY 4.0 · Maxim Balagurov, petroleum geologist</span>
+    <span><a href="https://github.com/maxim-balaguroff/how-sure">github.com/maxim-balaguroff/how-sure</a> · DOI <a href="https://doi.org/10.5281/zenodo.24242389">10.5281/zenodo.24242389</a></span>
+  </footer>
+</div>
+<div id="mini" class="mini" role="button" tabindex="0" aria-label="Jump to the answer"></div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const G = 6.674e-11, TWO_PI = 2 * Math.PI;
+const CLEAR = 5, MARGINAL = 2, PIN = 15, LOOSE = 30;
+const MAG_STEP = 100, DENSE = 50, ALT_T = 1.5, ALT_DZ = 0.2;
+const PRIOR = { depthRel: 0.25, lnT: 0.5, lnRho: 0.5, lnK: 0.5, edge: 1000 };
+const PLAT = ["ground", "uav", "fw"];
+const PNAME = { ground: "ground", uav: "UAV", fw: "fixed-wing" };
+const PCAP = { ground: "Ground", uav: "UAV", fw: "Fixed-wing" };
+const PFIELDS = [["h", "Height, m", 0, 5], ["gn", "Gravity noise, mGal", 0.001, 0.01], ["gL", "Gravity resolution, m", 0, 100], ["gs", "Gravity reading spacing, m", 1, 50], ["mn", "Magnetic noise, nT", 0.01, 0.1]];
+const EXAMPLE = {
+  depth: 1500, t: 150, W: 6000, drho: 0.25, k: 0.02, Fe: 58000, seis: 40, wrho: 10, wk: 20, gp: "ground", mp: "uav",
+  pl: { ground: { h: 2, gn: 0.03, gL: 0, gs: 250, mn: 1.0 }, uav: { h: 30, gn: 2.0, gL: 1000, gs: 100, mn: 0.5 }, fw: { h: 80, gn: 0.5, gL: 2500, gs: 100, mn: 0.5 } }
+};
+
+/* ---------- physics: 2D horizontal slab; gravity in mGal (density in g/cm3), magnetics in nT (vertical field, induced) ---------- */
+// Indefinite double integral of z / (u^2 + z^2) over u and z (Blakely 1995, 2D rectangle).
+function F2(X, Z) { return Z * Math.atan2(X, Z) + 0.5 * X * Math.log(X * X + Z * Z); }
+function gravSlab(x, drho, z1, t, xl, xr) {
+  const z2 = z1 + t, X1 = xl - x, X2 = xr - x;
+  return 2 * G * drho * 1000 * (F2(X2, z2) - F2(X1, z2) - F2(X2, z1) + F2(X1, z1)) * 1e5;
+}
+// k F / (2 pi) x (angle the top subtends at the sensor - angle the base subtends)
+function magSlab(x, k, Fe, z1, t, xl, xr) {
+  const z2 = z1 + t, X1 = xl - x, X2 = xr - x;
+  return k * Fe / TWO_PI * ((Math.atan2(X2, z1) - Math.atan2(X1, z1)) - (Math.atan2(X2, z2) - Math.atan2(X1, z2)));
+}
+// Gaussian low-pass, sigma = 0.375 L: half the amplitude at wavelength 2 L.
+function smooth(f, x, L) {
+  if (!(L > 0)) return f(x);
+  const s = 0.375 * L, N = 161; let a = 0, w = 0;
+  for (let i = 0; i < N; i++) { const u = -4 * s + 8 * s * i / (N - 1), wi = Math.exp(-0.5 * (u / s) * (u / s)); a += wi * f(x - u); w += wi; }
+  return a / w;
+}
+function qOf(m, over) { return Object.assign({ z: m.depth, t: m.t, drho: m.drho, k: m.k, xl: -m.W / 2, xr: m.W / 2, Fe: m.Fe }, over || {}); }
+function gAt(x, q, p) { const z1 = Math.max(0.1, q.z + p.h); return smooth(u => gravSlab(u, q.drho, z1, q.t, q.xl, q.xr), x, p.gL); }
+function mAt(x, q, p) { return magSlab(x, q.k, q.Fe, Math.max(0.1, q.z + p.h), q.t, q.xl, q.xr); }
+function halfLen(m) { return m.W / 2 + 5 * m.depth; }
+function positions(half, step) { const n = Math.floor(2 * half / step + 1e-9), xs = []; for (let i = 0; i <= n; i++) xs.push(-half + i * step); return xs; }
+function golden(f, lo, hi) {
+  const g = (Math.sqrt(5) - 1) / 2; let a = lo, b = hi, c = b - g * (b - a), d = a + g * (b - a), fc = f(c), fd = f(d);
+  for (let i = 0; i < 80; i++) { if (fc > fd) { b = d; d = c; fd = fc; c = b - g * (b - a); fc = f(c); } else { a = c; c = d; fc = fd; d = a + g * (b - a); fd = f(d); } }
+  const x = (a + b) / 2; return { x, v: f(x) };
+}
+function gravPeak(q, p) { return gAt(0, q, p); }
+function magPeak(q, p, half) {
+  const st = Math.max(1, (q.z + p.h) / 40), f = x => Math.abs(mAt(x, q, p)); let best = 0, bx = 0;
+  for (let x = 0; x <= half + 1e-9; x += st) { const v = f(x); if (v > best) { best = v; bx = x; } }
+  return Math.max(best, golden(f, Math.max(0, bx - st), bx + st).v);
+}
+function verdictOf(r) { return r >= CLEAR ? "clear" : r >= MARGINAL ? "marginal" : "below"; }
+const VWORD = { clear: "clear", marginal: "marginal", below: "lost in noise" };
+
+/* ---------- one field alone: what it cannot tell apart ---------- */
+function maxDiff(f0, f1, xs) { let d = 0; for (const x of xs) d = Math.max(d, Math.abs(f0(x) - f1(x))); return d; }
+function refit(f0, f1, xs) {
+  const a0 = xs.map(f0), a1 = xs.map(f1); let s01 = 0, s11 = 0;
+  for (let i = 0; i < xs.length; i++) { s01 += a0[i] * a1[i]; s11 += a1[i] * a1[i]; }
+  const a = s01 / s11; let r = 0; for (let i = 0; i < xs.length; i++) r = Math.max(r, Math.abs(a0[i] - a * a1[i]));
+  return { a, r };
+}
+function ambiguity(m) {
+  const q = qOf(m), pg = m.pl[m.gp], pm = m.pl[m.mp], xs = positions(halfLen(m), DENSE);
+  const qa = qOf(m, { t: m.t * ALT_T, drho: m.drho / ALT_T }), qb = qOf(m, { t: m.t * ALT_T, k: m.k / ALT_T }), qd = qOf(m, { z: m.depth * (1 + ALT_DZ) });
+  return {
+    gMass: maxDiff(x => gAt(x, q, pg), x => gAt(x, qa, pg), xs),
+    mKt: maxDiff(x => mAt(x, q, pm), x => mAt(x, qb, pm), xs),
+    gDeep: refit(x => gAt(x, q, pg), x => gAt(x, qd, pg), xs),
+    mDeep: refit(x => mAt(x, q, pm), x => mAt(x, qd, pm), xs)
+  };
+}
+
+/* ---------- which pair pins it: linearised least squares ---------- */
+function dataVec(th, m, useG, useM) {
+  const q = { z: th[0], t: Math.exp(th[1]), drho: Math.exp(th[2]), k: Math.exp(th[3]), xl: th[4], xr: th[5], Fe: m.Fe }, half = halfLen(m), out = [];
+  if (useG) { const p = m.pl[m.gp]; for (const x of positions(half, Math.max(p.gs, p.gL))) out.push(gAt(x, q, p) / p.gn); }
+  if (useM) { const p = m.pl[m.mp]; for (const x of positions(half, MAG_STEP)) out.push(mAt(x, q, p) / p.mn); }
+  return out;
+}
+function invert(A) {
+  const n = A.length, M = A.map((r, i) => r.concat(A.map((_, j) => (i === j ? 1 : 0))));
+  for (let c = 0; c < n; c++) {
+    let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+    [M[c], M[p]] = [M[p], M[c]];
+    const d = M[c][c]; for (let j = 0; j < 2 * n; j++) M[c][j] /= d;
+    for (let r = 0; r < n; r++) if (r !== c) { const f = M[r][c]; if (f) for (let j = 0; j < 2 * n; j++) M[r][j] -= f * M[c][j]; }
+  }
+  return M.map(r => r.slice(n));
+}
+function analyse(m, useG, useM, seis, well) {
+  const th0 = [m.depth, Math.log(m.t), Math.log(m.drho), Math.log(m.k), -m.W / 2, m.W / 2], steps = [1, 1e-3, 1e-3, 1e-3, 1, 1];
+  const cols = th0.map((_, i) => {
+    const a = th0.slice(), b = th0.slice(); a[i] += steps[i]; b[i] -= steps[i];
+    const da = dataVec(a, m, useG, useM), db = dataVec(b, m, useG, useM); return da.map((v, j) => (v - db[j]) / (2 * steps[i]));
+  });
+  const prior = [seis ? m.seis : PRIOR.depthRel * m.depth, PRIOR.lnT, well ? m.wrho / 100 : PRIOR.lnRho, well ? m.wk / 100 : PRIOR.lnK, PRIOR.edge, PRIOR.edge];
+  const A = th0.map((_, i) => th0.map((_, j) => { let s = 0; const ci = cols[i], cj = cols[j]; for (let k = 0; k < ci.length; k++) s += ci[k] * cj[k]; return s + (i === j ? 1 / (prior[i] * prior[i]) : 0); }));
+  const C = invert(A);
+  return { z: Math.sqrt(C[0][0]), t: 100 * Math.sqrt(C[1][1]), mass: 100 * Math.sqrt(C[1][1] + C[2][2] + 2 * C[1][2]), edge: Math.sqrt(C[4][4]) };
+}
+const COMBOS = [
+  { label: "Gravity alone", g: 1, m: 0, s: 0, w: 0 },
+  { label: "Gravity + seismic top", g: 1, m: 0, s: 1, w: 0 },
+  { label: "Gravity + seismic top + well", g: 1, m: 0, s: 1, w: 1 },
+  { label: "Magnetics alone", g: 0, m: 1, s: 0, w: 0 },
+  { label: "Magnetics + well", g: 0, m: 1, s: 0, w: 1 },
+  { label: "Gravity + magnetics", g: 1, m: 1, s: 0, w: 0 },
+  { label: "Both fields + seismic top + well", g: 1, m: 1, s: 1, w: 1 }
+];
+function tClass(t) { return t <= PIN ? "clear" : t <= LOOSE ? "marginal" : "below"; }
+const TWORD = { clear: "pinned", marginal: "loose", below: "not resolved" };
+
+/* ---------- reading the form ---------- */
+const NUM_IDS = ["depth", "t", "W", "drho", "k", "Fe", "seis", "wrho", "wk"];
+const MINS = { depth: 0, t: 1, W: 10, drho: 0.001, k: 0.0001, Fe: 1000, seis: 1, wrho: 1, wk: 1 };
+function buildPlatformTable() {
+  $("pl-body").innerHTML = PFIELDS.map(([key, label, min, step]) => `<tr><td>${label}</td>` + PLAT.map(p => `<td><input type="number" id="p-${p}-${key}" min="${min}" step="${step}" aria-label="${PCAP[p]}: ${label}"></td>`).join("") + "</tr>").join("");
+}
+function setModel(m) {
+  for (const id of NUM_IDS) $(id).value = m[id];
+  for (const p of PLAT) for (const [key] of PFIELDS) $(`p-${p}-${key}`).value = m.pl[p][key];
+  $("gp-" + m.gp).checked = true; $("mp-" + m.mp).checked = true;
+}
+function readModel() {
+  let ok = true;
+  const num = (el, min) => { const v = parseFloat(el.value); const bad = !isFinite(v) || v < min; el.setAttribute("aria-invalid", bad ? "true" : "false"); if (bad) ok = false; return v; };
+  const m = { pl: {} };
+  for (const id of NUM_IDS) m[id] = num($(id), MINS[id]);
+  for (const p of PLAT) { m.pl[p] = {}; for (const [key, , min] of PFIELDS) m.pl[p][key] = num($(`p-${p}-${key}`), key === "gn" || key === "mn" ? Math.max(min, 1e-9) : min); }
+  for (const p of PLAT) for (const key of ["gn", "mn", "gs"]) if (!(m.pl[p][key] > 0)) { ok = false; $(`p-${p}-${key}`).setAttribute("aria-invalid", "true"); }
+  m.gp = document.querySelector("input[name=gp]:checked").value;
+  m.mp = document.querySelector("input[name=mp]:checked").value;
+  return ok ? m : null;
+}
+
+/* ---------- formatting ---------- */
+function fmt(v, d) { if (!isFinite(v)) return "–"; const a = Math.abs(v); const p = d !== undefined ? d : a >= 100 ? 0 : a >= 10 ? 1 : a >= 1 ? 2 : a >= 0.1 ? 3 : 4; return v.toLocaleString("en-US", { minimumFractionDigits: p, maximumFractionDigits: p }); }
+function fmtR(r) { return r >= 10 ? fmt(r, 0) : r >= 0.1 ? fmt(r, 1) : "under 0.1"; }
+function pct(v) { return v >= 99.5 ? fmt(v, 0) : v >= 10 ? fmt(v, 0) : fmt(v, 1); }
+
+/* ---------- drawing ---------- */
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text !== undefined) e.textContent = text; return e; }
+function niceStep(range, n) { const raw = range / n, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p; }
+function panel(svg, y0, h, half, curves, noise, unit, title) {
+  const x0 = 58, w = 604, X = x => x0 + (x + half) / (2 * half) * w;
+  let lo = -noise, hi = noise; for (const c of curves) for (const [, v] of c.pts) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+  const pad = (hi - lo) * 0.08 || 1; lo -= pad; hi += pad;
+  const Y = v => y0 + h - (v - lo) / (hi - lo) * h;
+  const st = niceStep(hi - lo, 4);
+  for (let v0 = Math.ceil(lo / st) * st; v0 <= hi; v0 += st) {
+    const v = Math.abs(v0) < st * 1e-6 ? 0 : v0;
+    svg.appendChild(el("line", { x1: x0, x2: x0 + w, y1: Y(v), y2: Y(v), stroke: "var(--grid)", "stroke-width": 1 }));
+    svg.appendChild(el("text", { x: x0 - 6, y: Y(v) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, fmt(v, st < 0.01 ? 3 : st < 0.1 ? 2 : st < 1 ? 1 : 0)));
+  }
+  svg.appendChild(el("rect", { x: x0, y: Y(noise), width: w, height: Math.max(0.5, Y(-noise) - Y(noise)), fill: "var(--band)", opacity: 0.9 }));
+  svg.appendChild(el("line", { x1: x0, x2: x0 + w, y1: Y(0), y2: Y(0), stroke: "var(--axis)", "stroke-width": 1 }));
+  for (const c of curves) svg.appendChild(el("polyline", { points: c.pts.map(([x, v]) => `${X(x).toFixed(1)},${Y(v).toFixed(1)}`).join(" "), fill: "none", stroke: c.color, "stroke-width": c.w || 2, "stroke-dasharray": c.dash || "none" }));
+  svg.appendChild(el("text", { x: x0, y: y0 - 6, "font-size": 12, "font-weight": 600, fill: "var(--ink-2)" }, title));
+  svg.appendChild(el("text", { x: x0 + w, y: y0 - 6, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, unit));
+}
+function draw(m) {
+  const svg = $("chart"); while (svg.lastChild && svg.lastChild.tagName !== "desc") svg.removeChild(svg.lastChild);
+  const half = halfLen(m), q = qOf(m), pg = m.pl[m.gp], pm = m.pl[m.mp], N = 181, xs = [];
+  for (let i = 0; i < N; i++) xs.push(-half + 2 * half * i / (N - 1));
+  const qa = qOf(m, { t: m.t * ALT_T, drho: m.drho / ALT_T }), qb = qOf(m, { t: m.t * ALT_T, k: m.k / ALT_T });
+  panel(svg, 26, 120, half, [
+    { pts: xs.map(x => [x, gAt(x, q, pg)]), color: "var(--grav)" },
+    { pts: xs.map(x => [x, gAt(x, qa, pg)]), color: "var(--alt)", dash: "5 4", w: 1.5 }
+  ], pg.gn, "mGal", `Gravity, ${PNAME[m.gp]}`);
+  panel(svg, 190, 120, half, [
+    { pts: xs.map(x => [x, mAt(x, q, pm)]), color: "var(--mag)" },
+    { pts: xs.map(x => [x, mAt(x, qb, pm)]), color: "var(--alt)", dash: "5 4", w: 1.5 }
+  ], pm.mn, "nT", `Magnetics, ${PNAME[m.mp]}`);
+  // cross-section
+  const x0 = 58, w = 604, X = x => x0 + (x + half) / (2 * half) * w, y0 = 360, h = 150, zmax = (m.depth + m.t) * 1.35, Z = z => y0 + z / zmax * h;
+  svg.appendChild(el("text", { x: x0, y: y0 - 14, "font-size": 12, "font-weight": 600, fill: "var(--ink-2)" }, "Cross-section"));
+  svg.appendChild(el("line", { x1: x0, x2: x0 + w, y1: y0, y2: y0, stroke: "var(--ground)", "stroke-width": 2 }));
+  const zs = niceStep(zmax, 3);
+  for (let z = zs; z < zmax; z += zs) svg.appendChild(el("text", { x: x0 - 6, y: Z(z) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, fmt(z, 0)));
+  svg.appendChild(el("rect", { x: X(-m.W / 2), y: Z(m.depth), width: Math.max(1, X(m.W / 2) - X(-m.W / 2)), height: Math.max(2, Z(m.depth + m.t) - Z(m.depth)), fill: "var(--sill)" }));
+  svg.appendChild(el("text", { x: X(m.W / 2) + 6, y: Z(m.depth) + 4, "font-size": 11, fill: "var(--ink-2)" }, "top from seismic"));
+  const xw = -m.W / 4;
+  svg.appendChild(el("line", { x1: X(xw), x2: X(xw), y1: y0, y2: Z(Math.min(zmax, m.depth + m.t * 1.8)), stroke: "var(--well)", "stroke-width": 2 }));
+  svg.appendChild(el("text", { x: X(xw) + 5, y: y0 + 14, "font-size": 11, fill: "var(--well)" }, "well"));
+  const st = niceStep(2 * half / 1000, 6);
+  for (let v = Math.ceil(-half / 1000 / st) * st; v <= half / 1000 + 1e-9; v += st) if (X(v * 1000) < x0 + w - 28) svg.appendChild(el("text", { x: X(v * 1000), y: y0 + h + 22, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)" }, fmt(v, 0)));
+  svg.appendChild(el("text", { x: x0 + w, y: y0 + h + 22, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, "km"));
+  svg.appendChild(el("text", { x: x0 - 6, y: y0 - 2, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, "m"));
+}
+
+/* ---------- the answer ---------- */
+function render() {
+  const m = readModel(); if (!m) return;
+  const half = halfLen(m), q = qOf(m), pg = m.pl[m.gp], pm = m.pl[m.mp];
+  const gP = gravPeak(q, pg), mP = magPeak(q, pm, half), gR = gP / pg.gn, mR = mP / pm.mn;
+  $("s-g").textContent = fmt(gP); $("s-g-l").textContent = `gravity peak, mGal (${PNAME[m.gp]})`;
+  $("s-gr").textContent = fmtR(gR); $("s-m").textContent = fmt(mP); $("s-m-l").textContent = `magnetic peak, nT (${PNAME[m.mp]})`; $("s-mr").textContent = fmtR(mR);
+
+  // 1. fields x platforms
+  const rows = [];
+  for (const p of PLAT) { const pp = m.pl[p], v = gravPeak(q, pp), r = v / pp.gn; rows.push(`<tr class="${p === m.gp ? "here" : ""}"><td>Gravity, ${PNAME[p]}${pp.gL > 0 ? ` <span class="pl2">at ${fmt(pp.gL / 1000, 1)} km</span>` : ""}</td><td class="hcol">${fmt(pp.h, 0)}</td><td>${fmt(v)} mGal</td><td>${fmt(pp.gn)}</td><td>${fmtR(r)}</td><td><span class="tag ${verdictOf(r)}">${VWORD[verdictOf(r)]}</span></td></tr>`); }
+  for (const p of PLAT) { const pp = m.pl[p], v = magPeak(q, pp, half), r = v / pp.mn; rows.push(`<tr class="${p === m.mp ? "here" : ""}"><td>Magnetics, ${PNAME[p]}</td><td class="hcol">${fmt(pp.h, 0)}</td><td>${fmt(v)} nT</td><td>${fmt(pp.mn)}</td><td>${fmtR(r)}</td><td><span class="tag ${verdictOf(r)}">${VWORD[verdictOf(r)]}</span></td></tr>`); }
+  $("fields").querySelector("tbody").innerHTML = rows.join("");
+
+  const res = COMBOS.map(c => ({ c, r: analyse(m, c.g, c.m, c.s, c.w) }));
+  const r = k => res[k].r;
+  // 2. one field alone
+  const A = ambiguity(m), sameG = A.gMass < MARGINAL * pg.gn, sameM = A.mKt < MARGINAL * pm.mn;
+  $("a-g1").innerHTML = `<p><b>Gravity: thickness or density?</b> A sill ${fmt(m.t * ALT_T, 0)} m thick with a contrast of ${fmt(m.drho / ALT_T, 3)} g/cm³ differs from yours by at most ${fmt(A.gMass)} mGal, ${fmtR(A.gMass / pg.gn)} × the noise ${sameG ? "of one reading: the same data." : "of one reading: just distinguishable on clean data."}</p><p class="rule">Gravity measures mass per area, density contrast × thickness.</p>`;
+  const gDeepSame = A.gDeep.r < MARGINAL * pg.gn;
+  $("a-g2").innerHTML = `<p><b>Gravity: where is the top?</b> Put the top ${fmt(m.depth * ALT_DZ, 0)} m deeper and raise the contrast ${fmt((A.gDeep.a - 1) * 100, 0)} %: the profiles differ by ${fmt(A.gDeep.r)} mGal, ${fmtR(A.gDeep.r / pg.gn)} × the noise. ${gDeepSame ? `No single reading tells the two apart. The whole line places the top to ±${fmt(r(0).z, 0)} m (table 3); the seismic top gives ±${fmt(m.seis, 0)} m directly.` : `Gravity sees the difference; the whole line places the top to ±${fmt(r(0).z, 0)} m (table 3).`}</p><p class="rule">The edges of the gravity profile carry the depth; the middle carries the mass.</p>`;
+  $("a-m1").innerHTML = `<p><b>Magnetics: thickness or susceptibility?</b> ${fmt(m.t * ALT_T, 0)} m with ${fmt(m.k / ALT_T, 4)} SI differs from yours by at most ${fmt(A.mKt)} nT, ${fmtR(A.mKt / pm.mn)} × the noise ${sameM ? "of one reading: the same data." : "of one reading: distinguishable, because the base moves the edge anomaly."}</p><p class="rule">For a sill thinner than its depth, magnetics measures susceptibility × thickness.</p>`;
+  const mDeepSame = A.mDeep.r < MARGINAL * pm.mn;
+  $("a-m2").innerHTML = `<p><b>Magnetics: where is the top?</b> Top ${fmt(m.depth * ALT_DZ, 0)} m deeper, susceptibility refitted: the edge anomaly differs by ${fmt(A.mDeep.r)} nT, ${fmtR(A.mDeep.r / pm.mn)} × the noise. ${mDeepSame ? "Here magnetics cannot tell the depth either." : "Magnetics sees the top and the edges: the width of the edge anomaly gives the depth."}</p><p class="rule">The flanks of the magnetic anomaly are as wide as the top is deep, and they do not trade with susceptibility.</p>`;
+
+  // 3. pairs
+  const nItems = c => c.g + c.m + c.s + c.w;
+  const pinned = res.filter(x => x.r.t <= PIN).sort((a, b) => nItems(a.c) - nItems(b.c) || a.r.t - b.r.t);
+  const best = pinned[0] || res.slice().sort((a, b) => a.r.t - b.r.t)[0];
+  $("pairs").querySelector("tbody").innerHTML = res.map(x => `<tr class="${x === best ? "best" : ""}"><td>${x.c.label}</td><td>${fmt(x.r.z, 0)}</td><td>${fmt(x.r.edge, 0)}</td><td>${pct(x.r.mass)}</td><td>${pct(x.r.t)} <span class="tag ${tClass(x.r.t)}">${TWORD[tClass(x.r.t)]}</span></td></tr>`).join("");
+  $("pair-text").innerHTML = `Gravity + seismic top: the top moves from ±${fmt(r(0).z, 0)} m to ±${fmt(r(1).z, 0)} m, so the mass sits at a known depth, but the thickness stays at ±${pct(r(1).t)} %; with the density from a well it is ±${pct(r(2).t)} %${r(0).mass > LOOSE ? ", no better, because the gravity itself is lost in noise" : ""}. Magnetics + well: the core susceptibility turns the edge anomaly into thickness, ±${pct(r(4).t)} %; magnetics places the edges to ±${fmt(r(3).edge, 0)} m against ±${fmt(r(0).edge, 0)} m from gravity.`;
+
+  const cls = tClass(best.r.t), V = $("verdict");
+  V.className = "verdict " + cls;
+  $("v-main").textContent = pinned.length ? `Thickness pinned to ±${pct(best.r.t)} % by ${best.c.label.toLowerCase()}.` : `No set of data here pins the thickness to ±${PIN} %; the best is ±${pct(best.r.t)} % with ${best.c.label.toLowerCase()}.`;
+  $("v-sub").textContent = `Gravity from the ${PNAME[m.gp]}: ${fmt(gP)} mGal, ${fmtR(gR)} × the noise, ${VWORD[verdictOf(gR)]}; it sees mass to ±${pct(r(0).mass)} %. Magnetics from the ${PNAME[m.mp]}: ${fmt(mP)} nT, ${fmtR(mR)} × the noise, ${VWORD[verdictOf(mR)]}; it places the edges to ±${fmt(r(3).edge, 0)} m and the top to ±${fmt(r(3).z, 0)} m.`;
+  const mini = $("mini"); mini.textContent = `Thickness ±${pct(best.r.t)} %: ${best.c.label.toLowerCase()}`; mini.className = "mini " + cls + (mini.classList.contains("show") ? " show" : "");
+  draw(m);
+}
+
+/* ---------- checks against known answers ---------- */
+function runChecks() {
+  const rows = [], HAND = "by hand", NUM = "independent sum";
+  const add = (name, expected, got, tol, src, rel = true) => {
+    const ok = typeof expected === "string" ? expected === got : (rel ? Math.abs(got - expected) <= tol * Math.abs(expected) : Math.abs(got - expected) <= tol);
+    rows.push({ name, expected, got, tol: typeof expected === "string" ? "exact" : rel ? (tol * 100).toPrecision(2).replace(/\.?0+$/, "") + " %" : tol.toExponential(0), src, ok });
+  };
+  const m = JSON.parse(JSON.stringify(EXAMPLE)), q = qOf(m), pg = m.pl.ground, pu = m.pl.uav, pf = m.pl.fw, half = halfLen(m);
+  const bou = 2 * Math.PI * G * 1000 * 1e5;
+  // hand answers
+  add("Bouguer slab: mGal per m per g/cm³", 0.0419340, bou, 1e-4, HAND);
+  add("Very wide sill, top 1 km: centre = 2πGΔρt, mGal", 2 * Math.PI * G * 250 * 100 * 1e5, gravSlab(0, 0.25, 1000, 100, -5e9, 5e9), 1e-4, HAND);
+  add("Half-plane sill: over its edge = half the slab", 0.5, gravSlab(0, 0.25, 1000, 100, 0, 1e9) / gravSlab(0, 0.25, 1000, 100, -1e9, 1e9), 1e-6, HAND);
+  add("Gravity: same value either side, mGal", 0, gravSlab(2000, 0.25, 1500, 150, -3000, 3000) - gravSlab(-2000, 0.25, 1500, 150, -3000, 3000), 1e-9, HAND, false);
+  add("Gravity: twice the contrast gives twice the value", 2, gravSlab(1000, 0.5, 1500, 150, -3000, 3000) / gravSlab(1000, 0.25, 1500, 150, -3000, 3000), 1e-12, HAND);
+  add("Thin sheet 1 m: 2GΔρt × (angle the sheet subtends), mGal", 2 * G * 250 * 1 * (Math.atan2(3000 - 500, 1500) - Math.atan2(-3000 - 500, 1500)) * 1e5, gravSlab(500, 0.25, 1500, 1, -3000, 3000), 1e-3, HAND);
+  add("Magnetics over the middle of a very wide sill, nT", 0, magSlab(0, 0.02, 58000, 1500, 150, -5e9, 5e9), 1e-4, HAND, false);
+  add("Thin magnetic sheet at x = h from its edge: kFt / (4πh), nT", 0.02 * 58000 / (4 * Math.PI * 1000), magSlab(1000, 0.02, 58000, 1000, 1, 0, 1e9), 1e-3, HAND);
+  add("Half-plane sill edge: magnetic extreme at √(h(h + t)), m", Math.sqrt(1000 * 1150), golden(x => magSlab(x, 0.02, 58000, 1000, 150, 0, 1e9), 1, 5000).x, 2e-3, HAND);
+  add("Half-plane sill edge: magnetics odd about the edge, nT", 0, magSlab(700, 0.02, 58000, 1000, 150, 0, 1e12) + magSlab(-700, 0.02, 58000, 1000, 150, 0, 1e12), 1e-6, HAND, false);
+  add("Filter keeps a constant", 1, smooth(() => 1, 0, 2500), 1e-12, HAND);
+  add("Filter: half amplitude at wavelength 2L", 0.5, smooth(x => Math.cos(2 * Math.PI * x / 5000), 0, 2500), 1e-3, HAND);
+  add("Verdicts at 5.0, 4.99 and 1.99 × noise", "clear marginal below", [5, 4.99, 1.99].map(verdictOf).join(" "), 0, HAND);
+  // linearised analysis: hand answers on a thin sheet (mass only)
+  // a 1 m sheet: the data fix only the mass; the seismic top (±0.1 m) keeps depth from trading with it
+  const thin = JSON.parse(JSON.stringify(EXAMPLE)); thin.t = 1; thin.seis = 0.1; thin.pl.ground.gn = 1e-4;
+  add("Thin sheet, gravity alone: thickness splits the mass, ±%", 100 / Math.sqrt(8), analyse(thin, 1, 0, 0, 0).t, 2e-3, HAND);
+  add("Thin sheet + well density ±10 %: thickness, ±%", 100 / Math.sqrt(4 + 100), analyse(thin, 1, 0, 1, 1).t, 2e-3, HAND);
+  const thinM = JSON.parse(JSON.stringify(EXAMPLE)); thinM.t = 1; thinM.seis = 0.1; thinM.pl.uav.mn = 1e-4;
+  add("Thin sheet + well susceptibility ±20 %: thickness, ±%", 100 / Math.sqrt(4 + 25), analyse(thinM, 0, 1, 0, 1).t, 2e-3, HAND);
+  const blind = JSON.parse(JSON.stringify(EXAMPLE)); blind.pl.ground.gn = 1e6;
+  add("Gravity buried in noise: thickness stays at the starting ±50 %", 50, analyse(blind, 1, 0, 0, 0).t, 1e-3, HAND);
+  add("Seismic top alone: top = seismic ±40 m when gravity is noise", 40, analyse(blind, 1, 0, 1, 0).z, 1e-3, HAND);
+  // independent sums (physics_ref.py)
+  add("Example, ground gravity at the centre, mGal", 1.08809, gAt(0, q, pg), 1e-3, NUM);
+  add("Example, ground gravity over the edge, mGal", 0.657617, gAt(3000, q, pg), 1e-3, NUM);
+  add("Example, ground gravity 3 km outside, mGal", 0.155393, gAt(6000, q, pg), 1e-3, NUM);
+  add("Example, fixed-wing gravity at 2.5 km, centre, mGal", 1.03275, gAt(0, q, pf), 1e-3, NUM);
+  add("Example, UAV gravity at 1 km, 2.5 km off centre, mGal", 0.788475, gAt(2500, q, pu), 1e-3, NUM);
+  add("Example, UAV magnetics 1 km inside the edge, nT", 12.7727, mAt(2000, q, pu), 1e-3, NUM);
+  add("Example, UAV magnetics 1 km outside the edge, nT", -3.99327, mAt(4000, q, pu), 1e-3, NUM);
+  add("Example, UAV magnetic peak, nT", 14.4002, magPeak(q, pu, half), 1e-3, NUM);
+  add("Example, ground magnetic peak, nT", 14.5357, magPeak(q, pg, half), 1e-3, NUM);
+  const A = ambiguity(m);
+  add("Same mass (t × 1.5): largest gravity difference, mGal", 0.00969097, A.gMass, 5e-3, NUM);
+  add("Same k × t (t × 1.5): largest magnetic difference, nT", 0.268605, A.mKt, 5e-3, NUM);
+  add("Top 20 % deeper, contrast refitted: gravity residual, mGal", 0.0420609, A.gDeep.r, 5e-3, NUM);
+  add("Top 20 % deeper, susceptibility refitted: magnetic residual, nT", 1.42695, A.mDeep.r, 5e-3, NUM);
+  add("Gravity alone: mass, ±%", 2.33654, analyse(m, 1, 0, 0, 0).mass, 1e-2, NUM);
+  add("Gravity + seismic top + well: thickness, ±%", 10.0533, analyse(m, 1, 0, 1, 1).t, 1e-2, NUM);
+  const rm = analyse(m, 0, 1, 0, 0);
+  add("Magnetics alone: top, ±m", 30.9068, rm.z, 1e-2, NUM);
+  add("Magnetics alone: edge, ±m", 13.5729, rm.edge, 1e-2, NUM);
+  add("Magnetics + well: thickness, ±%", 18.5903, analyse(m, 0, 1, 0, 1).t, 1e-2, NUM);
+  add("Both fields + seismic top + well: thickness, ±%", 8.76480, analyse(m, 1, 1, 1, 1).t, 1e-2, NUM);
+  const mu = JSON.parse(JSON.stringify(EXAMPLE)); mu.gp = "uav";
+  add("UAV gravity alone: mass, ±%", 53.6903, analyse(mu, 1, 0, 0, 0).mass, 1e-2, NUM);
+
+  const tbody = $("checks").querySelector("tbody"); tbody.innerHTML = "";
+  for (const r of rows) {
+    const f = v => typeof v === "string" ? v : Math.abs(v) < 1e-6 ? v.toExponential(1) : (+v.toPrecision(6)).toString();
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.name}</td><td>${f(r.expected)}</td><td>${f(r.got)}</td><td class="tol">${r.tol}</td><td class="src">${r.src}</td><td class="st ${r.ok ? "ok" : "no"}">${r.ok ? "PASS" : "FAIL"}</td>`;
+    tbody.appendChild(tr);
+  }
+  const fails = rows.filter(r => !r.ok).length;
+  $("checks-sum").innerHTML = fails ? `<span class="fail">${fails} of ${rows.length} FAIL</span>` : `<span class="pass">ALL ${rows.length} PASS</span>`;
+  document.documentElement.setAttribute("data-checks", fails ? `FAIL ${fails}/${rows.length}` : `ALL ${rows.length} PASS`);
+  return rows;
+}
+
+/* ---------- wiring ---------- */
+try { const t = new URLSearchParams(location.search).get("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+buildPlatformTable();
+let timer = 0;
+const later = () => { clearTimeout(timer); timer = setTimeout(render, 200); };
+document.querySelectorAll("#form input[type=number]").forEach(i => { i.setAttribute("inputmode", "decimal"); i.addEventListener("input", later); });
+document.querySelectorAll("#form input[type=radio]").forEach(i => i.addEventListener("change", render));
+try { new IntersectionObserver(es => $("mini").classList.toggle("show", !es[0].isIntersecting)).observe($("verdict")); } catch (e) {}
+$("mini").addEventListener("click", () => $("verdict").scrollIntoView({ behavior: "smooth", block: "center" }));
+$("reset").addEventListener("click", () => { setModel(EXAMPLE); render(); });
+setModel(EXAMPLE);
+render();
+runChecks();
+try { if (new URLSearchParams(location.search).has("probe")) document.documentElement.dataset.width = document.documentElement.scrollWidth + "/" + window.innerWidth; } catch (e) {}
+</script>
+</body>
+</html>
