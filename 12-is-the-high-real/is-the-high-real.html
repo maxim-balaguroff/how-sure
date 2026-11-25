@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is the high real?</title>
+<meta name="description" content="A fast dolerite sill sits above a mapped high. How much of the high can the sill make by pulling the time up, how that changes with the host rock, and how sure the sill velocity has to be.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Is the high real?">
+<meta property="og:description" content="A fast dolerite sill sits above a mapped high. How much of the high can the sill make by pulling the time up, how that changes with the host rock, and how sure the sill velocity has to be.">
+<meta property="og:url" content="https://maxim-balaguroff.github.io/how-sure/12-is-the-high-real/is-the-high-real.html">
+<meta property="og:image" content="https://maxim-balaguroff.github.io/how-sure/12-is-the-high-real/cover.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1254">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    --page: #ffffff; --surface: #fafaf8; --card: #ffffff; --ink: #111110; --ink-2: #52514e; --muted: #8a8882;
+    --rule: #e2e1db; --grid: #ecebe6; --axis: #b9b8ae; --band: #efeee9; --accent: #2a78d6; --accent-soft: #e6f0fb;
+    --host: #e9e6dc; --sill: #4a4a46; --ground: #9a988f; --mapped: #2a78d6; --made: #c2410c; --left: #1f8a4c;
+    --ok: #1f8a4c; --ok-soft: #e5f4ea; --warn: #b06a00; --warn-soft: #fbf0dc; --bad: #b3261e; --bad-soft: #fbe7e5; --focus: #2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #8f8d84;
+      --rule: #34332f; --grid: #2a2a27; --axis: #55544d; --band: #2b2b28; --accent: #6aa7ee; --accent-soft: #1d2b3c;
+      --host: #2b2a26; --sill: #c9c7bd; --ground: #8f8d84; --mapped: #6aa7ee; --made: #f08a4b; --left: #5cc68a;
+      --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f; --bad: #f08a80; --bad-soft: #3a1c19;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #8f8d84;
+    --rule: #34332f; --grid: #2a2a27; --axis: #55544d; --band: #2b2b28; --accent: #6aa7ee; --accent-soft: #1d2b3c;
+    --host: #2b2a26; --sill: #c9c7bd; --ground: #8f8d84; --mapped: #6aa7ee; --made: #f08a4b; --left: #5cc68a;
+    --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f; --bad: #f08a80; --bad-soft: #3a1c19;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--page); color: var(--ink); }
+  body { font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif; font-size: 15px; line-height: 1.5; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 40px; }
+  .kicker { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 6px; }
+  h1 { font-size: 32px; line-height: 1.12; margin: 0 0 10px; letter-spacing: -.015em; }
+  .lead { font-size: 17px; max-width: 780px; margin: 0 0 12px; }
+  .why { font-size: 14.5px; color: var(--ink-2); max-width: 780px; margin: 0 0 24px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 10px; }
+  h3 { font-size: 15px; margin: 0 0 8px; }
+  .grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
+  .grid > *, .notes > * { min-width: 0; }
+  .card { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; overflow-x: auto; margin-bottom: 14px; }
+  .inputs { position: sticky; top: 12px; margin-bottom: 0; }
+  fieldset { border: 0; padding: 0; margin: 0 0 14px; min-width: 0; }
+  legend { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); padding: 0; margin-bottom: 8px; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin-bottom: 10px; }
+  .seg input { position: absolute; opacity: 0; pointer-events: none; }
+  .seg label { text-align: center; padding: 7px 4px; font-size: 14px; cursor: pointer; border-right: 1px solid var(--rule); background: var(--surface); }
+  .seg label:last-of-type { border-right: 0; }
+  .seg input:checked + label { background: var(--accent); color: #fff; }
+  .seg input:focus-visible + label { outline: 2px solid var(--focus); outline-offset: -3px; }
+  .field { display: grid; grid-template-columns: 1fr 100px; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .field label { font-size: 14px; }
+  .field .hint, .hint { grid-column: 1 / -1; font-size: 12.5px; color: var(--muted); margin-top: -4px; }
+  input[type=number] { width: 100%; font: inherit; font-variant-numeric: tabular-nums; text-align: right; padding: 6px 8px; border: 1px solid var(--rule); border-radius: 6px; background: var(--page); color: var(--ink); }
+  input[type=number]:focus { outline: 2px solid var(--focus); outline-offset: 0; border-color: transparent; }
+  input[aria-invalid="true"] { border-color: var(--bad); background: var(--bad-soft); }
+  button { font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; }
+  button:hover { border-color: var(--axis); }
+  button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .verdict { border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; border: 1px solid transparent; }
+  .verdict .v { font-size: 20px; font-weight: 700; line-height: 1.25; }
+  .verdict .s { color: var(--ink-2); margin-top: 4px; }
+  .verdict.clear { background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+  .verdict.clear .v { color: var(--ok); }
+  .verdict.marginal { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+  .verdict.marginal .v { color: var(--warn); }
+  .verdict.below { background: var(--bad-soft); border-color: color-mix(in srgb, var(--bad) 35%, transparent); }
+  .verdict.below .v { color: var(--bad); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; }
+  .stat .n { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; overflow-wrap: anywhere; }
+  .stat .l { font-size: 12.5px; color: var(--ink-2); }
+  figure { margin: 0 0 14px; }
+  svg { display: block; width: 100%; height: auto; }
+  svg text { font-family: "Segoe UI", system-ui, Arial, sans-serif; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--rule); font-size: 14px; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 12.5px; color: var(--ink-2); font-weight: 600; }
+  tr.here td { background: var(--accent-soft); font-weight: 600; }
+  td .pl2 { color: var(--muted); font-weight: 400; font-size: 13px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+  .tag.clear { background: var(--ok-soft); color: var(--ok); }
+  .tag.marginal { background: var(--warn-soft); color: var(--warn); }
+  .tag.below { background: var(--bad-soft); color: var(--bad); }
+  .tablewrap { overflow-x: auto; }
+  .tablenote { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+  .notes { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 28px; }
+  .notes ul { margin: 0; padding-left: 18px; }
+  .notes li { margin-bottom: 6px; }
+  details { margin-top: 24px; border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; background: var(--surface); }
+  summary { cursor: pointer; font-weight: 700; }
+  summary .pass { color: var(--ok); }
+  summary .fail { color: var(--bad); }
+  #checks td.st { font-weight: 700; }
+  #checks td.st.ok { color: var(--ok); }
+  #checks td.st.no { color: var(--bad); }
+  #checks td.src { text-align: left; color: var(--ink-2); font-size: 13px; }
+  .role { font-size: 14px; color: var(--ink-2); max-width: 780px; margin: 24px 0 0; }
+  footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--rule); color: var(--ink-2); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  a { color: var(--accent); }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--ink-2); margin: 4px 0 0; }
+  .legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid; vertical-align: middle; margin-right: 6px; }
+  .legend i.d { border-top-style: dashed; }
+  .legend i.b { height: 10px; border: 0; background: var(--sill); }
+  .err { color: var(--bad); font-size: 13px; margin: 0 0 8px; }
+  .mini { display: none; }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+    .inputs { position: static; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .notes { grid-template-columns: 1fr; }
+    h1 { font-size: 26px; }
+    input[type=number] { font-size: 16px; min-height: 44px; }
+    button { min-height: 44px; }
+    .seg label { min-height: 44px; display: flex; align-items: center; justify-content: center; }
+    .mini.show { display: block; position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; padding: 12px 16px; background: var(--card); border-top: 1px solid var(--rule); box-shadow: 0 -2px 10px rgba(0, 0, 0, .08); font-weight: 700; font-size: 15px; cursor: pointer; }
+    .mini.clear { color: var(--ok); }
+    .mini.marginal { color: var(--warn); }
+    .mini.below { color: var(--bad); }
+    body { padding-bottom: 56px; }
+  }
+  @media (max-width: 600px) { #checks .tol, #checks .src, .hcol { display: none; } .card { padding: 14px 12px; } svg text { font-size: 18px !important; } }
+  @media (max-width: 420px) { th, td { padding: 6px 4px; font-size: 13.5px; } td .pl2 { display: block; } .tag { white-space: normal; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">how-sure · tool 12 · before drilling a high under a sill · proposed check · v1.6</p>
+  <h1>Is the high real?</h1>
+  <p class="lead">A dolerite sill lies above a high on the depth map. Seismic waves cross the sill faster than the rock around it, so everything below arrives early and looks higher than it is. The page tells you how much of the high the sill alone can make, how that changes with the host rock, and how sure the sill velocity has to be.</p>
+  <p class="why">Why it matters in petroleum work: a high under a sill can be a trap, or it can be the sill seen through a velocity model that does not know it is there. Drilling a high that is half velocity costs a well. Sills in trap provinces are common and can be hundreds of metres thick.</p>
+
+  <div class="grid">
+    <form class="card inputs" id="form" autocomplete="off" onsubmit="return false">
+      <fieldset>
+        <legend>The sill</legend>
+        <div class="field"><label for="top">Depth to top, m</label><input type="number" id="top" min="0" step="50" value="1500"></div>
+        <div class="field"><label for="t">Thickness, m</label><input type="number" id="t" min="1" step="10" value="150">
+          <div class="hint">Tunguska Basin: sills 350 m thick and more, locally up to 65 % of the section (Svensen et al., 2018).</div></div>
+        <div class="field"><label for="vs">Sill velocity, m/s</label><input type="number" id="vs" min="100" step="100" value="5200">
+          <div class="hint">One sill on a sonic log: 5.2 ± 0.3 km/s; for a whole sill 4.5 to 6.0 km/s is used (Magee et al., 2019, after Smallwood and Maresh, 2002).</div></div>
+      </fieldset>
+      <fieldset>
+        <legend>The host rock</legend>
+        <div class="seg" role="radiogroup" aria-label="Host rock">
+          <input type="radio" name="host" id="h-clastic" value="clastic" checked><label for="h-clastic">Clastic</label>
+          <input type="radio" name="host" id="h-salt" value="salt"><label for="h-salt">Rock salt</label>
+          <input type="radio" name="host" id="h-dolomite" value="dolomite"><label for="h-dolomite">Dolomite</label>
+        </div>
+        <div class="field"><label for="vh">Host velocity, m/s</label><input type="number" id="vh" min="100" step="100" value="3000">
+          <div class="hint" id="host-hint"></div></div>
+      </fieldset>
+      <fieldset>
+        <legend>The target</legend>
+        <div class="field"><label for="target">Depth of the mapped high, m</label><input type="number" id="target" min="1" step="50" value="2500"></div>
+        <div class="field"><label for="high">Height of the high, m</label><input type="number" id="high" min="1" step="5" value="80">
+          <div class="hint">Relief of the closure on the depth map, made without the sill in the velocity model.</div></div>
+      </fieldset>
+      <fieldset>
+        <legend>How sure is the sill velocity</legend>
+        <div class="field"><label for="vlo">Low, m/s</label><input type="number" id="vlo" min="100" step="100" value="4500"></div>
+        <div class="field"><label for="vhi">High, m/s</label><input type="number" id="vhi" min="100" step="100" value="6000"></div>
+        <div class="field"><label for="wellv">From a well, ± m/s</label><input type="number" id="wellv" min="1" step="50" value="300">
+          <div class="hint">A sonic log through the sill; the example takes the spread of one published log (the scatter inside one sill), used here as the uncertainty of the sill velocity: my estimate, not from a source.</div></div>
+      </fieldset>
+      <p class="err" id="err" hidden></p>
+      <button type="button" id="reset">Back to the example</button>
+    </form>
+
+    <main>
+      <div class="verdict" id="verdict" aria-live="polite"><div class="v" id="v-main"></div><div class="s" id="v-sub"></div></div>
+      <div class="stats">
+        <div class="stat"><div class="n" id="s-dt"></div><div class="l">pull-up, ms two-way time</div></div>
+        <div class="stat"><div class="n" id="s-dz"></div><div class="l">pull-up at the target, m</div></div>
+        <div class="stat"><div class="n" id="s-share"></div><div class="l">share of the high</div></div>
+        <div class="stat"><div class="n" id="s-tau"></div><div class="l">sill in time, ms</div></div>
+      </div>
+      <figure>
+        <svg id="chart" viewBox="0 0 680 470" role="img" aria-labelledby="chart-title chart-desc">
+          <title id="chart-title">Cross-section and the mapped high, split into what the sill can make and what is left</title>
+          <desc id="chart-desc">Upper panel: the sill and the target in depth, to scale. Lower panel: the top of the target across the sill after depth conversion without the sill, the part the sill can make, and the part left over, with the vertical scale stretched.</desc>
+        </svg>
+        <div class="legend"><span><i class="b"></i>sill</span><span><i style="border-color:var(--mapped)"></i>mapped high</span><span><i class="d" style="border-color:var(--made)"></i>made by the sill</span><span><i style="border-color:var(--left)"></i>left after the correction</span></div>
+      </figure>
+
+      <div class="card">
+        <h3>1. The same sill in other host rocks</h3>
+        <div class="tablewrap"><table id="hosts" aria-label="Pull-up for each host rock">
+          <thead><tr><th>Host rock</th><th>Velocity, m/s</th><th class="hcol">Pull-up, ms</th><th>At the target, m</th><th>Share of the high</th><th>Verdict</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <p class="tablenote" id="host-src"></p>
+      </div>
+
+      <div class="card">
+        <h3>2. How sure is the sill velocity?</h3>
+        <div class="tablewrap"><table id="sens" aria-label="Thickness and pull-up for the low, middle and high sill velocity">
+          <thead><tr><th>Sill velocity</th><th>m/s</th><th>Thickness, m</th><th>Pull-up at the target, m</th><th>Share of the high</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <p id="sens-text" style="margin:10px 0 0"></p>
+        <p class="tablenote">Seismic measures the sill in time, top to base. The thickness is that time × velocity ÷ 2, so a velocity 15 % too high makes the sill 15 % too thick. In one published case the thickness of a sill came out between about 117 and 187 m for velocities of 4.5 to 6.0 km/s (Magee et al., 2019); the page does not repeat their full conversion, it shows the same effect with one rule.</p>
+      </div>
+
+      <div class="card">
+        <h3>3. What would settle it</h3>
+        <p id="settle" style="margin:0"></p>
+      </div>
+      <p style="margin:0;font-size:14px;color:var(--ink-2)">Can gravity or magnetics constrain the sill? <a href="https://maxim-balaguroff.github.io/how-sure/11-gravity-or-magnetics/gravity-or-magnetics.html">Tool 11, Gravity, magnetics or both?</a></p>
+    </main>
+  </div>
+
+  <div class="notes">
+    <section>
+      <h2>How it works</h2>
+      <ul>
+        <li>Rays go straight down. Across the sill the wave spends 2t / Vs instead of 2t / Vh, so everything below arrives earlier by 2t (1/Vh − 1/Vs): the pull-up in two-way time.</li>
+        <li>A depth map made without the sill converts that early time with the host velocity, so the target comes out higher by the pull-up × Vh / 2 = t (1 − Vh / Vs). The overburden above the sill cancels: it is the same with and without the sill.</li>
+        <li>Seismic gives the sill in time, τ = 2t / Vs. Read with another velocity V, its thickness becomes τ V / 2 and the estimated pull-up (τ / 2)(V − Vh).</li>
+        <li>With the sill in the velocity model at the wrong velocity, the target moves by (τ / 2) × the velocity error: a well with a sonic log narrows that error.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Rules it uses</h2>
+      <ul>
+        <li><b>Share of the high:</b> the pull-up at the target ÷ the height of the high.</li>
+        <li><b>Verdict:</b> at least 50 % of the high could be the sill: red; 20 to 50 %: amber; under 20 %: green. A sill slower than its host pushes the horizon below it down and makes no pull-up: green. The flanks beside it can then look relatively high; the page does not judge them.</li>
+        <li><b>Host presets:</b> clastic 3,000 m/s, the strata above one logged sill (Magee et al., 2019); rock salt 4,750 m/s, the middle of 4.5 to 5.0 km/s; dolomite 5,500 m/s, an estimate chosen close to the sill velocity, since dolerite and dolostone look alike on seismic (Svensen et al., 2018), inside 2.5 to 6.5 km/s (UBC EOSC 350 table).</li>
+        <li>The 50 % and 20 % thresholds are my conventions.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Limits</h2>
+      <ul>
+        <li>Straight vertical rays and flat layers. Under a sill narrower than the seismic Fresnel zone, the pull-up is smeared and smaller; at the sill edges, ray bending distorts the image. The page gives the full pull-up under the middle of a wide sill; a narrower sill and the smoothing of seismic imaging give less.</li>
+        <li>A sill of even thickness under the whole map lifts everything below it by the same amount and makes no high. The pull-up becomes relief only where the sill lies under the crest and is thinner, slower or absent under the flanks; the page takes the case of no sill under the flanks.</li>
+        <li>Velocity models from stacking velocities or tomography often hold part of the sill, smeared over a thicker interval. The page assumes none of it is in the model, so for the velocity you enter its figure is the largest.</li>
+        <li>One sill, one host velocity. Stacked sills add up; a host that changes velocity with depth needs its own interval velocities.</li>
+        <li>The drawing in the lower panel puts the high under the sill on purpose: that is the case the page tests. A high offset from the sill is not made by it.</li>
+        <li>The page checks one cause of a false high. Other causes (salt, shallow channels, statics) need their own checks.</li>
+      </ul>
+    </section>
+  </div>
+
+  <p class="role">Stage: proposed check. The example is made up and reports no project. The check builds on the author's work reducing geological uncertainty in structurally complex systems by integrating seismic, well, gravity–magnetic, core, laboratory and field data into consistent geological models. The pull-up as a share of the high is an estimate, not a figure from a source.</p>
+
+  <details id="checks-box">
+    <summary>Checks against known answers: <span id="checks-sum"></span></summary>
+    <p>Each check compares the page with an answer worked out another way: by hand from the relations above, or by an independent calculation that adds up two-way time cell by cell through a velocity log with a slow overburden and converts time back to depth by bisection, instead of the page's closed forms (<code>physics_ref.py</code> in the repository). Change the code and break a formula, and a row turns FAIL.</p>
+    <div class="tablewrap"><table id="checks"><thead><tr><th>Check</th><th>Expected</th><th>Page</th><th class="tol">Tolerance</th><th class="src">Source</th><th></th></tr></thead><tbody></tbody></table></div>
+  </details>
+
+  <footer>
+    <span>Built with AI assistance; the geology and the checks are mine.</span>
+    <span>The example is made up; no project data.</span>
+    <span>References: Svensen et al. (2018), <i>Phil. Trans. R. Soc. A</i> 376, 20170080, doi:10.1098/rsta.2017.0080; Magee et al. (2019), <i>Frontiers in Earth Science</i> 7:37, doi:10.3389/feart.2019.00037; Smallwood and Maresh (2002), as cited by Magee et al.; UBC EOSC 350, Seismic velocities and materials, eoas.ubc.ca.</span>
+    <span>CC BY 4.0 · Maxim Balagurov, petroleum geologist</span>
+    <span><a href="https://github.com/maxim-balaguroff/how-sure">github.com/maxim-balaguroff/how-sure</a> · DOI <a href="https://doi.org/10.5281/zenodo.24242389">10.5281/zenodo.24242389</a></span>
+  </footer>
+</div>
+<div id="mini" class="mini" role="button" tabindex="0" aria-label="Jump to the answer"></div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const RED = 50, AMBER = 20;
+const HOSTS = {
+  clastic: { name: "Clastic", v: 3000, src: "Strata above one logged sill: about 3.0 km/s; sedimentary section there 2.2 to 3.2 km/s (Magee et al., 2019)." },
+  salt: { name: "Rock salt", v: 4750, src: "Salt 4.5 to 5.0 km/s; the preset is the middle (UBC EOSC 350 table)." },
+  dolomite: { name: "Dolomite", v: 5500, src: "Estimate, chosen close to the sill velocity: in the Tunguska Basin dolerite and dolostone look alike on seismic (Svensen et al., 2018); dolomites span 2.5 to 6.5 km/s (UBC EOSC 350 table)." }
+};
+const EXAMPLE = { top: 1500, t: 150, vs: 5200, vh: 3000, host: "clastic", target: 2500, high: 80, vlo: 4500, vhi: 6000, wellv: 300 };
+
+/* ---------- physics: straight vertical rays, two-way time ---------- */
+function pullupTime(t, vs, vh) { return 2 * t * (1 / vh - 1 / vs); }            // s
+function pullupDepth(t, vs, vh) { return pullupTime(t, vs, vh) * vh / 2; }       // m, converted with the host velocity
+function sillTime(t, vs) { return 2 * t / vs; }                                    // s
+function thicknessAt(tau, v) { return tau * v / 2; }                               // m
+function pullupFromTime(tau, v, vh) { return pullupDepth(thicknessAt(tau, v), v, vh); }
+function modelError(tau, dv) { return tau * dv / 2; }                              // m, target moves by this much
+function share(dz, high) { return 100 * dz / high; }
+function classOf(dz, s) { return dz <= 0 ? "clear" : s >= RED ? "below" : s >= AMBER ? "marginal" : "clear"; }
+const CWORD = { clear: "the high stands", marginal: "part could be the sill", below: "mostly the sill" };
+
+/* ---------- reading the form ---------- */
+const NUM_IDS = ["top", "t", "vs", "vh", "target", "high", "vlo", "vhi", "wellv"];
+const MINS = { top: 0, t: 1, vs: 100, vh: 100, target: 1, high: 1, vlo: 100, vhi: 100, wellv: 0 };
+function setModel(m) { for (const id of NUM_IDS) $(id).value = m[id]; $("h-" + m.host).checked = true; hostHint(); }
+function readModel() {
+  let ok = true; const m = {}, msg = [];
+  for (const id of NUM_IDS) { const v = parseFloat($(id).value), bad = !isFinite(v) || v < MINS[id]; $(id).setAttribute("aria-invalid", bad ? "true" : "false"); if (bad) ok = false; m[id] = v; }
+  if (ok && m.target <= m.top + m.t) { ok = false; $("target").setAttribute("aria-invalid", "true"); msg.push("The target must lie below the base of the sill."); }
+  if (ok && !(m.vlo < m.vhi)) { ok = false; $("vlo").setAttribute("aria-invalid", "true"); $("vhi").setAttribute("aria-invalid", "true"); msg.push("Low velocity must be below high."); }
+  m.host = (document.querySelector("input[name=host]:checked") || {}).value || "";
+  $("err").hidden = !msg.length; $("err").textContent = msg.join(" ");
+  return ok ? m : null;
+}
+function hostHint() { const h = document.querySelector("input[name=host]:checked"); $("host-hint").textContent = h ? HOSTS[h.value].src : "Your own value."; }
+
+/* ---------- formatting ---------- */
+function fmt(v, d) { if (!isFinite(v)) return "–"; const a = Math.abs(v); const p = d !== undefined ? d : a >= 100 ? 0 : a >= 10 ? 1 : a >= 1 ? 2 : 3; return v.toLocaleString("en-US", { minimumFractionDigits: p, maximumFractionDigits: p }); }
+function pct(v) { return Math.abs(v) >= 10 ? fmt(v, 0) : fmt(v, 1); }
+
+/* ---------- drawing ---------- */
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text !== undefined) e.textContent = text; return e; }
+function niceStep(range, n) { const raw = range / n, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p; return (f < 1.5 ? 1 : f < 3.5 ? 2 : f < 7.5 ? 5 : 10) * p; }
+function draw(m, dz) {
+  const svg = $("chart"); while (svg.lastChild && svg.lastChild.tagName !== "desc") svg.removeChild(svg.lastChild);
+  const x0 = 58, w = 604, X = u => x0 + (u + 1) / 2 * w, half = 0.42;            // u in [-1, 1], sill from -half to half
+  // upper panel: section in depth, to scale
+  const y0 = 28, h = 170, zmax = m.target * 1.12, Z = z => y0 + z / zmax * h;
+  svg.appendChild(el("text", { x: x0, y: y0 - 10, "font-size": 12, "font-weight": 600, fill: "var(--ink-2)" }, "Section in depth, to scale"));
+  svg.appendChild(el("rect", { x: x0, y: y0, width: w, height: h, fill: "var(--host)" }));
+  svg.appendChild(el("line", { x1: x0, x2: x0 + w, y1: y0, y2: y0, stroke: "var(--ground)", "stroke-width": 2 }));
+  svg.appendChild(el("rect", { x: X(-half), y: Z(m.top), width: X(half) - X(-half), height: Math.max(2, Z(m.top + m.t) - Z(m.top)), fill: "var(--sill)" }));
+  svg.appendChild(el("text", { x: X(half) + 6, y: Z(m.top + m.t / 2) + 4, "font-size": 11, fill: "var(--ink-2)" }, `sill ${fmt(m.t, 0)} m, ${fmt(m.vs, 0)} m/s`));
+  svg.appendChild(el("line", { x1: x0, x2: x0 + w, y1: Z(m.target), y2: Z(m.target), stroke: "var(--left)", "stroke-width": 2 }));
+  svg.appendChild(el("text", { x: x0 + 4, y: Z(m.target) - 5, "font-size": 11, fill: "var(--ink-2)" }, `target ${fmt(m.target, 0)} m`));
+  const zs = niceStep(zmax, 3);
+  for (let z = zs; z < zmax; z += zs) svg.appendChild(el("text", { x: x0 - 6, y: Z(z) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, fmt(z, 0)));
+  svg.appendChild(el("text", { x: x0 - 6, y: y0 + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, "m"));
+  // lower panel: the top of the target, vertical scale stretched
+  const y1 = 250, h1 = 190, N = 181, us = [], shape = u => 0.5 * (Math.tanh((u + half) / 0.07) - Math.tanh((u - half) / 0.07));
+  for (let i = 0; i < N; i++) us.push(-1 + 2 * i / (N - 1));
+  const left = m.high - dz, lo = Math.min(0, left, dz) - m.high * 0.15, hi = Math.max(m.high, dz) * 1.15, H = v => y1 + h1 - (v - lo) / (hi - lo) * h1;
+  svg.appendChild(el("text", { x: x0, y: y1 - 12, "font-size": 12, "font-weight": 600, fill: "var(--ink-2)" }, "Top of the target above its flanks, m (stretched)"));
+  const st = niceStep(hi - lo, 4);
+  for (let v0 = Math.ceil(lo / st) * st; v0 <= hi; v0 += st) {
+    const v = Math.abs(v0) < st * 1e-6 ? 0 : v0;
+    svg.appendChild(el("line", { x1: x0, x2: x0 + w, y1: H(v), y2: H(v), stroke: v === 0 ? "var(--axis)" : "var(--grid)", "stroke-width": 1 }));
+    svg.appendChild(el("text", { x: x0 - 6, y: H(v) + 4, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, fmt(v, 0)));
+  }
+  const line = (amp, color, dash, sw) => svg.appendChild(el("polyline", { points: us.map(u => `${X(u).toFixed(1)},${H(amp * shape(u)).toFixed(1)}`).join(" "), fill: "none", stroke: color, "stroke-width": sw || 2, "stroke-dasharray": dash || "none" }));
+  line(m.high, "var(--mapped)", null, 2.5);
+  line(dz, "var(--made)", "6 4", 2);
+  line(left, "var(--left)", null, 2);
+  svg.appendChild(el("text", { x: x0 + w, y: y1 + h1 + 18, "text-anchor": "end", "font-size": 11, fill: "var(--muted)" }, "across the sill"));
+}
+
+/* ---------- the answer ---------- */
+function render() {
+  hostHint();
+  const m = readModel();
+  if (!m) { $("verdict").className = "verdict"; $("v-main").textContent = "Check the marked fields."; $("v-sub").textContent = ""; return; }
+  const dt = pullupTime(m.t, m.vs, m.vh), dz = pullupDepth(m.t, m.vs, m.vh), s = share(dz, m.high), tau = sillTime(m.t, m.vs), cls = classOf(dz, s);
+  $("s-dt").textContent = fmt(dt * 1000, 1); $("s-dz").textContent = fmt(dz, 1); $("s-share").textContent = dz > 0 ? pct(s) + " %" : "none"; $("s-tau").textContent = fmt(tau * 1000, 1);
+
+  // 1. host rocks
+  const rows = Object.entries(HOSTS).map(([key, hh]) => ({ key, name: hh.name, v: hh.v }));
+  if (!rows.some(r => r.v === m.vh)) rows.push({ key: "own", name: "Your value", v: m.vh });
+  $("hosts").querySelector("tbody").innerHTML = rows.map(r => {
+    const d = pullupDepth(m.t, m.vs, r.v), sh = share(d, m.high), c = classOf(d, sh);
+    return `<tr class="${r.v === m.vh ? "here" : ""}"><td>${r.name}</td><td>${fmt(r.v, 0)}</td><td class="hcol">${fmt(pullupTime(m.t, m.vs, r.v) * 1000, 1)}</td><td>${fmt(d, 1)}</td><td>${d > 0 ? pct(sh) + " %" : "none"}</td><td><span class="tag ${c}">${d > 0 ? CWORD[c] : "pushes it down"}</span></td></tr>`;
+  }).join("");
+  $("host-src").textContent = "Sources: " + Object.values(HOSTS).map(hh => hh.name + ": " + hh.src).join(" ");
+
+  // 2. sensitivity to the sill velocity
+  const sens = [["Low", m.vlo], ["As entered", m.vs], ["High", m.vhi]].map(([n, v]) => ({ n, v, th: thicknessAt(tau, v), d: pullupFromTime(tau, v, m.vh) }));
+  $("sens").querySelector("tbody").innerHTML = sens.map(r => `<tr class="${r.n === "As entered" ? "here" : ""}"><td>${r.n}</td><td>${fmt(r.v, 0)}</td><td>${fmt(r.th, 0)}</td><td>${fmt(r.d, 1)}</td><td>${r.d > 0 ? pct(share(r.d, m.high)) + " %" : "none"}</td></tr>`).join("");
+  const me = modelError(tau, m.wellv);
+  $("sens-text").innerHTML = `The sill is ${fmt(tau * 1000, 1)} ms thick in time. Between ${fmt(m.vlo, 0)} and ${fmt(m.vhi, 0)} m/s it is ${fmt(sens[0].th, 0)} to ${fmt(sens[2].th, 0)} m thick, and the pull-up at the target is ${fmt(sens[0].d, 1)} to ${fmt(sens[2].d, 1)} m. Put the sill into the velocity model with a velocity known to ±${fmt(m.wellv, 0)} m/s from a well, and the target can still move ±${fmt(me, 1)} m.`;
+
+  // 3. what would settle it
+  const after = m.high - dz;
+  $("settle").innerHTML = dz <= 0
+    ? `This sill is slower than its host: it pushes the horizon below it down by ${fmt(-dz, 1)} m and makes no pull-up. The flanks beside it can look relatively high; check other causes of a false high.`
+    : `Put the sill into the velocity model. If the high is ${fmt(m.high, 0)} m and the sill can make ${fmt(dz, 1)} m,${after > 0 ? `about ${fmt(after, 0)} m would be left` : "nothing would be left"}. That rests on the sill velocity and on where its base is. A well through the sill gives both at one point: the sonic log gives the velocity, here worth ±${fmt(me, 1)} m at the target. Away from the well, the thickness of the sill is the open question; that is what tool 11 asks of gravity and magnetics.`;
+
+  const V = $("verdict"); V.className = "verdict " + cls;
+  $("v-main").textContent = dz <= 0 ? `The sill does not make this high: it pushes the horizon down by ${fmt(-dz, 1)} m.`
+    : s >= 100 ? `The whole ${fmt(m.high, 0)} m high could be the sill.`
+    : s >= RED ? `Most of the high could be the sill: up to ${fmt(dz, 0)} of ${fmt(m.high, 0)} m.`
+    : s >= AMBER ? `Part of the high could be the sill: up to ${fmt(dz, 0)} of ${fmt(m.high, 0)} m.`
+    : `The high stands: the sill makes at most ${fmt(dz, 0)} of ${fmt(m.high, 0)} m.`;
+  $("v-sub").textContent = `Pull-up ${fmt(dt * 1000, 1)} ms; converted with the host velocity, ${fmt(dz, 1)} m at the target, ${fmt(100 * dz / m.target, 1)} % of its depth. With the sill velocity between ${fmt(m.vlo, 0)} and ${fmt(m.vhi, 0)} m/s: ${fmt(sens[0].d, 1)} to ${fmt(sens[2].d, 1)} m.`;
+  const mini = $("mini"); mini.textContent = dz > 0 ? `Sill can make ${pct(s)} % of the high` : "Sill pushes the horizon down"; mini.className = "mini " + cls + (mini.classList.contains("show") ? " show" : "");
+  draw(m, dz);
+}
+
+/* ---------- checks against known answers ---------- */
+function runChecks() {
+  const rows = [], HAND = "by hand", NUM = "independent sum";
+  const add = (name, expected, got, tol, src, rel = true) => {
+    const ok = typeof expected === "string" ? expected === got : (rel ? Math.abs(got - expected) <= tol * Math.abs(expected) : Math.abs(got - expected) <= tol);
+    rows.push({ name, expected, got, tol: typeof expected === "string" ? "exact" : rel ? (tol * 100).toPrecision(2).replace(/\.?0+$/, "") + " %" : tol.toExponential(0), src, ok });
+  };
+  const m = EXAMPLE, tau = sillTime(m.t, m.vs), dz = pullupDepth(m.t, m.vs, m.vh);
+  // hand answers
+  add("Example pull-up: 2 × 150 × (1/3000 − 1/5200), ms", 300 * (1 / 3000 - 1 / 5200) * 1000, pullupTime(m.t, m.vs, m.vh) * 1000, 1e-12, HAND);
+  add("Example pull-up in depth: 150 × (1 − 3000/5200), m", 150 * (1 - 3000 / 5200), dz, 1e-12, HAND);
+  add("Sill as fast as its host: no pull-up, m", 0, pullupDepth(150, 4000, 4000), 1e-12, HAND, false);
+  add("Sill slower than its host: the horizon goes down", "down", pullupDepth(150, 5200, 5500) < 0 ? "down" : "up", 0, HAND);
+  add("Very fast sill: pull-up tends to its thickness, m", 150, pullupDepth(150, 1e12, 3000), 1e-6, HAND);
+  add("Twice the thickness, twice the pull-up", 2, pullupDepth(300, 5200, 3000) / pullupDepth(150, 5200, 3000), 1e-12, HAND);
+  add("Sill in time: 2 × 150 / 5200, ms", 300 / 5200 * 1000, tau * 1000, 1e-12, HAND);
+  add("Thickness from its own time at its own velocity, m", 150, thicknessAt(tau, m.vs), 1e-12, HAND);
+  add("Pull-up from time = pull-up from thickness, m", dz, pullupFromTime(tau, m.vs, m.vh), 1e-12, HAND);
+  add("Velocity 15 % high: thickness 15 % high", 1.15, thicknessAt(tau, m.vs * 1.15) / 150, 1e-12, HAND);
+  add("Share: 63.46 of 80 m, %", 100 * 150 * (1 - 3000 / 5200) / 80, share(dz, m.high), 1e-12, HAND);
+  add("Verdicts at 50 %, 49.9 %, 20 %, 19.9 % and a sag", "below marginal marginal clear clear", [[1, 50], [1, 49.9], [1, 20], [1, 19.9], [-1, 10]].map(([d, s]) => classOf(d, s)).join(" "), 0, HAND);
+  // independent sums (physics_ref.py)
+  add("Example pull-up, ms two-way time", 42.3077, pullupTime(m.t, m.vs, m.vh) * 1000, 1e-4, NUM);
+  add("Example pull-up at the target, m", 63.4615, dz, 1e-4, NUM);
+  add("Same, with a slow overburden 0 to 800 m at 2,200 m/s, m", 63.4615, dz, 1e-4, NUM);
+  add("Share of the 80 m high, %", 79.3269, share(dz, m.high), 1e-4, NUM);
+  add("Rock salt host 4,750 m/s: pull-up, ms", 5.46559, pullupTime(m.t, m.vs, 4750) * 1000, 1e-4, NUM);
+  add("Rock salt host: pull-up at the target, m", 12.9808, pullupDepth(m.t, m.vs, 4750), 1e-4, NUM);
+  add("Dolomite host 5,500 m/s: horizon goes down, m", -8.65385, pullupDepth(m.t, m.vs, 5500), 1e-4, NUM);
+  add("Sill in time, ms", 57.6923, tau * 1000, 1e-4, NUM);
+  add("Thickness at 4,500 m/s, m", 129.808, thicknessAt(tau, 4500), 1e-4, NUM);
+  add("Thickness at 6,000 m/s, m", 173.077, thicknessAt(tau, 6000), 1e-4, NUM);
+  add("Pull-up at 4,500 m/s, m", 43.2692, pullupFromTime(tau, 4500, m.vh), 1e-4, NUM);
+  add("Pull-up at 6,000 m/s, m", 86.5385, pullupFromTime(tau, 6000, m.vh), 1e-4, NUM);
+  add("Sill in the model 300 m/s too fast: target too deep, m", 8.65385, modelError(tau, 300), 1e-4, NUM);
+  add("Two-way time to the target without the sill, s", 1.66667, 2 * m.target / m.vh, 1e-4, NUM);
+
+  const tbody = $("checks").querySelector("tbody"); tbody.innerHTML = "";
+  for (const r of rows) {
+    const f = v => typeof v === "string" ? v : Math.abs(v) < 1e-6 ? v.toExponential(1) : (+v.toPrecision(6)).toString();
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.name}</td><td>${f(r.expected)}</td><td>${f(r.got)}</td><td class="tol">${r.tol}</td><td class="src">${r.src}</td><td class="st ${r.ok ? "ok" : "no"}">${r.ok ? "PASS" : "FAIL"}</td>`;
+    tbody.appendChild(tr);
+  }
+  const fails = rows.filter(r => !r.ok).length;
+  $("checks-sum").innerHTML = fails ? `<span class="fail">${fails} of ${rows.length} FAIL</span>` : `<span class="pass">ALL ${rows.length} PASS</span>`;
+  document.documentElement.setAttribute("data-checks", fails ? `FAIL ${fails}/${rows.length}` : `ALL ${rows.length} PASS`);
+  return rows;
+}
+
+/* ---------- wiring ---------- */
+try { const t = new URLSearchParams(location.search).get("theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+let timer = 0;
+const later = () => { clearTimeout(timer); timer = setTimeout(render, 200); };
+document.querySelectorAll("#form input[type=number]").forEach(i => { i.setAttribute("inputmode", "decimal"); i.addEventListener("input", later); });
+$("vh").addEventListener("input", () => { const h = document.querySelector("input[name=host]:checked"); if (h && HOSTS[h.value].v !== parseFloat($("vh").value)) h.checked = false; });
+document.querySelectorAll("input[name=host]").forEach(i => i.addEventListener("change", () => { $("vh").value = HOSTS[i.value].v; render(); }));
+try { new IntersectionObserver(es => $("mini").classList.toggle("show", !es[0].isIntersecting)).observe($("verdict")); } catch (e) {}
+$("mini").addEventListener("click", () => $("verdict").scrollIntoView({ behavior: "smooth", block: "center" }));
+$("reset").addEventListener("click", () => { setModel(EXAMPLE); render(); });
+setModel(EXAMPLE);
+render();
+runChecks();
+try { if (new URLSearchParams(location.search).has("probe")) document.documentElement.dataset.width = document.documentElement.scrollWidth + "/" + window.innerWidth; } catch (e) {}
+</script>
+</body>
+</html>
