@@ -1,0 +1,173 @@
+[
+ {
+  "well": "W-01",
+  "doc": 2,
+  "type": "crs",
+  "fields": [
+   "x",
+   "y"
+  ],
+  "note": "summary table in REG-95"
+ },
+ {
+  "well": "W-01",
+  "doc": 2,
+  "type": "pick",
+  "fields": [
+   "top:H2"
+  ],
+  "note": "H2 re-picked in 2009: 1716.5 against 1712.0"
+ },
+ {
+  "well": "W-02",
+  "doc": 0,
+  "type": "typo",
+  "fields": [
+   "y"
+  ],
+  "note": "Y typed 37 788.5 for 37 288.5"
+ },
+ {
+  "well": "W-02",
+  "doc": 1,
+  "type": "datum",
+  "fields": [
+   "td",
+   "survey",
+   "tops",
+   "core"
+  ],
+  "note": "drilling report measured from ground level, stated GL"
+ },
+ {
+  "well": "W-02",
+  "doc": 2,
+  "type": "elev",
+  "fields": [
+   "tops"
+  ],
+  "note": "tops as absolute elevations, KB - TVD"
+ },
+ {
+  "well": "W-03",
+  "doc": 0,
+  "type": "magnetic",
+  "fields": [
+   "survey"
+  ],
+  "note": "well file survey to magnetic north, stated"
+ },
+ {
+  "well": "W-03",
+  "doc": 1,
+  "type": "pick",
+  "fields": [
+   "top:H3"
+  ],
+  "note": "H3 1845.5 against 1840.0"
+ },
+ {
+  "well": "W-03",
+  "doc": 1,
+  "type": "core",
+  "fields": [
+   "core:2"
+  ],
+  "note": "core run 2 written 1887.0-1894.5, TD 1885"
+ },
+ {
+  "well": "W-03",
+  "doc": 2,
+  "type": "crs",
+  "fields": [
+   "x",
+   "y"
+  ],
+  "note": "summary table in REG-95"
+ },
+ {
+  "well": "W-04",
+  "doc": 0,
+  "type": "flip",
+  "fields": [
+   "survey"
+  ],
+  "note": "well file survey written 180 degrees off (back bearings)"
+ },
+ {
+  "well": "W-04",
+  "doc": 1,
+  "type": "feet",
+  "fields": [
+   "td",
+   "survey",
+   "tops",
+   "core",
+   "kb",
+   "gl"
+  ],
+  "note": "contractor's drilling report in feet, depths and elevations"
+ },
+ {
+  "well": "W-04",
+  "doc": 2,
+  "type": "zone",
+  "fields": [
+   "x",
+   "y"
+  ],
+  "note": "summary table in REG-95 with the zone number 8 in front of the easting"
+ },
+ {
+  "well": "W-05",
+  "doc": 0,
+  "type": "magnetic",
+  "fields": [
+   "survey"
+  ],
+  "note": "well file survey to magnetic north, not stated"
+ },
+ {
+  "well": "W-05",
+  "doc": 2,
+  "type": "swap",
+  "fields": [
+   "x",
+   "y"
+  ],
+  "note": "X and Y swapped in the summary table"
+ },
+ {
+  "well": "W-05",
+  "doc": 2,
+  "type": "typo",
+  "fields": [
+   "td"
+  ],
+  "note": "TD typed 1652 for 1952"
+ },
+ {
+  "well": "W-06",
+  "doc": 1,
+  "type": "sidetrack",
+  "fields": [
+   "td",
+   "survey",
+   "tops",
+   "core",
+   "kb"
+  ],
+  "note": "drilling report of the 2012 sidetrack under the same number, from a rig with KB 1.7 m lower"
+ },
+ {
+  "well": "W-06",
+  "doc": 2,
+  "type": "datum",
+  "fields": [
+   "td",
+   "tops",
+   "core"
+  ],
+  "note": "summary table depths from ground level, labelled KB"
+ }
+]
