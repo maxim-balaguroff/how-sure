@@ -1,0 +1,60 @@
+{
+  "note": "Made-up example run for tool 07. All documents, wells and numbers are invented. One source for the workbook, the page and the checks.",
+  "library": [
+    {"id": "D1", "title": "Final well report, Well X-1", "pages": 64},
+    {"id": "D2", "title": "Core analysis report, Well X-1", "pages": 38},
+    {"id": "D3", "title": "Well test report, Well X-1 (DST 1)", "pages": 22},
+    {"id": "D4", "title": "Petrophysical evaluation, Well X-1, revision 2 (later than D1)", "pages": 30},
+    {"id": "D5", "title": "Final well report, Well X-2", "pages": 58},
+    {"id": "D6", "title": "Mud logging report, Well X-1 (depths in feet)", "pages": 26}
+  ],
+  "types": [
+    {"code": "fact", "name": "Fact from a page"},
+    {"code": "table", "name": "Number from a table"},
+    {"code": "units", "name": "Units and depth reference"},
+    {"code": "conflict", "name": "Two documents disagree"},
+    {"code": "noanswer", "name": "No answer in the documents"},
+    {"code": "figure", "name": "Figure or map"},
+    {"code": "compare", "name": "Comparing two documents"}
+  ],
+  "grades": [
+    {"code": "right-page", "name": "Right, right page"},
+    {"code": "right-nopage", "name": "Right, page wrong or missing"},
+    {"code": "partly", "name": "Partly right"},
+    {"code": "wrong", "name": "Wrong"},
+    {"code": "refused", "name": "Refused: says the documents do not answer"},
+    {"code": "madeup", "name": "Made up: a value or a page the documents do not hold"}
+  ],
+  "questions": [
+    {"no": 1, "type": "fact", "q": "What was the total depth of Well X-1?", "src": "D1 p. 4", "exp": "3,150 m MD (measured depth).", "ans": "3,150 m MD.", "cited": "D1 p. 4", "grade": "right-page"},
+    {"no": 2, "type": "fact", "q": "What drilling fluid was used in the 8.5-inch hole section of Well X-1?", "src": "D1 p. 9", "exp": "Oil-based mud; the same page gives its weight, 1.15 to 1.18 sg.", "ans": "Oil-based mud, 1.15 to 1.18 sg.", "cited": "D1 p. 9", "grade": "right-page", "why": "Both claims checked: the mud type and its weight are on page 9. A claim the page does not hold would make it Partly right."},
+    {"no": 3, "type": "fact", "q": "What was the main target of Well X-1?", "src": "D1 p. 3", "exp": "The Unit B sandstone.", "ans": "The Unit B sandstone.", "cited": "D1 p. 3", "grade": "right-page"},
+    {"no": 4, "type": "fact", "q": "On what date did Well X-1 reach total depth?", "src": "D1 p. 4", "exp": "26 April 2019.", "ans": "26 April 2019.", "cited": "D1 p. 4", "grade": "right-page"},
+    {"no": 5, "type": "fact", "q": "What was the status of Well X-1 at the end of operations?", "src": "D1 p. 5", "exp": "Suspended, with a plug above Unit B, for a later production test.", "ans": "Suspended for a later production test; a plug was set above Unit B.", "cited": "D1 p. 5", "grade": "right-page"},
+    {"no": 6, "type": "fact", "q": "How were the core plugs from Well X-1 cleaned before measurement?", "src": "D2 p. 7", "exp": "Dean-Stark extraction with toluene, then dried at 60 °C.", "ans": "Dean-Stark extraction with toluene, dried at 60 °C.", "cited": "D2 p. 7", "grade": "right-page"},
+    {"no": 7, "type": "table", "q": "What is the porosity of core plug 14?", "src": "D2 p. 22 (table 5)", "exp": "0.214 (21.4 %).", "ans": "21.4 %.", "cited": "D2 p. 22", "grade": "right-page"},
+    {"no": 8, "type": "table", "q": "What is the permeability of core plug 14?", "src": "D2 p. 22 (table 5)", "exp": "186 mD (air).", "ans": "186 mD (air permeability).", "cited": "D2 p. 22", "grade": "right-page"},
+    {"no": 9, "type": "table", "q": "What gas-oil ratio was measured in DST 1?", "src": "D3 p. 9 (table 3)", "exp": "112 m³/m³.", "ans": "112 m³/m³.", "cited": "D3 p. 9", "grade": "right-page"},
+    {"no": 10, "type": "table", "q": "What is the measured depth of the top of Unit C in Well X-1?", "src": "D1 p. 17 (table 4)", "exp": "2,618 m MD.", "ans": "2,618 m MD.", "cited": "D1 p. 17", "grade": "right-page"},
+    {"no": 11, "type": "table", "q": "What is the average water saturation of the Unit B net pay in Well X-1?", "src": "D4 p. 14 (table 2)", "exp": "0.31.", "ans": "0.31.", "cited": "D4 p. 15", "grade": "right-nopage", "why": "Right value; page 15 holds the net pay table, the saturation table is on page 14."},
+    {"no": 12, "type": "units", "q": "At what depth, in metres, was the first gas show in Well X-1?", "src": "D6 p. 11", "exp": "7,980 ft MD in the mud log, which is 2,432 m MD.", "ans": "At 7,980 m.", "cited": "D6 p. 11", "grade": "wrong", "why": "Feet read as metres: 7,980 m is deeper than the well."},
+    {"no": 13, "type": "units", "q": "What was the initial reservoir pressure in DST 1, in bar?", "src": "D3 p. 10", "exp": "3,560 psia, about 245 bar absolute.", "ans": "3,560.", "cited": "D3 p. 10", "grade": "partly", "why": "Right number from the right page, but no unit and not in bar."},
+    {"no": 14, "type": "units", "q": "What is the density of the oil from DST 1, in kg/m³?", "src": "D3 p. 12", "exp": "34 °API, about 855 kg/m³.", "ans": "34 °API, which is about 855 kg/m³.", "cited": "D3 p. 12", "grade": "right-page"},
+    {"no": 15, "type": "units", "q": "How deep below sea level is the top of Unit C in Well X-1?", "src": "D1 p. 17 and p. 4", "exp": "2,505.5 m TVDSS: 2,618 m MD minus the 112.5 m kelly bushing elevation; the well is vertical.", "ans": "About 2,505.5 m below sea level: 2,618 m MD, kelly bushing 112.5 m above sea level, vertical well.", "cited": "D1 p. 17, p. 4", "grade": "right-page"},
+    {"no": 16, "type": "conflict", "q": "What is the depth of the top of Unit B in Well X-1?", "src": "D1 p. 17; D4 p. 6", "exp": "Two values: 2,431 m MD in the final well report and 2,436 m MD in the later petrophysical evaluation, re-picked on the density log. Both, and the 5 m difference, should be shown.", "ans": "2,431 m MD in the final well report; the later petrophysical evaluation re-picks it at 2,436 m MD on the density log.", "cited": "D1 p. 17; D4 p. 6", "grade": "right-page"},
+    {"no": 17, "type": "conflict", "q": "What is the net pay of Unit B in Well X-1?", "src": "D1 p. 21; D4 p. 15", "exp": "18.0 m in D1; 14.5 m in D4, where the porosity cut-off was raised from 0.10 to 0.12.", "ans": "14.5 m.", "cited": "D4 p. 15", "grade": "partly", "why": "One value only. The other document says 18.0 m, and the answer does not say they differ."},
+    {"no": 18, "type": "conflict", "q": "What is the average log porosity of the Unit B net pay in Well X-1?", "src": "D1 p. 22; D4 p. 14", "exp": "Two values: 0.182 in the final well report and 0.176 in the later petrophysical evaluation, after the porosity cut-off was raised. Both should be shown.", "ans": "0.182 in the final well report; the later petrophysical evaluation, with the raised cut-off, gives 0.176.", "cited": "D1 p. 22; D4 p. 14", "grade": "right-page"},
+    {"no": 19, "type": "conflict", "q": "Over what depth interval was DST 1 run?", "src": "D1 p. 24; D3 p. 5", "exp": "2,440-2,452 m MD in D1; 2,441-2,453 m MD in D3, on log-corrected depth.", "ans": "2,440-2,452 m MD.", "cited": "D1 p. 24", "grade": "partly", "why": "One value only; the test report gives the interval 1 m deeper."},
+    {"no": 20, "type": "noanswer", "q": "What porosity was measured on core plug 41 of Well X-1?", "src": "none", "exp": "Not in the documents: the core analysis lists plugs 1 to 36.", "ans": "The core analysis report lists plugs 1 to 36; there is no plug 41.", "cited": "", "grade": "refused", "why": "A question close to a real answer: plug 14 is in the table, plug 41 is not."},
+    {"no": 21, "type": "noanswer", "q": "What recovery factor is assumed for Unit B?", "src": "none", "exp": "Not in the documents.", "ans": "A recovery factor of 30 % is assumed.", "cited": "D4 p. 18", "grade": "madeup", "why": "D4 p. 18 holds no recovery factor; no document gives one."},
+    {"no": 22, "type": "noanswer", "q": "What is the shear-wave velocity in Unit B?", "src": "none", "exp": "Not in the documents: no shear-wave log was run.", "ans": "I could not find a shear-wave velocity in these documents.", "cited": "", "grade": "refused"},
+    {"no": 23, "type": "noanswer", "q": "What gas-oil ratio was measured in DST 2 of Well X-1?", "src": "none", "exp": "Not in the documents: only one test, DST 1, was run in Well X-1.", "ans": "Only DST 1 is reported for Well X-1; there is no DST 2.", "cited": "", "grade": "refused"},
+    {"no": 24, "type": "figure", "q": "On the depth map of the top of Unit B, at what depth is the spill point?", "src": "D1 p. 31 (figure 12)", "exp": "2,380 m TVDSS, read from the contours of figure 12.", "ans": "About 2,380 m TVDSS.", "cited": "D1 p. 31", "grade": "right-page"},
+    {"no": 25, "type": "figure", "q": "On the seismic line through both wells, does the fault between X-1 and X-2 offset Unit B?", "src": "D1 p. 29 (figure 11)", "exp": "Yes: it offsets Unit B by about 40 ms.", "ans": "The documents do not say.", "cited": "", "grade": "refused", "why": "The answer is in figure 11; refusing here is a miss, not a fault of honesty."},
+    {"no": 26, "type": "figure", "q": "What does the core photograph of core 2 show at 2,447 m?", "src": "D2 p. 30 (figure 9)", "exp": "Cross-bedded sandstone with mud clasts.", "ans": "Cross-bedded sandstone with mud clasts.", "cited": "D2 p. 30", "grade": "right-page"},
+    {"no": 27, "type": "compare", "q": "Which well found the thicker Unit B, X-1 or X-2?", "src": "D1 p. 17; D5 p. 15", "exp": "X-1: 26 m against 11 m in X-2.", "ans": "X-1, with 26 m against 11 m in X-2.", "cited": "D1 p. 17; D5 p. 15", "grade": "right-page"},
+    {"no": 28, "type": "compare", "q": "How did the mud weight at total depth differ between X-1 and X-2?", "src": "D1 p. 9; D5 p. 8", "exp": "1.18 sg in X-1 and 1.12 sg in X-2.", "ans": "1.18 sg in X-1 and 1.12 sg in X-2.", "cited": "D1 p. 9; D5 p. 8", "grade": "right-page"},
+    {"no": 29, "type": "compare", "q": "Did both wells find oil in Unit B?", "src": "D1 p. 21; D5 p. 20", "exp": "No: X-1 found oil; in X-2 Unit B was water-bearing with no shows.", "ans": "No. X-1 found oil in Unit B; in X-2 it was water-bearing with no shows.", "cited": "D1 p. 21; D5 p. 20", "grade": "right-page"},
+    {"no": 30, "type": "compare", "q": "Which well took fewer days to reach total depth?", "src": "D1 p. 4; D5 p. 4", "exp": "X-2: 38 days against 45 days for X-1.", "ans": "X-2, 38 days; X-1 took 45 days.", "cited": "D1 p. 4; D5 p. 4", "grade": "right-page"}
+  ]
+}

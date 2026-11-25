@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is the answer on the page it cites?</title>
+<meta name="description" content="An acceptance check for a document search that answers questions with a page reference: thirty questions of seven types, one grade per answer, a verdict and the result in one line.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Is the answer on the page it cites?">
+<meta property="og:description" content="An acceptance check for a document search that answers questions with a page reference: thirty questions of seven types, one grade per answer, a verdict and the result in one line.">
+<meta property="og:url" content="https://maxim-balaguroff.github.io/how-sure/07-library-acceptance/library-acceptance.html">
+<meta property="og:image" content="https://maxim-balaguroff.github.io/how-sure/07-library-acceptance/cover.png">
+<meta property="og:image:width" content="2400">
+<meta property="og:image:height" content="1254">
+<meta name="twitter:card" content="summary_large_image">
+<style>
+  :root {
+    color-scheme: light;
+    --page: #ffffff; --surface: #fafaf8; --card: #ffffff; --ink: #111110; --ink-2: #52514e; --muted: #6b6963;
+    --rule: #e2e1db; --grid: #ecebe6; --axis: #b9b8ae; --accent: #2a78d6; --accent-soft: #e6f0fb;
+    --ok: #1f8a4c; --ok-soft: #e5f4ea; --warn: #965a00; --warn-soft: #fbf0dc; --bad: #b3261e; --bad-soft: #fbe7e5; --focus: #2a78d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #9a988f;
+      --rule: #34332f; --grid: #2a2a27; --axis: #6a6961; --accent: #6aa7ee; --accent-soft: #1d2b3c;
+      --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f; --bad: #f08a80; --bad-soft: #3a1c19;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #151514; --surface: #1c1c1a; --card: #1f1f1d; --ink: #f1f0ea; --ink-2: #c4c2b8; --muted: #9a988f;
+    --rule: #34332f; --grid: #2a2a27; --axis: #6a6961; --accent: #6aa7ee; --accent-soft: #1d2b3c;
+    --ok: #5cc68a; --ok-soft: #17301f; --warn: #e3a94a; --warn-soft: #33270f; --bad: #f08a80; --bad-soft: #3a1c19;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--page); color: var(--ink); }
+  body { font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif; font-size: 15px; line-height: 1.5; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 40px; }
+  .kicker { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-2); margin: 0 0 6px; }
+  h1 { font-size: 32px; line-height: 1.12; margin: 0 0 10px; letter-spacing: -.015em; }
+  .lead { font-size: 19px; max-width: 800px; margin: 0 0 24px; }
+  .why { font-size: 14.5px; color: var(--ink-2); max-width: 800px; margin: -12px 0 24px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 10px; }
+  h2.sec { font-size: 22px; line-height: 1.2; text-transform: none; letter-spacing: -.01em; color: var(--ink); margin: 30px 0 8px; }
+  h3 { font-size: 15px; margin: 0 0 6px; }
+  .card { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; min-width: 0; }
+  .finds { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 0 0 16px; }
+  .find { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 16px 18px; min-width: 0; }
+  .find.wide { grid-column: 1 / -1; }
+  .find h2 { font-size: 19px; line-height: 1.25; text-transform: none; letter-spacing: 0; color: var(--ink); margin: 0 0 8px; }
+  .find .fl { display: inline-block; min-width: 26px; height: 26px; line-height: 26px; text-align: center; border-radius: 6px; background: var(--accent); color: var(--page); font-size: 15px; margin-right: 9px; vertical-align: 1px; }
+  .find .ft { margin: 0 0 10px; }
+  .find .rule { font-size: 13.5px; color: var(--ink-2); margin: 8px 0 0; }
+  figure { margin: 0; }
+  figcaption { font-size: 13px; color: var(--ink-2); margin: 4px 0 0; }
+  svg { display: block; width: 100%; height: auto; }
+  svg text { font-family: "Segoe UI", system-ui, Arial, sans-serif; font-size: 12px; fill: var(--ink-2); }
+  svg .b { fill: var(--ink); font-weight: 700; }
+  svg .ax { stroke: var(--axis); stroke-width: 1; fill: none; }
+  svg .gr { stroke: var(--grid); stroke-width: 1; }
+  svg .bar { fill: var(--accent); }
+  svg .barbg { fill: var(--grid); }
+  svg .barw { fill: var(--warn); }
+  svg .rng { stroke: var(--accent); stroke-width: 10; stroke-linecap: round; opacity: .35; }
+  svg .dot { fill: var(--accent); stroke: var(--card); stroke-width: 2; }
+  svg .need { stroke: var(--ink); stroke-width: 1.5; stroke-dasharray: 5 3; }
+  svg .sq-ok { fill: var(--ok); } svg .sq-bad { fill: var(--bad); } svg .sq-warn { fill: var(--warn); } svg .sq-none { fill: var(--grid); stroke: var(--axis); }
+  svg .halo { paint-order: stroke; stroke: var(--card); stroke-width: 3px; stroke-linejoin: round; }
+  .verdict { border-radius: 10px; padding: 14px 16px; margin: 0 0 14px; border: 1px solid transparent; }
+  .verdict .line { font-size: 19px; font-weight: 700; line-height: 1.3; }
+  .verdict .v { font-weight: 700; margin-top: 6px; }
+  .verdict .s { color: var(--ink-2); margin-top: 2px; }
+  .verdict.ok { background: var(--ok-soft); border-color: color-mix(in srgb, var(--ok) 35%, transparent); }
+  .verdict.ok .v { color: var(--ok); }
+  .verdict.mid { background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 35%, transparent); }
+  .verdict.mid .v { color: var(--warn); }
+  .verdict.bad { background: var(--bad-soft); border-color: color-mix(in srgb, var(--bad) 35%, transparent); }
+  .verdict.bad .v { color: var(--bad); }
+  .chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 14px; }
+  .chip { background: var(--surface); border: 1px solid var(--rule); border-left: 5px solid var(--accent); border-radius: 8px; padding: 9px 13px; min-width: 0; }
+  .chip b { display: block; font-size: 24px; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .chip span { font-size: 13.5px; color: var(--ink-2); }
+  .chip.c-bad { border-left-color: var(--bad); } .chip.c-ok { border-left-color: var(--ok); } .chip.c-mid { border-left-color: var(--warn); }
+  .plain ul, .plain ol { margin: 0; padding-left: 20px; }
+  .plain li { margin-bottom: 7px; }
+  .todo { margin: 0 0 16px; }
+  .inrow { display: grid; grid-template-columns: 1fr 320px; gap: 16px; align-items: start; margin-bottom: 16px; }
+  .inrow > * { min-width: 0; }
+  .legend { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2); margin: 0 0 8px; display: block; }
+  .exnote { font-size: 13.5px; color: var(--ink-2); margin: 0 0 12px; }
+  .field { display: grid; grid-template-columns: 1fr 120px; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .field label { font-size: 14px; }
+  .hint { font-size: 12.5px; color: var(--muted); margin: 6px 0 0; }
+  input[type=number], input[type=text], select, textarea { width: 100%; font: inherit; font-size: 14px; padding: 5px 7px; border: 1px solid var(--rule); border-radius: 6px; background: var(--page); color: var(--ink); min-width: 0; }
+  textarea { font-family: Consolas, "Courier New", monospace; font-size: 13px; min-height: 90px; resize: vertical; }
+  input[type=number] { font-variant-numeric: tabular-nums; text-align: right; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--focus); outline-offset: 0; border-color: transparent; }
+  select[aria-invalid="true"], input[aria-invalid="true"] { border-color: var(--bad); background: var(--bad-soft); }
+  button, .btn { font: inherit; font-size: 13px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; text-decoration: none; display: inline-block; }
+  button:hover, .btn:hover { border-color: var(--axis); }
+  button:focus-visible, .btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .qhead, .qrow { display: grid; grid-template-columns: 34px minmax(200px, 1.25fr) minmax(120px, 1.6fr) minmax(200px, 1.3fr) 30px; gap: 6px; align-items: center; }
+  .qhead { font-size: 12.5px; color: var(--muted); margin-bottom: 4px; }
+  .qrow { margin-bottom: 5px; }
+  .qrow .no { font-size: 13px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+  .qrow .del { padding: 4px 0; }
+  .qrow .cl { display: none; font-size: 12px; color: var(--muted); }
+  .qrow .msg { grid-column: 2 / -1; font-size: 12.5px; color: var(--bad); margin: -2px 0 4px; }
+  .rows { max-height: 560px; overflow-y: auto; padding-right: 4px; }
+  .errs { border: 1px solid var(--bad); background: var(--bad-soft); color: var(--bad); border-radius: 8px; padding: 10px 14px; margin: 10px 0; }
+  .note-ok { border: 1px solid var(--rule); background: var(--surface); border-radius: 8px; padding: 8px 12px; margin: 10px 0; font-size: 13.5px; }
+  .tablewrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--rule); font-size: 14px; vertical-align: top; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-size: 12.5px; color: var(--ink-2); font-weight: 600; vertical-align: bottom; }
+  td.l, th.l { text-align: left; }
+  .tablenote { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+  .tag.ok { background: var(--ok-soft); color: var(--ok); } .tag.bad { background: var(--bad-soft); color: var(--bad); } .tag.mid { background: var(--warn-soft); color: var(--warn); } .tag.no { background: var(--surface); color: var(--ink-2); border: 1px solid var(--rule); }
+  details { margin-top: 18px; border: 1px solid var(--rule); border-radius: 10px; padding: 12px 16px; background: var(--surface); }
+  details > summary + * { margin-top: 12px; }
+  summary { cursor: pointer; font-weight: 700; }
+  summary .pass { color: var(--ok); }
+  summary .fail { color: var(--bad); }
+  .lim { margin: 28px 0 14px; }
+  #checks td.st { font-weight: 700; }
+  #checks td.st.ok { color: var(--ok); }
+  #checks td.st.no { color: var(--bad); }
+  #checks td.src { text-align: left; color: var(--ink-2); font-size: 13px; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .two > * { min-width: 0; }
+  footer { margin-top: 28px; padding-top: 12px; border-top: 1px solid var(--rule); color: var(--ink-2); font-size: 13.5px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+  a { color: var(--accent); }
+  .nw { white-space: nowrap; }
+  @media (max-width: 1000px) { .inrow { grid-template-columns: 1fr; } }
+  @media (max-width: 900px) { .finds, .two { grid-template-columns: 1fr; } }
+  @media (max-width: 760px) {
+    h1 { font-size: 26px; }
+    .lead { font-size: 17px; }
+    .chips { grid-template-columns: 1fr; }
+    input[type=number], input[type=text], select, textarea { font-size: 16px; min-height: 44px; }
+    button, .btn { min-height: 44px; }
+    .qhead { display: none; }
+    .qrow { grid-template-columns: 1fr 1fr; border: 1px solid var(--rule); border-radius: 8px; padding: 8px; margin-bottom: 8px; }
+    .qrow .no { text-align: left; grid-column: 1 / -1; font-weight: 600; color: var(--ink); }
+    .qrow .c-q { grid-column: 1 / -1; }
+    .qrow .cl { display: block; margin-bottom: 2px; }
+    .qrow .del { grid-column: 1 / -1; }
+    .qrow .msg { grid-column: 1 / -1; }
+    .rows { max-height: none; }
+  }
+  @media (max-width: 600px) { #checks .tol, #checks .src { display: none; } }
+  @media (max-width: 420px) { th, td { padding: 6px 4px; font-size: 13.5px; } .chip b { font-size: 21px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="kicker">how-sure · tool 07 · before accepting a document search · draft</p>
+  <h1>Is the answer on the page it cites?</h1>
+  <p class="lead">An acceptance check for a system that searches your documents and answers questions with a page reference. About forty questions of seven types, one grade per answer, and the result in one line: how often it answered from the right page, and what it does where the documents have no answer.</p>
+  <p class="why">Maxim Balagurov, petroleum geologist. I set the geological task and check the result. I design the workflow scenarios, the behaviour of the AI models and the graphics. I work closely with IT developers, some of them with oil-company experience. The check does no searching and names no product: it works with any system that gives an answer and the page it took it from. The questions and the grades are a geologist's job, because only someone who knows the documents can say which page holds the answer. The example below is a made-up run on six made-up reports about two made-up wells.</p>
+
+  <div id="verdict" class="verdict" role="status"></div>
+  <div class="chips" id="chips" aria-label="The run in three numbers"></div>
+
+  <section class="finds" aria-label="Three findings on the run">
+    <article class="find" id="find-a">
+      <h2><span class="fl">A</span>How often it answers from the right page</h2>
+      <p class="ft" id="fa-text"></p>
+      <figure>
+        <svg id="fig-a" viewBox="0 0 520 190" role="img" aria-labelledby="fa-title"><title id="fa-title">The right-page share with its range and the bar</title></svg>
+        <figcaption id="fa-cap"></figcaption>
+      </figure>
+      <p class="rule">Only an answer with the right page can be checked in seconds, so this is the share that decides. The range is the exact binomial range: where the system's share most likely lies on questions like these, in this mix of kinds. With a 90 % range, "the whole range at or above the bar" is wrong at most 1 time in 20.</p>
+    </article>
+    <article class="find" id="find-b">
+      <h2><span class="fl">B</span>What it does where the documents have no answer</h2>
+      <p class="ft" id="fb-text"></p>
+      <figure>
+        <svg id="fig-b" viewBox="0 0 520 190" role="img" aria-labelledby="fb-title"><title id="fb-title">One square per question without an answer, and per refusal where an answer exists</title></svg>
+        <figcaption id="fb-cap"></figcaption>
+      </figure>
+      <p class="rule">A made-up answer, on any question, gives a value or a page the documents do not hold. It looks like any other answer and carries a page. It is the one error that does harm even when everything else is good, so by default one is enough to stop.</p>
+    </article>
+    <article class="find wide" id="find-c">
+      <h2><span class="fl">C</span>Where it errs, by kind of question</h2>
+      <p class="ft" id="fc-text"></p>
+      <figure>
+        <svg id="fig-c" viewBox="0 0 1060 250" role="img" aria-labelledby="fc-title"><title id="fc-title">Right answers with the right page, by question type</title></svg>
+        <figcaption id="fc-cap"></figcaption>
+      </figure>
+      <p class="rule">Counts per type are small, three to six questions, so read them as where to look, not as shares to trust. The weak types are where the supplier should look and where the next run should add questions.</p>
+    </article>
+  </section>
+
+  <section class="card todo plain" aria-labelledby="todo-h">
+    <h2 id="todo-h">What to do with this result</h2>
+    <ol id="todo"></ol>
+  </section>
+
+  <h2 class="sec">Grade your own run</h2>
+  <form id="form" autocomplete="off" onsubmit="return false">
+    <p class="exnote">The form holds the made-up run: 30 questions and the grade each answer got. Change a type or a grade, paste or load your own grades as CSV, or change the settings: the verdict, the findings and the tables update. Nothing leaves your browser.</p>
+    <div class="inrow">
+      <section class="card" aria-labelledby="lg-rows">
+        <span class="legend" id="lg-rows">Questions and grades</span>
+        <div class="qhead"><span class="r">No.</span><span>Question type</span><span>Question (optional)</span><span>Grade</span><span></span></div>
+        <div class="rows" id="rows"></div>
+        <div class="btns" style="margin-top:8px">
+          <button type="button" id="add">Add a question</button>
+          <button type="button" id="clear">Clear all</button>
+          <button type="button" id="reset">Back to the example</button>
+          <a class="btn" id="dl" href="#" download="library-acceptance-grades.csv">Save as CSV</a>
+        </div>
+      </section>
+      <section class="card" aria-labelledby="lg-set">
+        <span class="legend" id="lg-set">Settings</span>
+        <div class="field"><label for="bar">Bar for the right-page share, %</label><input type="number" id="bar" min="1" max="99" step="1" value="80"></div>
+        <div class="field"><label for="conf">Confidence of the range</label><select id="conf"><option value="0.8">80 %</option><option value="0.9" selected>90 %</option><option value="0.95">95 %</option></select></div>
+        <div class="field"><label for="allowed">Made-up answers allowed</label><input type="number" id="allowed" min="0" max="100" step="1" value="0"></div>
+        <div class="field"><label for="minnon">Questions with no answer needed to accept</label><input type="number" id="minnon" min="0" max="100" step="1" value="10"></div>
+        <p class="hint">Accepted only if the whole range is at or above the bar, no more answers were made up than allowed, and the run held enough questions with no answer. Lower the bar for reference questions, raise it for numbers that go into a calculation. A 95 % range needs more questions. Four refusals of four still allow a system that makes up one answer in two; ten of ten show it refuses at least three times in four. Agree these settings with the supplier in writing before the run.</p>
+        <span class="legend" style="margin-top:16px">Your grades as CSV</span>
+        <p class="hint" style="margin-top:0">Columns: number, type, grade; question optional. Comma, semicolon or tab. A header row is fine. Types and grades by name or by code: <code>fact, table, units, conflict, noanswer, figure, compare</code>; <code>right-page, right-nopage, partly, wrong, refused, madeup</code>.</p>
+        <textarea id="csv" aria-label="Paste CSV here" placeholder="1,fact,right-page&#10;2,noanswer,refused"></textarea>
+        <div class="btns" style="margin-top:6px"><button type="button" id="paste">Use the pasted CSV</button><label class="btn" for="file">Load a CSV file</label><input type="file" id="file" accept=".csv,.txt,text/csv" hidden></div>
+        <div id="csvmsg" aria-live="polite"></div>
+      </section>
+    </div>
+  </form>
+
+  <main id="out">
+    <h2 class="sec">The numbers in full</h2>
+    <div class="tablewrap"><table id="tbl-type"></table></div>
+    <p class="tablenote">For questions with no answer in the documents the right answer is a refusal, so that row counts refusals. Rows with a grade that does not fit their type are left out until fixed.</p>
+    <div class="two" style="margin-top:16px">
+      <div class="tablewrap"><table id="tbl-sum"></table></div>
+      <div class="tablewrap"><table id="tbl-size"></table><p class="tablenote" id="size-note"></p></div>
+    </div>
+  </main>
+
+  <section class="card lim plain" aria-labelledby="scale-h">
+    <h2 id="scale-h">The seven kinds of question and the six grades</h2>
+    <div class="two">
+      <div><h3>What counts as right</h3><ul id="rules"></ul></div>
+      <div><h3>One grade per answer</h3><ul id="grades"></ul>
+        <p class="hint"><b>Right page</b> means the cited page holds the passage the answer comes from; across a page break either page will do, and a page range or a section that holds it counts. If the answer rests on two documents, both pages are needed; one of the two is "page wrong or missing".</p>
+        <p class="hint"><b>Every claim counts.</b> Each claim in the answer must be on the cited page. A right answer with an extra claim the page does not hold: partly. A value or a page the documents do not hold, on any question: made up. A value from an older revision, without the later one: partly, because the reader cannot tell that a later value exists.</p></div>
+    </div>
+  </section>
+
+  <section class="card plain" aria-labelledby="ex-h">
+    <h2 id="ex-h">Four graded answers from the example</h2>
+    <div class="tablewrap"><table id="tbl-ex"></table></div>
+  </section>
+
+  <section class="card plain" aria-labelledby="day-h">
+    <h2 id="day-h">How to run it in one day</h2>
+    <ol>
+      <li><b>Before the day.</b> Agree the settings with the supplier in writing: the bar, the confidence, the made-up answers allowed. Run the system on its full working library, not on a copy that holds only your documents: neighbouring wells and old revisions are part of the test.</li>
+      <li><b>Morning, 3 to 4 hours.</b> Pick 5 to 10 documents you know well. Write about 40 questions of the seven kinds: 30 with an answer and 10 without. Give each the answer you expect, the document and page that hold it, and any other page that would also count. Ask in your own words, not the words of the document, and put no more than two questions on one page. Make the questions without an answer close to a real one, such as a sample or a test that does not exist, and search the whole library to be sure there is no answer. Write them before the system sees them.</li>
+      <li><b>Midday, 1 to 1.5 hours.</b> Ask each question once, in a fresh session, with no follow-up. Copy the answer and the cited page word for word. Ask five of them again in other words, and record the system version and the date.</li>
+      <li><b>Afternoon, about 2 hours.</b> Open each cited page and give one grade. A second person grades every fifth answer without seeing your grade; write down how many grades agree, and settle the doubtful cases together.</li>
+      <li><b>End of the day.</b> Paste the grades here or use the spreadsheet: the result in one line, the verdict, and the kinds of question it errs on.</li>
+    </ol>
+    <p class="hint">Keep the questions and the expected answers from the supplier, before the run and after. A system hosted by the supplier keeps the questions in its logs, so write a new set for every run: a question set that has been seen no longer tests anything.</p>
+  </section>
+
+  <section class="card lim plain" aria-labelledby="lim-h">
+    <h2 id="lim-h">What this check does not tell you</h2>
+    <ul>
+      <li><b>Speed.</b> How long an answer takes, and whether the system holds up with a hundred people asking at once.</li>
+      <li><b>Access rights.</b> Whether each user sees only the documents they should.</li>
+      <li><b>Security.</b> Where the documents and the questions go, and who can see them.</li>
+      <li><b>Text recognition on scans.</b> A miss on a scanned page shows here, but not whether recognition or search caused it. Check a few scanned pages separately.</li>
+      <li><b>Other kinds of documents.</b> Thirty questions about well reports say nothing about contracts, standards or correspondence. Each kind needs its own set.</li>
+      <li><b>Other wordings.</b> Five questions in a second wording show whether the answer holds; they do not measure it.</li>
+      <li><b>Search or answer.</b> A miss shows here, but not whether the search failed to find the passage or the answer was written wrong from it. That needs the passages the system found.</li>
+      <li><b>The cost of each error.</b> A wrong number that goes into a calculation weighs more than a wrong date. The share counts them alike.</li>
+      <li><b>The future.</b> After any update of the system or the library, run it again with new questions.</li>
+    </ul>
+    <details>
+      <summary>More limits</summary>
+      <ul>
+        <li>The numbers are made up. No real well or project data went into the example.</li>
+        <li>The range treats every question as an independent draw from the questions people will really ask. A set that is easier or harder than daily use moves the share, and the range does not know it: choose the mix of kinds as people really ask. Questions on the same page are not independent, so the true range is wider than shown; in the example, page 17 of D1 serves four questions, which a real run should avoid.</li>
+        <li>One grader's call is a judgement. For borderline answers a second grader, and a written reason on the Scoring sheet, keep the run honest.</li>
+        <li>Per-type counts are too small for ranges. Three right out of three is consistent with a system that gets that kind wrong one time in three.</li>
+        <li>"How many more questions" assumes the share stays where it is. It is a size for the next run, not a promise.</li>
+      </ul>
+    </details>
+  </section>
+
+  <details class="plain">
+    <summary>Rules it uses</summary>
+    <ul>
+      <li><b>A</b> = right with the right page, out of the questions whose answer is in the documents. Right in any form is shown beside it, for reference.</li>
+      <li><b>B</b> = honest refusals, out of the questions the documents do not answer. <b>Made up</b> is counted on every question.</li>
+      <li><b>Range</b>: exact binomial (Clopper-Pearson). From = the share at which getting this many right or more has a chance of (1 - c)/2; to = the share at which getting this many right or fewer has the same chance; c is the confidence. Requiring the whole two-sided range at or above the bar is a one-sided test at (1 + c)/2: 95 % for c = 90 %.</li>
+      <li><b>Verdict</b>, in this order: rows to fix → not ready; more made-up answers than allowed → not accepted; whole range below the bar → not accepted; bar inside the range → not proven yet; fewer questions without an answer than needed → not proven yet; otherwise accepted.</li>
+      <li><b>More questions</b>: if the share held, the smallest number of extra questions with an answer at which the range would start at the bar.</li>
+    </ul>
+  </details>
+
+  <details id="checks-box">
+    <summary>Checks: <span id="checks-sum"></span></summary>
+    <p class="hint">The checks run in your browser each time the page opens, on fixed cases, whatever is in the form. "By hand" answers are counted or come from the closed forms written beside them. "Independent calculation" answers come from <a href="acceptance_ref.py">acceptance_ref.py</a>: scipy's beta quantile and a bisection on the binomial tail, which agree to 1e-9, sharing no code with this page. The spreadsheet gives the same numbers on the same run.</p>
+    <div class="tablewrap"><table id="checks"></table></div>
+  </details>
+
+  <footer>
+    <span>Built with AI assistance; the method and the checks are mine.</span>
+    <span>Maxim Balagurov, petroleum geologist</span>
+    <span><a href="https://github.com/maxim-balaguroff/how-sure">github.com/maxim-balaguroff/how-sure</a></span>
+    <span>CC BY 4.0</span>
+  </footer>
+</div>
+
+<script>
+"use strict";
+const DATA = {"note":"Made-up example run for tool 07. All documents, wells and numbers are invented. One source for the workbook, the page and the checks.","library":[{"id":"D1","title":"Final well report, Well X-1","pages":64},{"id":"D2","title":"Core analysis report, Well X-1","pages":38},{"id":"D3","title":"Well test report, Well X-1 (DST 1)","pages":22},{"id":"D4","title":"Petrophysical evaluation, Well X-1, revision 2 (later than D1)","pages":30},{"id":"D5","title":"Final well report, Well X-2","pages":58},{"id":"D6","title":"Mud logging report, Well X-1 (depths in feet)","pages":26}],"types":[{"code":"fact","name":"Fact from a page"},{"code":"table","name":"Number from a table"},{"code":"units","name":"Units and depth reference"},{"code":"conflict","name":"Two documents disagree"},{"code":"noanswer","name":"No answer in the documents"},{"code":"figure","name":"Figure or map"},{"code":"compare","name":"Comparing two documents"}],"grades":[{"code":"right-page","name":"Right, right page"},{"code":"right-nopage","name":"Right, page wrong or missing"},{"code":"partly","name":"Partly right"},{"code":"wrong","name":"Wrong"},{"code":"refused","name":"Refused: says the documents do not answer"},{"code":"madeup","name":"Made up: a value or a page the documents do not hold"}],"questions":[{"no":1,"type":"fact","q":"What was the total depth of Well X-1?","src":"D1 p. 4","exp":"3,150 m MD (measured depth).","ans":"3,150 m MD.","cited":"D1 p. 4","grade":"right-page"},{"no":2,"type":"fact","q":"What drilling fluid was used in the 8.5-inch hole section of Well X-1?","src":"D1 p. 9","exp":"Oil-based mud; the same page gives its weight, 1.15 to 1.18 sg.","ans":"Oil-based mud, 1.15 to 1.18 sg.","cited":"D1 p. 9","grade":"right-page","why":"Both claims checked: the mud type and its weight are on page 9. A claim the page does not hold would make it Partly right."},{"no":3,"type":"fact","q":"What was the main target of Well X-1?","src":"D1 p. 3","exp":"The Unit B sandstone.","ans":"The Unit B sandstone.","cited":"D1 p. 3","grade":"right-page"},{"no":4,"type":"fact","q":"On what date did Well X-1 reach total depth?","src":"D1 p. 4","exp":"26 April 2019.","ans":"26 April 2019.","cited":"D1 p. 4","grade":"right-page"},{"no":5,"type":"fact","q":"What was the status of Well X-1 at the end of operations?","src":"D1 p. 5","exp":"Suspended, with a plug above Unit B, for a later production test.","ans":"Suspended for a later production test; a plug was set above Unit B.","cited":"D1 p. 5","grade":"right-page"},{"no":6,"type":"fact","q":"How were the core plugs from Well X-1 cleaned before measurement?","src":"D2 p. 7","exp":"Dean-Stark extraction with toluene, then dried at 60 °C.","ans":"Dean-Stark extraction with toluene, dried at 60 °C.","cited":"D2 p. 7","grade":"right-page"},{"no":7,"type":"table","q":"What is the porosity of core plug 14?","src":"D2 p. 22 (table 5)","exp":"0.214 (21.4 %).","ans":"21.4 %.","cited":"D2 p. 22","grade":"right-page"},{"no":8,"type":"table","q":"What is the permeability of core plug 14?","src":"D2 p. 22 (table 5)","exp":"186 mD (air).","ans":"186 mD (air permeability).","cited":"D2 p. 22","grade":"right-page"},{"no":9,"type":"table","q":"What gas-oil ratio was measured in DST 1?","src":"D3 p. 9 (table 3)","exp":"112 m³/m³.","ans":"112 m³/m³.","cited":"D3 p. 9","grade":"right-page"},{"no":10,"type":"table","q":"What is the measured depth of the top of Unit C in Well X-1?","src":"D1 p. 17 (table 4)","exp":"2,618 m MD.","ans":"2,618 m MD.","cited":"D1 p. 17","grade":"right-page"},{"no":11,"type":"table","q":"What is the average water saturation of the Unit B net pay in Well X-1?","src":"D4 p. 14 (table 2)","exp":"0.31.","ans":"0.31.","cited":"D4 p. 15","grade":"right-nopage","why":"Right value; page 15 holds the net pay table, the saturation table is on page 14."},{"no":12,"type":"units","q":"At what depth, in metres, was the first gas show in Well X-1?","src":"D6 p. 11","exp":"7,980 ft MD in the mud log, which is 2,432 m MD.","ans":"At 7,980 m.","cited":"D6 p. 11","grade":"wrong","why":"Feet read as metres: 7,980 m is deeper than the well."},{"no":13,"type":"units","q":"What was the initial reservoir pressure in DST 1, in bar?","src":"D3 p. 10","exp":"3,560 psia, about 245 bar absolute.","ans":"3,560.","cited":"D3 p. 10","grade":"partly","why":"Right number from the right page, but no unit and not in bar."},{"no":14,"type":"units","q":"What is the density of the oil from DST 1, in kg/m³?","src":"D3 p. 12","exp":"34 °API, about 855 kg/m³.","ans":"34 °API, which is about 855 kg/m³.","cited":"D3 p. 12","grade":"right-page"},{"no":15,"type":"units","q":"How deep below sea level is the top of Unit C in Well X-1?","src":"D1 p. 17 and p. 4","exp":"2,505.5 m TVDSS: 2,618 m MD minus the 112.5 m kelly bushing elevation; the well is vertical.","ans":"About 2,505.5 m below sea level: 2,618 m MD, kelly bushing 112.5 m above sea level, vertical well.","cited":"D1 p. 17, p. 4","grade":"right-page"},{"no":16,"type":"conflict","q":"What is the depth of the top of Unit B in Well X-1?","src":"D1 p. 17; D4 p. 6","exp":"Two values: 2,431 m MD in the final well report and 2,436 m MD in the later petrophysical evaluation, re-picked on the density log. Both, and the 5 m difference, should be shown.","ans":"2,431 m MD in the final well report; the later petrophysical evaluation re-picks it at 2,436 m MD on the density log.","cited":"D1 p. 17; D4 p. 6","grade":"right-page"},{"no":17,"type":"conflict","q":"What is the net pay of Unit B in Well X-1?","src":"D1 p. 21; D4 p. 15","exp":"18.0 m in D1; 14.5 m in D4, where the porosity cut-off was raised from 0.10 to 0.12.","ans":"14.5 m.","cited":"D4 p. 15","grade":"partly","why":"One value only. The other document says 18.0 m, and the answer does not say they differ."},{"no":18,"type":"conflict","q":"What is the average log porosity of the Unit B net pay in Well X-1?","src":"D1 p. 22; D4 p. 14","exp":"Two values: 0.182 in the final well report and 0.176 in the later petrophysical evaluation, after the porosity cut-off was raised. Both should be shown.","ans":"0.182 in the final well report; the later petrophysical evaluation, with the raised cut-off, gives 0.176.","cited":"D1 p. 22; D4 p. 14","grade":"right-page"},{"no":19,"type":"conflict","q":"Over what depth interval was DST 1 run?","src":"D1 p. 24; D3 p. 5","exp":"2,440-2,452 m MD in D1; 2,441-2,453 m MD in D3, on log-corrected depth.","ans":"2,440-2,452 m MD.","cited":"D1 p. 24","grade":"partly","why":"One value only; the test report gives the interval 1 m deeper."},{"no":20,"type":"noanswer","q":"What porosity was measured on core plug 41 of Well X-1?","src":"none","exp":"Not in the documents: the core analysis lists plugs 1 to 36.","ans":"The core analysis report lists plugs 1 to 36; there is no plug 41.","cited":"","grade":"refused","why":"A question close to a real answer: plug 14 is in the table, plug 41 is not."},{"no":21,"type":"noanswer","q":"What recovery factor is assumed for Unit B?","src":"none","exp":"Not in the documents.","ans":"A recovery factor of 30 % is assumed.","cited":"D4 p. 18","grade":"madeup","why":"D4 p. 18 holds no recovery factor; no document gives one."},{"no":22,"type":"noanswer","q":"What is the shear-wave velocity in Unit B?","src":"none","exp":"Not in the documents: no shear-wave log was run.","ans":"I could not find a shear-wave velocity in these documents.","cited":"","grade":"refused"},{"no":23,"type":"noanswer","q":"What gas-oil ratio was measured in DST 2 of Well X-1?","src":"none","exp":"Not in the documents: only one test, DST 1, was run in Well X-1.","ans":"Only DST 1 is reported for Well X-1; there is no DST 2.","cited":"","grade":"refused"},{"no":24,"type":"figure","q":"On the depth map of the top of Unit B, at what depth is the spill point?","src":"D1 p. 31 (figure 12)","exp":"2,380 m TVDSS, read from the contours of figure 12.","ans":"About 2,380 m TVDSS.","cited":"D1 p. 31","grade":"right-page"},{"no":25,"type":"figure","q":"On the seismic line through both wells, does the fault between X-1 and X-2 offset Unit B?","src":"D1 p. 29 (figure 11)","exp":"Yes: it offsets Unit B by about 40 ms.","ans":"The documents do not say.","cited":"","grade":"refused","why":"The answer is in figure 11; refusing here is a miss, not a fault of honesty."},{"no":26,"type":"figure","q":"What does the core photograph of core 2 show at 2,447 m?","src":"D2 p. 30 (figure 9)","exp":"Cross-bedded sandstone with mud clasts.","ans":"Cross-bedded sandstone with mud clasts.","cited":"D2 p. 30","grade":"right-page"},{"no":27,"type":"compare","q":"Which well found the thicker Unit B, X-1 or X-2?","src":"D1 p. 17; D5 p. 15","exp":"X-1: 26 m against 11 m in X-2.","ans":"X-1, with 26 m against 11 m in X-2.","cited":"D1 p. 17; D5 p. 15","grade":"right-page"},{"no":28,"type":"compare","q":"How did the mud weight at total depth differ between X-1 and X-2?","src":"D1 p. 9; D5 p. 8","exp":"1.18 sg in X-1 and 1.12 sg in X-2.","ans":"1.18 sg in X-1 and 1.12 sg in X-2.","cited":"D1 p. 9; D5 p. 8","grade":"right-page"},{"no":29,"type":"compare","q":"Did both wells find oil in Unit B?","src":"D1 p. 21; D5 p. 20","exp":"No: X-1 found oil; in X-2 Unit B was water-bearing with no shows.","ans":"No. X-1 found oil in Unit B; in X-2 it was water-bearing with no shows.","cited":"D1 p. 21; D5 p. 20","grade":"right-page"},{"no":30,"type":"compare","q":"Which well took fewer days to reach total depth?","src":"D1 p. 4; D5 p. 4","exp":"X-2: 38 days against 45 days for X-1.","ans":"X-2, 38 days; X-1 took 45 days.","cited":"D1 p. 4; D5 p. 4","grade":"right-page"}]};
+const REF = {"example":{"rows":30,"bad":0,"n":26,"k":4,"rr":20,"rn":1,"partly":3,"wrong":1,"overrefused":1,"refused":3,"madeup":1,"madeup_ans":0,"a":0.7692307692307693,"a_any":0.8076923076923077,"a_lo":0.5946461655688338,"a_hi":0.8944035510724828,"b":0.75,"b_lo":0.2486046257301818,"b_hi":0.9872585449014338,"per_type":{"fact":[6,6],"table":[4,5],"units":[2,4],"conflict":[2,4],"noanswer":[3,4],"figure":[2,3],"compare":[4,4]},"verdict":"rejected-madeup","more":null,"line":"20 of 26 answerable questions answered from the right page; refused 3 of 4 questions that have no answer; made up 1."},"cases":{"example":{"rows":30,"bad":0,"n":26,"k":4,"rr":20,"rn":1,"partly":3,"wrong":1,"overrefused":1,"refused":3,"madeup":1,"madeup_ans":0,"a":0.7692307692307693,"a_any":0.8076923076923077,"a_lo":0.5946461655688338,"a_hi":0.8944035510724828,"b":0.75,"b_lo":0.2486046257301818,"b_hi":0.9872585449014338,"per_type":{"fact":[6,6],"table":[4,5],"units":[2,4],"conflict":[2,4],"noanswer":[3,4],"figure":[2,3],"compare":[4,4]},"verdict":"rejected-madeup","more":null,"line":"20 of 26 answerable questions answered from the right page; refused 3 of 4 questions that have no answer; made up 1.","grades":[["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["table","right-page"],["table","right-page"],["table","right-page"],["table","right-page"],["table","right-nopage"],["units","wrong"],["units","partly"],["units","right-page"],["units","right-page"],["conflict","right-page"],["conflict","partly"],["conflict","right-page"],["conflict","partly"],["noanswer","refused"],["noanswer","madeup"],["noanswer","refused"],["noanswer","refused"],["figure","right-page"],["figure","refused"],["figure","right-page"],["compare","right-page"],["compare","right-page"],["compare","right-page"],["compare","right-page"]]},"strong":{"rows":40,"bad":0,"n":30,"k":10,"rr":29,"rn":1,"partly":0,"wrong":0,"overrefused":0,"refused":10,"madeup":0,"madeup_ans":0,"a":0.9666666666666667,"a_any":1.0,"a_lo":0.8514039313408869,"a_hi":0.9982916843555343,"b":1.0,"b_lo":0.7411344491069477,"b_hi":1.0,"per_type":{"fact":[29,30],"table":[0,0],"units":[0,0],"conflict":[0,0],"noanswer":[10,10],"figure":[0,0],"compare":[0,0]},"verdict":"accepted","more":null,"line":"29 of 30 answerable questions answered from the right page; refused 10 of 10 questions that have no answer.","grades":[["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-nopage"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"]]},"weak":{"rows":30,"bad":0,"n":26,"k":4,"rr":15,"rn":3,"partly":4,"wrong":3,"overrefused":1,"refused":4,"madeup":0,"madeup_ans":0,"a":0.5769230769230769,"a_any":0.6923076923076923,"a_lo":0.398424154755433,"a_hi":0.7415758657964993,"b":1.0,"b_lo":0.47287080450158786,"b_hi":1.0,"per_type":{"fact":[15,18],"table":[0,4],"units":[0,3],"conflict":[0,0],"noanswer":[4,4],"figure":[0,1],"compare":[0,0]},"verdict":"rejected-share","more":null,"line":"15 of 26 answerable questions answered from the right page; refused 4 of 4 questions that have no answer.","grades":[["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-nopage"],["fact","right-nopage"],["fact","right-nopage"],["table","partly"],["table","partly"],["table","partly"],["table","partly"],["units","wrong"],["units","wrong"],["units","wrong"],["figure","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"]]},"middle":{"rows":30,"bad":0,"n":26,"k":4,"rr":23,"rn":1,"partly":1,"wrong":1,"overrefused":0,"refused":4,"madeup":0,"madeup_ans":0,"a":0.8846153846153846,"a_any":0.9230769230769231,"a_lo":0.7280980448444658,"a_hi":0.9678010953799681,"b":1.0,"b_lo":0.47287080450158786,"b_hi":1.0,"per_type":{"fact":[23,24],"table":[0,1],"units":[0,1],"conflict":[0,0],"noanswer":[4,4],"figure":[0,0],"compare":[0,0]},"verdict":"notproven","more":43,"line":"23 of 26 answerable questions answered from the right page; refused 4 of 4 questions that have no answer.","grades":[["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-nopage"],["table","partly"],["units","wrong"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"]]},"no_noanswer":{"rows":26,"bad":0,"n":26,"k":0,"rr":26,"rn":0,"partly":0,"wrong":0,"overrefused":0,"refused":0,"madeup":0,"madeup_ans":0,"a":1.0,"a_any":1.0,"a_lo":0.8911696442392152,"a_hi":1.0,"b":null,"b_lo":null,"b_hi":null,"per_type":{"fact":[26,26],"table":[0,0],"units":[0,0],"conflict":[0,0],"noanswer":[0,0],"figure":[0,0],"compare":[0,0]},"verdict":"notproven-noanswer","more":null,"line":"26 of 26 answerable questions answered from the right page; refused 0 of 0 questions that have no answer.","grades":[["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"]]},"few_noanswer":{"rows":34,"bad":0,"n":30,"k":4,"rr":29,"rn":1,"partly":0,"wrong":0,"overrefused":0,"refused":4,"madeup":0,"madeup_ans":0,"a":0.9666666666666667,"a_any":1.0,"a_lo":0.8514039313408869,"a_hi":0.9982916843555343,"b":1.0,"b_lo":0.47287080450158786,"b_hi":1.0,"per_type":{"fact":[29,30],"table":[0,0],"units":[0,0],"conflict":[0,0],"noanswer":[4,4],"figure":[0,0],"compare":[0,0]},"verdict":"notproven-noanswer","more":null,"line":"29 of 30 answerable questions answered from the right page; refused 4 of 4 questions that have no answer.","grades":[["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-nopage"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"]]},"madeup_answerable":{"rows":40,"bad":0,"n":30,"k":10,"rr":29,"rn":0,"partly":0,"wrong":0,"overrefused":0,"refused":10,"madeup":1,"madeup_ans":1,"a":0.9666666666666667,"a_any":0.9666666666666667,"a_lo":0.8514039313408869,"a_hi":0.9982916843555343,"b":1.0,"b_lo":0.7411344491069477,"b_hi":1.0,"per_type":{"fact":[29,29],"table":[0,0],"units":[0,1],"conflict":[0,0],"noanswer":[10,10],"figure":[0,0],"compare":[0,0]},"verdict":"rejected-madeup","more":null,"line":"29 of 30 answerable questions answered from the right page; refused 10 of 10 questions that have no answer; made up 1.","grades":[["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["units","madeup"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"]]},"bad_grade":{"rows":30,"bad":1,"n":26,"k":3,"rr":25,"rn":1,"partly":0,"wrong":0,"overrefused":0,"refused":3,"madeup":0,"madeup_ans":0,"a":0.9615384615384616,"a_any":1.0,"a_lo":0.8301687769996166,"a_hi":0.998029125713451,"b":1.0,"b_lo":0.36840314986403866,"b_hi":1.0,"per_type":{"fact":[25,26],"table":[0,0],"units":[0,0],"conflict":[0,0],"noanswer":[3,3],"figure":[0,0],"compare":[0,0]},"verdict":"notready","more":null,"line":"25 of 26 answerable questions answered from the right page; refused 3 of 3 questions that have no answer.","grades":[["noanswer","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-page"],["fact","right-nopage"],["noanswer","refused"],["noanswer","refused"],["noanswer","refused"]]}},"ranges":[{"x":20,"n":26,"conf":0.8,"lo":0.630031635436642,"hi":0.8740298529712118},{"x":20,"n":26,"conf":0.9,"lo":0.5946461655688338,"hi":0.8944035510724828},{"x":20,"n":26,"conf":0.95,"lo":0.5635249030586136,"hi":0.9102598891154248},{"x":3,"n":4,"conf":0.8,"lo":0.3204605837218183,"hi":0.9740037464252967},{"x":3,"n":4,"conf":0.9,"lo":0.2486046257301818,"hi":0.9872585449014338},{"x":3,"n":4,"conf":0.95,"lo":0.19412044968324346,"hi":0.9936905367902902},{"x":4,"n":4,"conf":0.8,"lo":0.5623413251903491,"hi":1.0},{"x":4,"n":4,"conf":0.9,"lo":0.47287080450158786,"hi":1.0},{"x":4,"n":4,"conf":0.95,"lo":0.3976353643835254,"hi":1.0},{"x":0,"n":5,"conf":0.8,"lo":0.0,"hi":0.36904265551980675},{"x":0,"n":5,"conf":0.9,"lo":0.0,"hi":0.45071972834694096},{"x":0,"n":5,"conf":0.95,"lo":0.0,"hi":0.5218237501049814},{"x":1,"n":10,"conf":0.8,"lo":0.010480741793785605,"hi":0.33684772330672474},{"x":1,"n":10,"conf":0.9,"lo":0.005116196891823701,"hi":0.39416330243650466},{"x":1,"n":10,"conf":0.95,"lo":0.0025285785444617865,"hi":0.4450161170281954},{"x":25,"n":26,"conf":0.8,"lo":0.8584683919792134,"hi":0.9959558720743248},{"x":25,"n":26,"conf":0.9,"lo":0.8301687769996166,"hi":0.998029125713451},{"x":25,"n":26,"conf":0.95,"lo":0.8036303532374611,"hi":0.9990267121066649},{"x":45,"n":50,"conf":0.8,"lo":0.8223818723826234,"hi":0.9505543583578656},{"x":45,"n":50,"conf":0.9,"lo":0.8011669974835816,"hi":0.9597634095978854},{"x":45,"n":50,"conf":0.95,"lo":0.7818646335657977,"hi":0.9667249064109775},{"x":87,"n":100,"conf":0.8,"lo":0.8161255356569277,"hi":0.9120173520452859},{"x":87,"n":100,"conf":0.9,"lo":0.8012802069575176,"hi":0.921359795671951},{"x":87,"n":100,"conf":0.95,"lo":0.7879593229125502,"hi":0.9289269538145705},{"x":199,"n":200,"conf":0.8,"lo":0.980691361779778,"hi":0.9994733361578259},{"x":199,"n":200,"conf":0.9,"lo":0.9765015295650493,"hi":0.9997435664127765},{"x":199,"n":200,"conf":0.95,"lo":0.9724581015427943,"hi":0.999873418972133}],"need80":{"20":20,"26":25,"30":28,"50":45,"100":87},"power90":{"20":0.12157665459056935,"26":0.2512642956921486,"30":0.4113512395595057,"40":0.4231306530930025,"50":0.6161230077242777,"80":0.7234499159812767,"82":0.8057063959899657,"90":0.8135068365034722,"94":0.8562185754036751,"100":0.8761232074006723},"power_stays":94,"min_non":10,"verdicts_min":{"4":"accepted","10":"notproven-noanswer"}};
+
+const TYPES = DATA.types.map(function (t) { return t.code; });
+const TNAME = {}; DATA.types.forEach(function (t) { TNAME[t.code] = t.name; });
+const GRADES = DATA.grades.map(function (g) { return g.code; });
+const GNAME = {}; DATA.grades.forEach(function (g) { GNAME[g.code] = g.name; });
+const SHORT = { "right-page": "Right, right page", "right-nopage": "Right, page wrong or missing", partly: "Partly right", wrong: "Wrong", refused: "Refused", madeup: "Made up" };
+const TSHORT = { fact: "facts from a page", table: "numbers from a table", units: "units and depth reference", conflict: "two documents that disagree", noanswer: "questions with no answer", figure: "figures and maps", compare: "comparisons of two documents" };
+const RULES = {
+  fact: "the same value or statement as the source; rounding only if the source rounds.",
+  table: "the number from the right row and column.",
+  units: "the number with the right unit or depth reference; a conversion right to rounding. No unit: partly. A number in the wrong unit: wrong.",
+  conflict: "both values, both sources, and a word that they differ. One value only, even the later one: partly. An average of the two: wrong.",
+  noanswer: "says the documents do not answer, and may say where to look: refused, which is right here. Any value: made up.",
+  figure: "a value read off a map or a section: right to half a contour interval. A yes or no, or a description: as the figure shows it. \"Not in the documents\": refused, which here is a miss.",
+  compare: "both sides with their sources, and the right comparison. One side only: partly."
+};
+const GRULE = {
+  "right-page": "the answer is right by the rule for its kind, and the cited page holds the passage.",
+  "right-nopage": "the answer is right, but the cited page does not hold it, or no page is given.",
+  partly: "part of it is right: one value of two, a number without its unit, one side of a comparison.",
+  wrong: "the answer is wrong, whatever the page.",
+  refused: "it says the documents do not answer. Right where there is no answer; a miss where there is one.",
+  madeup: "it gives a value or a page the documents do not hold: an answer where there is none, or a number with a page that does not carry it. Fits any question; a value that is in the documents but wrong for this question is Wrong."
+};
+const FITS_ANS = ["right-page", "right-nopage", "partly", "wrong", "refused", "madeup"];
+const FITS_NON = ["refused", "madeup"];
+
+// ---------- the arithmetic: exact binomial range ----------
+function lnGamma(z) {                      // Lanczos, g = 7
+  const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059,
+    12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+  if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - lnGamma(1 - z);
+  z -= 1;
+  let x = c[0];
+  for (let i = 1; i < 9; i++) x += c[i] / (z + i);
+  const t = z + 7.5;
+  return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+}
+function betaCF(x, a, b) {                 // continued fraction for the incomplete beta (modified Lentz)
+  const tiny = 1e-300;
+  let c = 1, d = 1 - (a + b) * x / (a + 1);
+  if (Math.abs(d) < tiny) d = tiny;
+  d = 1 / d;
+  let h = d;
+  for (let m = 1; m <= 500; m++) {
+    const m2 = 2 * m;
+    let aa = m * (b - m) * x / ((a + m2 - 1) * (a + m2));
+    d = 1 + aa * d; if (Math.abs(d) < tiny) d = tiny;
+    c = 1 + aa / c; if (Math.abs(c) < tiny) c = tiny;
+    d = 1 / d; h *= d * c;
+    aa = -(a + m) * (a + b + m) * x / ((a + m2) * (a + m2 + 1));
+    d = 1 + aa * d; if (Math.abs(d) < tiny) d = tiny;
+    c = 1 + aa / c; if (Math.abs(c) < tiny) c = tiny;
+    d = 1 / d;
+    const del = d * c;
+    h *= del;
+    if (Math.abs(del - 1) < 1e-15) break;
+  }
+  return h;
+}
+function betaInc(x, a, b) {                // regularized incomplete beta I_x(a, b)
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+  const lbt = lnGamma(a + b) - lnGamma(a) - lnGamma(b) + a * Math.log(x) + b * Math.log(1 - x);
+  if (x < (a + 1) / (a + b + 2)) return Math.exp(lbt) * betaCF(x, a, b) / a;
+  return 1 - Math.exp(lbt) * betaCF(1 - x, b, a) / b;
+}
+function betaInv(p, a, b) {                // the x at which I_x(a, b) = p, by bisection
+  let lo = 0, hi = 1;
+  for (let i = 0; i < 100; i++) { const mid = (lo + hi) / 2; if (betaInc(mid, a, b) < p) lo = mid; else hi = mid; }
+  return (lo + hi) / 2;
+}
+function cp(x, n, conf) {                  // exact binomial (Clopper-Pearson) range for x right out of n
+  const a = 1 - conf;
+  return [x === 0 ? 0 : betaInv(a / 2, x, n - x + 1), x === n ? 1 : betaInv(1 - a / 2, x + 1, n - x)];
+}
+function moreQuestions(rr, n, bar, conf) { // extra questions with an answer until the range starts at the bar, if the share held; -1 if never within 500
+  const p = rr / n;
+  if (p <= bar) return -1;
+  for (let extra = 1; extra <= 500; extra++) {
+    const m = n + extra, x = Math.floor(p * m + 1e-9);
+    if (cp(x, m, conf)[0] >= bar) return extra;
+  }
+  return -1;
+}
+function fits(t, g) { return t === "noanswer" ? FITS_NON.indexOf(g) >= 0 : FITS_ANS.indexOf(g) >= 0; }
+
+function summarise(rows, set) {            // rows: [{type, grade}], set: {bar, conf, allowed, minnon}
+  const o = { rows: rows.length, bad: 0, badList: [], n: 0, k: 0, rr: 0, rn: 0, partly: 0, wrong: 0, overrefused: 0, refused: 0, madeup: 0, madeAns: 0, madeList: [], madeNonList: [], madeAnsList: [], overList: [], per: {} };
+  TYPES.forEach(function (t) { o.per[t] = { n: 0, good: 0, g: {} }; GRADES.forEach(function (g) { o.per[t].g[g] = 0; }); });
+  rows.forEach(function (r, i) {
+    const label = r.no || (i + 1);
+    if (TYPES.indexOf(r.type) < 0 || !r.grade || !fits(r.type, r.grade)) { o.bad++; o.badList.push(label); return; }
+    const p = o.per[r.type]; p.n++; p.g[r.grade]++;
+    if (r.type === "noanswer") {
+      o.k++;
+      if (r.grade === "refused") { o.refused++; p.good++; } else { o.madeup++; o.madeList.push(label); o.madeNonList.push(label); }
+    } else {
+      o.n++;
+      if (r.grade === "right-page") { o.rr++; p.good++; }
+      else if (r.grade === "right-nopage") o.rn++;
+      else if (r.grade === "partly") o.partly++;
+      else if (r.grade === "wrong") o.wrong++;
+      else if (r.grade === "refused") { o.overrefused++; o.overList.push(label); }
+      else if (r.grade === "madeup") { o.madeup++; o.madeAns++; o.madeList.push(label); o.madeAnsList.push(label); }
+    }
+  });
+  o.a = o.n ? o.rr / o.n : null;
+  o.aAny = o.n ? (o.rr + o.rn) / o.n : null;
+  const ra = o.n ? cp(o.rr, o.n, set.conf) : [null, null]; o.aLo = ra[0]; o.aHi = ra[1];
+  o.b = o.k ? o.refused / o.k : null;
+  const rb = o.k ? cp(o.refused, o.k, set.conf) : [null, null]; o.bLo = rb[0]; o.bHi = rb[1];
+  let v;
+  if (o.bad) v = "notready";
+  else if (o.madeup > set.allowed) v = "rejected-madeup";
+  else if (o.n && o.aHi < set.bar) v = "rejected-share";
+  else if (!o.n) v = "notproven-empty";
+  else if (o.aLo < set.bar) v = "notproven";
+  else if (o.k < set.minnon) v = "notproven-noanswer";
+  else v = "accepted";
+  o.verdict = v;
+  o.more = v === "notproven" ? moreQuestions(o.rr, o.n, set.bar, set.conf) : null;
+  o.line = o.rr + " of " + o.n + " answerable questions answered from the right page; refused " + o.refused + " of " + o.k + " questions that have no answer" + (o.madeup ? "; made up " + o.madeup : "") + ".";
+  o.errs = TYPES.filter(function (t) { return t !== "noanswer" && o.per[t].n > 0 && o.per[t].good < o.per[t].n; })
+    .map(function (t) { return TNAME[t] + " " + o.per[t].good + " of " + o.per[t].n; }).join("; ");
+  return o;
+}
+
+// ---------- words ----------
+const pc = function (x, d) { return x === null ? "" : (x * 100).toFixed(d || 0) + " %"; };
+const plural = function (n, one, many) { return n + " " + (n === 1 ? one : many); };
+function listNos(a) { return a.length === 1 ? "question " + a[0] : "questions " + a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
+function listWords(a) { return a.length === 1 ? a[0] : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; }
+function verdictText(o, set) {
+  switch (o.verdict) {
+    case "notready": return ["mid", "NOT READY", plural(o.bad, "row needs", "rows need") + " a grade, or a grade that fits the question (" + listNos(o.badList) + ")."];
+    case "rejected-madeup": return ["bad", "NOT ACCEPTED", "It made up " + (o.madeup === 1 ? "an answer" : "answers to " + o.madeup + " questions") + ", giving a value or a page the documents do not hold" + (set.allowed ? ", more than the " + set.allowed + " allowed" : "") + "."];
+    case "rejected-share": return ["bad", "NOT ACCEPTED", "The right-page share is below the bar of " + pc(set.bar) + " even at the top of its range."];
+    case "notproven-empty": return ["mid", "NOT PROVEN YET", "No graded questions with an answer."];
+    case "notproven": return ["mid", "NOT PROVEN YET", "The bar of " + pc(set.bar) + " is inside the range of the right-page share. " + moreText(o, set)];
+    case "notproven-noanswer": return ["mid", "NOT PROVEN YET", "The share clears the bar, but the run has " + (o.k ? "only " + o.k : "no") + " of the " + set.minnon + " questions without an answer needed to show it does not make answers up."];
+    default: return ["ok", "ACCEPTED", "The whole range of the right-page share is at or above the bar of " + pc(set.bar) + ", and " + (o.madeup ? "made-up answers stayed within the " + set.allowed + " allowed." : "no answer was made up.")];
+  }
+}
+function moreText(o, set) {
+  if (o.a <= set.bar) return "The share itself is not above the bar, so more questions would more likely end in not accepted than prove it.";
+  if (o.more < 0) return "More than 500 more questions with an answer would be needed.";
+  return "About " + o.more + " more questions with an answer would prove it, if the share held.";
+}
+function shareStatus(o, set) {
+  if (!o.n) return "";
+  if (o.aLo >= set.bar) return "The whole range is at or above the bar of " + pc(set.bar) + ".";
+  if (o.aHi < set.bar) return "The whole range is below the bar of " + pc(set.bar) + ".";
+  return "The bar of " + pc(set.bar) + " is inside the range: not proven yet. " + moreText(o, set);
+}
+
+// ---------- state ----------
+let rows = [], set = { bar: 0.8, conf: 0.9, allowed: 0, minnon: 10 };
+function exampleRows() { return DATA.questions.map(function (q) { return { no: q.no, type: q.type, grade: q.grade, q: q.q }; }); }
+
+// ---------- CSV ----------
+function splitCSV(line, sep) {
+  const out = []; let cur = "", q = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (q) { if (ch === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+    else if (ch === '"') q = true;
+    else if (ch === sep) { out.push(cur); cur = ""; }
+    else cur += ch;
+  }
+  out.push(cur);
+  return out.map(function (s) { return s.trim(); });
+}
+function norm(s) { return String(s || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
+const TALIAS = {}, GALIAS = {};
+DATA.types.forEach(function (t) { TALIAS[norm(t.code)] = t.code; TALIAS[norm(t.name)] = t.code; });
+Object.assign(TALIAS, { "no answer": "noanswer", "none": "noanswer", "unit": "units", "units": "units", "figure": "figure", "map": "figure", "comparison": "compare" });
+DATA.grades.forEach(function (g) { GALIAS[norm(g.code)] = g.code; GALIAS[norm(g.name)] = g.code; GALIAS[norm(SHORT[g.code])] = g.code; });
+Object.assign(GALIAS, { "right page": "right-page", "right no page": "right-nopage", "made up": "madeup", "refusal": "refused", "honest refusal": "refused", "partly": "partly", "partial": "partly" });
+function parseCSV(text) {
+  const lines = String(text).replace(/\r/g, "").split("\n").filter(function (l) { return l.trim() !== ""; });
+  if (!lines.length) return { rows: [], errors: ["The CSV is empty."] };
+  const first = lines[0];
+  const sep = first.indexOf("\t") >= 0 ? "\t" : (first.split(";").length > first.split(",").length ? ";" : ",");
+  let cols = { no: 0, type: 1, grade: 2, q: -1 }, start = 0;
+  const head = splitCSV(first, sep).map(norm);
+  if (head.some(function (h) { return h === "type" || h === "grade" || h.indexOf("question type") === 0; })) {
+    const find = function (keys) { for (let i = 0; i < head.length; i++) for (const k of keys) if (head[i] === k || head[i].indexOf(k) === 0) return i; return -1; };
+    cols = { no: find(["no", "number", "n"]), type: find(["question type", "type"]), grade: find(["grade"]), q: find(["question"]) };
+    if (cols.q === cols.type) cols.q = -1;
+    start = 1;
+  }
+  const out = [], errors = [];
+  for (let i = start; i < lines.length; i++) {
+    const c = splitCSV(lines[i], sep);
+    const t = TALIAS[norm(c[cols.type])], g = GALIAS[norm(c[cols.grade])];
+    const no = cols.no >= 0 && c[cols.no] !== "" ? c[cols.no] : String(out.length + 1);
+    if (!t) errors.push("Line " + (i + 1) + ": type \"" + (c[cols.type] || "") + "\" not recognised.");
+    if (c[cols.grade] && !g) errors.push("Line " + (i + 1) + ": grade \"" + c[cols.grade] + "\" not recognised.");
+    out.push({ no: no, type: t || "", grade: g || "", q: cols.q >= 0 ? (c[cols.q] || "") : "" });
+  }
+  return { rows: out, errors: errors };
+}
+function toCSV(rs) {
+  const esc = function (s) { s = String(s == null ? "" : s); return /[",\n;]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  return "no,type,grade,question\n" + rs.map(function (r) { return [r.no, r.type, r.grade, r.q].map(esc).join(","); }).join("\n") + "\n";
+}
+
+// ---------- the form ----------
+const $ = function (id) { return document.getElementById(id); };
+function el(tag, attrs, html) { const e = document.createElement(tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (html != null) e.innerHTML = html; return e; }
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function drawRows() {
+  const box = $("rows"); box.innerHTML = "";
+  rows.forEach(function (r, i) {
+    const row = el("div", { class: "qrow" });
+    row.appendChild(el("span", { class: "no" }, esc(r.no)));
+    const ts = el("select", { "aria-label": "Question " + r.no + ": type" });
+    ts.appendChild(el("option", { value: "" }, "choose a type"));
+    TYPES.forEach(function (t) { const o = el("option", { value: t }, esc(TNAME[t])); if (t === r.type) o.selected = true; ts.appendChild(o); });
+    const gs = el("select", { "aria-label": "Question " + r.no + ": grade" });
+    gs.appendChild(el("option", { value: "" }, "choose a grade"));
+    GRADES.forEach(function (g) { const o = el("option", { value: g }, esc(SHORT[g])); if (g === r.grade) o.selected = true; gs.appendChild(o); });
+    const qi = el("input", { type: "text", "aria-label": "Question " + r.no + ": question text", value: r.q || "" });
+    const wt = el("div", {}); wt.appendChild(el("span", { class: "cl" }, "Type")); wt.appendChild(ts);
+    const wq = el("div", { class: "c-q" }); wq.appendChild(el("span", { class: "cl" }, "Question")); wq.appendChild(qi);
+    const wg = el("div", {}); wg.appendChild(el("span", { class: "cl" }, "Grade")); wg.appendChild(gs);
+    const del = el("button", { type: "button", class: "del", "aria-label": "Remove question " + r.no, title: "Remove" }, "×");
+    row.appendChild(wt); row.appendChild(wq); row.appendChild(wg); row.appendChild(del);
+    const bad = !r.type || !r.grade || !fits(r.type, r.grade);
+    if (bad) {
+      gs.setAttribute("aria-invalid", "true");
+      const m = !r.type ? "Choose a type." : !r.grade ? "Choose a grade." : r.type === "noanswer" ? "Only Refused or Made up fit a question with no answer." : "This grade does not fit a question with an answer.";
+      row.appendChild(el("div", { class: "msg" }, m));
+    }
+    ts.addEventListener("change", function () { r.type = ts.value; update(true); });
+    gs.addEventListener("change", function () { r.grade = gs.value; update(true); });
+    qi.addEventListener("input", function () { r.q = qi.value; refreshCSV(); });
+    del.addEventListener("click", function () { rows.splice(i, 1); update(true); });
+    box.appendChild(row);
+  });
+}
+function readSettings() {
+  const b = parseFloat($("bar").value), al = parseInt($("allowed").value, 10), mn = parseInt($("minnon").value, 10);
+  const okB = isFinite(b) && b >= 1 && b <= 99, okA = isFinite(al) && al >= 0, okM = isFinite(mn) && mn >= 0;
+  $("bar").setAttribute("aria-invalid", okB ? "false" : "true");
+  $("allowed").setAttribute("aria-invalid", okA ? "false" : "true");
+  $("minnon").setAttribute("aria-invalid", okM ? "false" : "true");
+  set = { bar: okB ? b / 100 : set.bar, conf: parseFloat($("conf").value), allowed: okA ? al : set.allowed, minnon: okM ? mn : set.minnon };
+}
+function refreshCSV() { $("dl").href = "data:text/csv;charset=utf-8," + encodeURIComponent(toCSV(rows)); }
+
+// ---------- figures ----------
+const NS = "http://www.w3.org/2000/svg";
+function svgClear(svg) { Array.from(svg.childNodes).forEach(function (c) { if (c.nodeName !== "title") svg.removeChild(c); }); }
+function s(svg, tag, attrs, text) { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; svg.appendChild(e); return e; }
+function drawA(o) {
+  const svg = $("fig-a"); svgClear(svg);
+  const x0 = 30, x1 = 490, X = function (v) { return x0 + v * (x1 - x0); };
+  [0, .2, .4, .6, .8, 1].forEach(function (v) {
+    s(svg, "line", { x1: X(v), x2: X(v), y1: 40, y2: 150, class: "gr" });
+    s(svg, "text", { x: X(v), y: 168, "text-anchor": "middle" }, (v * 100) + " %");
+  });
+  s(svg, "line", { x1: x0, x2: x1, y1: 150, y2: 150, class: "ax" });
+  if (o.n) {
+    const rows2 = [["Right page", o.a, o.aLo, o.aHi, 78, true], ["Right in any form", o.aAny, null, null, 122, false]];
+    rows2.forEach(function (r) {
+      if (r[2] !== null) s(svg, "line", { x1: X(r[2]), x2: X(r[3]), y1: r[4], y2: r[4], class: "rng" });
+      s(svg, "rect", { x: x0, y: r[4] - 5, width: Math.max(0, X(r[1]) - x0), height: 10, class: r[5] ? "bar" : "barbg", rx: 2 });
+      s(svg, "circle", { cx: X(r[1]), cy: r[4], r: 6, class: "dot" });
+      s(svg, "text", { x: x0, y: r[4] - 12, class: r[5] ? "b" : "" }, r[0] + ": " + pc(r[1]) + (r[2] !== null ? "  (range " + pc(r[2]) + " to " + pc(r[3]) + ")" : ""));
+    });
+  }
+  s(svg, "line", { x1: X(set.bar), x2: X(set.bar), y1: 30, y2: 150, class: "need" });
+  s(svg, "text", { x: X(set.bar) + (set.bar > .8 ? -6 : 6), y: 26, "text-anchor": set.bar > .8 ? "end" : "start", class: "b halo" }, "bar " + pc(set.bar));
+  $("fa-cap").textContent = o.n ? "Shaded: the " + pc(set.conf) + " range of the right-page share for " + plural(o.n, "question", "questions") + " with an answer. Dashed: the bar." : "";
+}
+function drawB(o) {
+  const svg = $("fig-b"); svgClear(svg);
+  const sq = 30, gap = 8, perRow = 12;
+  const items = [];
+  rows.forEach(function (r, i) {
+    if (!r.type || !r.grade || !fits(r.type, r.grade)) return;
+    if (r.type === "noanswer") items.push([r.grade === "refused" ? "sq-ok" : "sq-bad", r.no, 0]);
+  });
+  const over = [];
+  rows.forEach(function (r) { if (r.type !== "noanswer" && r.grade === "refused" && TYPES.indexOf(r.type) >= 0) over.push(r.no); });
+  s(svg, "text", { x: 10, y: 20, class: "b" }, "Questions the documents do not answer");
+  let y = 32;
+  items.forEach(function (it, i) {
+    const cx = 10 + (i % perRow) * (sq + gap), cy = y + Math.floor(i / perRow) * (sq + gap);
+    s(svg, "rect", { x: cx, y: cy, width: sq, height: sq, rx: 4, class: it[0] });
+    s(svg, "text", { x: cx + sq / 2, y: cy + sq / 2 + 4, "text-anchor": "middle", style: "fill:var(--page);font-weight:700" }, it[1]);
+  });
+  if (!items.length) s(svg, "text", { x: 10, y: y + 20 }, "none in the run");
+  y += Math.max(1, Math.ceil(items.length / perRow)) * (sq + gap) + 26;
+  s(svg, "text", { x: 10, y: y - 8, class: "b" }, "Refused, although the answer is there");
+  over.forEach(function (no, i) {
+    const cx = 10 + (i % perRow) * (sq + gap), cy = y + Math.floor(i / perRow) * (sq + gap);
+    s(svg, "rect", { x: cx, y: cy, width: sq, height: sq, rx: 4, class: "sq-warn" });
+    s(svg, "text", { x: cx + sq / 2, y: cy + sq / 2 + 4, "text-anchor": "middle", style: "fill:var(--page);font-weight:700" }, no);
+  });
+  if (!over.length) s(svg, "text", { x: 10, y: y + 18 }, "none");
+  y += Math.max(1, Math.ceil(over.length / perRow)) * (sq + gap);
+  svg.setAttribute("viewBox", "0 0 520 " + Math.max(150, y + 6));
+  $("fb-cap").textContent = "Green: honest refusal. Red: made up. Amber: refused a question whose answer is in the documents. Numbers are question numbers.";
+}
+function drawC(o) {
+  const svg = $("fig-c"); svgClear(svg);
+  const types = TYPES.filter(function (t) { return t !== "noanswer"; });
+  const x0 = 250, x1 = 980, rowH = 34, y0 = 26, X = function (v) { return x0 + v * (x1 - x0); };
+  [0, .25, .5, .75, 1].forEach(function (v) {
+    s(svg, "line", { x1: X(v), x2: X(v), y1: y0 - 8, y2: y0 + types.length * rowH, class: "gr" });
+    s(svg, "text", { x: X(v), y: y0 + types.length * rowH + 16, "text-anchor": "middle" }, (v * 100) + " %");
+  });
+  types.forEach(function (t, i) {
+    const p = o.per[t], y = y0 + i * rowH, share = p.n ? p.good / p.n : 0;
+    s(svg, "text", { x: x0 - 10, y: y + 15, "text-anchor": "end", class: p.n && p.good < p.n ? "b" : "" }, TNAME[t]);
+    s(svg, "rect", { x: x0, y: y + 3, width: x1 - x0, height: 18, class: "barbg", rx: 2 });
+    if (p.n) s(svg, "rect", { x: x0, y: y + 3, width: X(share) - x0, height: 18, class: p.good < p.n ? "barw" : "bar", rx: 2 });
+    s(svg, "text", { x: x1 + 10, y: y + 15, class: "b" }, p.n ? p.good + " of " + p.n : "none");
+  });
+  s(svg, "line", { x1: X(set.bar), x2: X(set.bar), y1: y0 - 12, y2: y0 + types.length * rowH, class: "need" });
+  svg.setAttribute("viewBox", "0 0 1060 " + (y0 + types.length * rowH + 24));
+  $("fc-cap").textContent = "Right with the right page, by kind of question with an answer. Amber: at least one miss. Dashed: the bar, for scale only.";
+}
+
+// ---------- text and tables ----------
+function render() {
+  const o = summarise(rows, set);
+  const vt = verdictText(o, set);
+  const V = $("verdict");
+  V.className = "verdict " + vt[0];
+  V.innerHTML = '<div class="line">' + esc(o.line) + '</div><div class="v">' + vt[1] + '</div><div class="s">' + esc(vt[2]) + "</div>";
+  // chips
+  $("chips").innerHTML =
+    '<div class="chip ' + (o.n && o.aLo >= set.bar ? "c-ok" : o.n && o.aHi < set.bar ? "c-bad" : "c-mid") + '"><b>' + o.rr + " of " + o.n + "</b><span>answered from the right page" + (o.n ? ": " + pc(o.a) + ", likely " + pc(o.aLo).replace(" %", "") + " to " + pc(o.aHi) : "") + "</span></div>" +
+    '<div class="chip ' + (o.k && o.refused === o.k ? "c-ok" : "c-mid") + '"><b>' + o.refused + " of " + o.k + "</b><span>refused where the documents have no answer</span></div>" +
+    '<div class="chip ' + (o.madeup > set.allowed ? "c-bad" : "c-ok") + '"><b>' + o.madeup + "</b><span>" + (o.madeup === 1 ? "answer" : "answers") + " made up (" + set.allowed + " allowed)</span></div>";
+  // A
+  $("fa-text").textContent = o.n
+    ? o.rr + " of " + o.n + " questions that have an answer came back right with the right page: " + pc(o.a) + ". With " + o.n + " questions the true share most likely lies between " + pc(o.aLo) + " and " + pc(o.aHi) + ". " + shareStatus(o, set) +
+      (o.rn ? " Right in any form, page or not: " + (o.rr + o.rn) + " of " + o.n + "." : "")
+    : "No graded questions with an answer yet.";
+  // B
+  let bt;
+  if (!o.k) bt = "The run has no questions the documents do not answer, so it says little about made-up answers. Acceptance needs " + set.minnon + ".";
+  else {
+    bt = "Where the documents have no answer, it refused " + o.refused + " of " + o.k + (o.madeNonList.length ? " and made up an answer to " + listNos(o.madeNonList) : ", and made up none") + ". ";
+    bt += o.refused + " of " + o.k + " only shows that it refuses at least " + pc(o.bLo) + " of the time" + (o.k < set.minnon ? "; acceptance needs " + set.minnon + " such questions." : ".");
+  }
+  if (o.madeAns) bt += " It also made up an answer to " + listNos(o.madeAnsList) + ", whose answer is in the documents: a value or a page the documents do not hold.";
+  if (o.overrefused) bt += " It also refused " + listNos(o.overList) + ", whose answer is in the documents: a miss, though not a dishonest one.";
+  $("fb-text").textContent = bt;
+  // C
+  const types = TYPES.filter(function (t) { return t !== "noanswer" && o.per[t].n > 0; });
+  const weak = types.filter(function (t) { return o.per[t].good < o.per[t].n; }).sort(function (a, b) { return o.per[a].good / o.per[a].n - o.per[b].good / o.per[b].n; });
+  const full = types.filter(function (t) { return o.per[t].good === o.per[t].n; });
+  let ct;
+  if (!types.length) ct = "No graded questions with an answer yet.";
+  else if (!weak.length) ct = "No misses on any kind of question with an answer.";
+  else {
+    ct = "It errs on " + listWords(weak.map(function (t) { return TSHORT[t] + " (" + o.per[t].good + " of " + o.per[t].n + ")"; })) + ".";
+    if (full.length) {
+      const g = full.reduce(function (a, t) { return a + o.per[t].good; }, 0);
+      ct += " " + listWords(full.map(function (t) { return TSHORT[t]; })).replace(/^./, function (c) { return c.toUpperCase(); }) + " came back right with the page, " + g + " of " + g + ".";
+    }
+  }
+  $("fc-text").textContent = ct;
+  drawA(o); drawB(o); drawC(o);
+  // what to do
+  const todo = [];
+  if (o.verdict === "notready") todo.push("Fix the rows marked in red in the form: each needs a type and a grade that fits it.");
+  if (o.madeup > set.allowed) todo.push("Do not accept it. Send each made-up answer to the supplier with the question, the answer and the page it cited, and ask why it answered at all. After the fix, run the check again on new questions.");
+  if (o.verdict === "rejected-share") todo.push("Send the misses by kind of question to the supplier. Re-run with new questions after the fix; the same questions would only test whether they were memorised.");
+  if (o.verdict === "notproven") todo.push(o.a > set.bar && o.more > 0
+    ? "Add about " + o.more + " questions with an answer in the next run, more of them of the weak kinds, and grade them the same way. Until then, check every answer against its page."
+    : "The share is not above the bar, so more questions would not help. Send the misses by kind of question to the supplier, and run the check again on new questions after the fix.");
+  if (o.verdict === "rejected-madeup" && o.n && o.aLo < set.bar) todo.push("Even without the made-up answer, the right-page share would not be enough: " + shareStatus(o, set).replace(/^./, function (c) { return c.toLowerCase(); }));
+  if (o.k < set.minnon && o.verdict !== "notready") todo.push("In the next run, include " + set.minnon + " questions the documents do not answer" + (o.k ? "; " + o.k + " is too few to accept." : "."));
+  if (weak.length && o.verdict !== "accepted") todo.push("Ask the supplier about " + listWords(weak.slice(0, 3).map(function (t) { return TSHORT[t]; })) + ": these are where its answers fail.");
+  if (o.verdict === "accepted") {
+    todo.push("Record the result line and the date. Use the system, and open the page for any number that goes into a calculation.");
+    todo.push("Re-run with new questions after every update of the system or the library, and spot-check about one answer in ten in daily use.");
+  }
+  todo.push("Keep the question set from the supplier. A set that has been seen no longer tests anything.");
+  $("todo").innerHTML = todo.map(function (t) { return "<li>" + esc(t) + "</li>"; }).join("");
+  // tables
+  let h = '<thead><tr><th class="l">Question type</th><th>Questions</th><th>Right with the right page (no answer: refused)</th>' +
+    GRADES.map(function (g) { return "<th>" + esc(SHORT[g]) + "</th>"; }).join("") + "</tr></thead><tbody>";
+  TYPES.forEach(function (t) {
+    const p = o.per[t];
+    h += '<tr><td>' + esc(TNAME[t]) + "</td><td>" + p.n + "</td><td><b>" + (p.n ? p.good + " of " + p.n : "") + "</b></td>" + GRADES.map(function (g) { return "<td>" + (p.g[g] || "") + "</td>"; }).join("") + "</tr>";
+  });
+  $("tbl-type").innerHTML = h + "</tbody>";
+  const r3 = function (a, b) { return "<tr><td>" + a + "</td><td>" + b + "</td></tr>"; };
+  $("tbl-sum").innerHTML = '<thead><tr><th class="l">The run</th><th></th></tr></thead><tbody>' +
+    r3("Questions graded", o.rows - o.bad + (o.bad ? " (+" + o.bad + " to fix)" : "")) +
+    r3("With an answer in the documents", o.n) + r3("&nbsp;&nbsp;right, right page", o.rr) + r3("&nbsp;&nbsp;right, page wrong or missing", o.rn) +
+    r3("&nbsp;&nbsp;partly right", o.partly) + r3("&nbsp;&nbsp;wrong", o.wrong) + r3("&nbsp;&nbsp;refused, although the answer is there", o.overrefused) +
+    r3("With no answer in the documents", o.k) + r3("&nbsp;&nbsp;refused (right)", o.refused) + r3("&nbsp;&nbsp;made up", o.madeup) +
+    r3("<b>A.</b> Right-page share, range", o.n ? pc(o.a, 1) + ", " + pc(o.aLo, 1) + " to " + pc(o.aHi, 1) : "") +
+    r3("<b>B.</b> Refused where there is no answer, range", o.k ? pc(o.b, 1) + ", " + pc(o.bLo, 1) + " to " + pc(o.bHi, 1) : "") + "</tbody>";
+  // how many questions
+  let z = '<thead><tr><th class="l">Questions with an answer</th><th>Right</th><th>Share</th><th>Range</th></tr></thead><tbody>';
+  [20, 30, 50].forEach(function (n) { [0.7, 0.8, 0.9, 1].forEach(function (sh) { const x = Math.round(sh * n), r = cp(x, n, set.conf); z += "<tr><td>" + n + "</td><td>" + x + "</td><td>" + pc(x / n) + "</td><td>" + pc(r[0]) + " to " + pc(r[1]) + "</td></tr>"; }); });
+  $("tbl-size").innerHTML = z + "</tbody>";
+  const need = [20, 30, 50, 100].map(function (n) { for (let x = 0; x <= n; x++) if ((x === 0 ? 0 : cp(x, n, set.conf)[0]) >= set.bar) return [n, x]; return [n, null]; });
+  $("size-note").textContent = "To prove the bar of " + pc(set.bar) + " at a " + pc(set.conf) + " range you need at least " + need.map(function (a) { return a[1] === null ? "(impossible) of " + a[0] : a[1] + " of " + a[0]; }).join(", ") + " right. Thirty questions with an answer reject a weak system and accept a nearly faultless one." +
+    (set.bar === 0.8 && set.conf === 0.9 ? " A system that is truly right nine times in ten passes about " + Math.round(REF.power90["30"] * 100) + " times in a hundred with 30 questions with an answer, " + Math.round(REF.power90["26"] * 100) + " with 26, and steadily eight times in ten only from about " + REF.power_stays + "." : "");
+  // four graded answers from the example
+  const exq = [2, 11, 17, 21].map(function (no) { return DATA.questions.filter(function (q) { return q.no === no; })[0]; });
+  $("tbl-ex").innerHTML = '<thead><tr><th class="l">Question</th><th class="l">Expected, and where</th><th class="l">The system said, and cited</th><th class="l">Grade, and why</th></tr></thead><tbody>' +
+    exq.map(function (q) { return '<tr><td class="l">' + q.no + ". " + esc(q.q) + '</td><td class="l">' + esc(q.exp) + " <i>" + esc(q.src) + '</i></td><td class="l">' + esc(q.ans) + (q.cited ? " <i>" + esc(q.cited) + "</i>" : "") + '</td><td class="l"><b>' + esc(SHORT[q.grade]) + "</b>. " + esc(q.why || "") + "</td></tr>"; }).join("") + "</tbody>";
+  if (window.PROBE) document.body.setAttribute("data-result", JSON.stringify({ n: o.n, rr: o.rr, rn: o.rn, partly: o.partly, wrong: o.wrong, overrefused: o.overrefused, k: o.k, refused: o.refused, madeup: o.madeup, a: o.a, aLo: o.aLo, aHi: o.aHi, b: o.b, bLo: o.bLo, bHi: o.bHi, verdict: o.verdict, line: o.line, errs: o.errs, per: TYPES.map(function (t) { return [o.per[t].good, o.per[t].n]; }) }));
+  return o;
+}
+function update(redraw) { readSettings(); if (redraw) drawRows(); refreshCSV(); render(); }
+
+// ---------- checks ----------
+function runChecks() {
+  const out = [];
+  const add = function (name, got, exp, tol, src) {
+    const ok = typeof exp === "number" ? (typeof got === "number" && Math.abs(got - exp) <= tol) : got === exp;
+    out.push({ name: name, got: got, exp: exp, tol: tol, src: src, ok: ok });
+  };
+  const D = { bar: 0.8, conf: 0.9, allowed: 0, minnon: REF.min_non };
+  const ex = summarise(exampleRows(), D);
+  const H = "by hand";
+  add("Example: questions with an answer", ex.n, 26, 0, H + ": 30 - 4");
+  add("Example: right, right page", ex.rr, 20, 0, H + ": 6 + 4 + 2 + 2 + 2 + 4");
+  add("Example: right, page wrong", ex.rn, 1, 0, H + ": question 11");
+  add("Example: partly right", ex.partly, 3, 0, H + ": questions 13, 17, 19");
+  add("Example: wrong", ex.wrong, 1, 0, H + ": question 12");
+  add("Example: refused, although answer is there", ex.overrefused, 1, 0, H + ": question 25");
+  add("Example: questions with no answer", ex.k, 4, 0, H + ": questions 20-23");
+  add("Example: refused there", ex.refused, 3, 0, H + ": questions 20, 22, 23");
+  add("Example: made up", ex.madeup, 1, 0, H + ": question 21");
+  add("Example: A", ex.a, 20 / 26, 1e-12, H + ": 20 / 26");
+  add("Example: B", ex.b, 0.75, 1e-12, H + ": 3 / 4");
+  add("Example: verdict", ex.verdict, "rejected-madeup", 0, H + ": one made up, none allowed");
+  add("Example: result in one line", ex.line, REF.example.line, 0, H);
+  add("Example: where it errs", ex.errs, "Number from a table 4 of 5; Units and depth reference 2 of 4; Two documents disagree 2 of 4; Figure or map 2 of 3", 0, H);
+  const T = ["fact", "table", "units", "conflict", "noanswer", "figure", "compare"], G = [6, 4, 2, 2, 3, 2, 4];
+  T.forEach(function (t, i) { add("Example: " + TNAME[t] + ", right", ex.per[t].good, G[i], 0, H); });
+  // closed forms
+  add("4 of 4 at 90 %: from", cp(4, 4, 0.9)[0], Math.pow(0.05, 1 / 4), 1e-9, H + ": 0.05^(1/4)");
+  add("0 of 5 at 90 %: to", cp(0, 5, 0.9)[1], 1 - Math.pow(0.05, 1 / 5), 1e-9, H + ": 1 - 0.05^(1/5)");
+  add("1 of 10 at 90 %: from", cp(1, 10, 0.9)[0], 1 - Math.pow(0.95, 1 / 10), 1e-9, H + ": 1 - 0.95^(1/10)");
+  add("9 of 10 at 90 %: to", cp(9, 10, 0.9)[1], Math.pow(0.95, 1 / 10), 1e-9, H + ": 0.95^(1/10)");
+  add("26 of 26 at 90 %: from", cp(26, 26, 0.9)[0], Math.pow(0.05, 1 / 26), 1e-9, H + ": 0.05^(1/26)");
+  add("1 of 2 at 80 %: from", cp(1, 2, 0.8)[0], 1 - Math.sqrt(0.9), 1e-9, H + ": 1 - 0.9^(1/2)");
+  // fit rules and CSV
+  add("Made up fits a fact question too", fits("fact", "madeup"), true, 0, H);
+  add("Right, right page on a no-answer question does not fit", fits("noanswer", "right-page"), false, 0, H);
+  add("Refused fits both kinds", fits("table", "refused") && fits("noanswer", "refused"), true, 0, H);
+  const c1 = parseCSV("No;Question type;Grade\n1;Fact from a page;Right, right page\n2;No answer in the documents;" + GNAME.madeup + "\n3;units;partly");
+  add("CSV with semicolons, a header and names", JSON.stringify(c1.rows.map(function (r) { return r.type + "/" + r.grade; })), '["fact/right-page","noanswer/madeup","units/partly"]', 0, H);
+  const c2 = parseCSV("1,figure,refused\n2,compare,wrong\n3,table,maybe");
+  add("CSV without a header; unknown grade reported", c2.errors.length + "/" + c2.rows[2].grade, "1/", 0, H);
+  const c3 = parseCSV(toCSV(exampleRows()));
+  add("CSV saved and read back gives the same run", summarise(c3.rows, D).line, ex.line, 0, H);
+  // independent: the example ranges
+  const I = "independent calculation";
+  add("Example: A from", ex.aLo, REF.example.a_lo, 1e-9, I);
+  add("Example: A to", ex.aHi, REF.example.a_hi, 1e-9, I);
+  add("Example: B from", ex.bLo, REF.example.b_lo, 1e-9, I);
+  add("Example: B to", ex.bHi, REF.example.b_hi, 1e-9, I);
+  REF.ranges.forEach(function (r) {
+    const g = cp(r.x, r.n, r.conf);
+    add(r.x + " of " + r.n + " at " + Math.round(r.conf * 100) + " %: from", g[0], r.lo, 1e-9, I);
+    add(r.x + " of " + r.n + " at " + Math.round(r.conf * 100) + " %: to", g[1], r.hi, 1e-9, I);
+  });
+  // independent: verdicts on synthetic runs
+  Object.keys(REF.cases).filter(function (k) { return k !== "example"; }).forEach(function (k) {
+    const r = REF.cases[k], o = summarise(r.grades.map(function (g) { return { type: g[0], grade: g[1] }; }), D);
+    add("Run \"" + k + "\": verdict", o.verdict, r.verdict, 0, I);
+    if (r.more !== null) add("Run \"" + k + "\": more questions", o.more, r.more, 0, I);
+    add("Run \"" + k + "\": A from", o.aLo, r.a_lo, 1e-9, I);
+  });
+  [20, 30, 50, 100].forEach(function (n) {
+    let need = null; for (let x = 0; x <= n; x++) if (x > 0 && cp(x, n, 0.9)[0] >= 0.8) { need = x; break; }
+    add("Fewest right to prove 80 % at " + n, need, REF.need80[String(n)], 0, I);
+  });
+  ["4", "10"].forEach(function (m) {
+    add("Minimum of " + m + " questions with no answer (bar 50 %, one made up allowed)", summarise(exampleRows(), { bar: 0.5, conf: 0.9, allowed: 1, minnon: Number(m) }).verdict, REF.verdicts_min[m], 0, I);
+  });
+  return out;
+}
+function showChecks() {
+  const res = runChecks(), pass = res.filter(function (r) { return r.ok; }).length;
+  const sum = pass === res.length ? "ALL " + res.length + " PASS" : (res.length - pass) + " FAIL of " + res.length;
+  $("checks-sum").innerHTML = '<span class="' + (pass === res.length ? "pass" : "fail") + '">' + sum + "</span>";
+  const fmt = function (v) { return typeof v === "number" ? (Number.isInteger(v) ? String(v) : v.toFixed(9)) : esc(String(v)); };
+  $("checks").innerHTML = '<thead><tr><th class="l">Check</th><th>Page</th><th>Expected</th><th class="tol">Tolerance</th><th class="l src">Source</th><th>Status</th></tr></thead><tbody>' +
+    res.map(function (r) { return "<tr><td>" + esc(r.name) + "</td><td>" + fmt(r.got) + "</td><td>" + fmt(r.exp) + '</td><td class="tol">' + (typeof r.exp === "number" && r.tol ? r.tol.toExponential(0) : "exact") + '</td><td class="src">' + esc(r.src) + '</td><td class="st ' + (r.ok ? "ok" : "no") + '">' + (r.ok ? "PASS" : "FAIL") + "</td></tr>"; }).join("") + "</tbody>";
+  if (window.PROBE) document.body.setAttribute("data-checks", sum);
+  if (pass !== res.length) $("checks-box").open = true;
+}
+
+// ---------- start ----------
+(function () {
+  const q = new URLSearchParams(location.search);
+  const th = q.get("theme"); if (th === "light" || th === "dark") document.documentElement.setAttribute("data-theme", th);
+  window.PROBE = q.get("probe") === "1";
+  $("rules").innerHTML = TYPES.map(function (t) { return "<li><b>" + esc(TNAME[t]) + "</b>: " + esc(RULES[t]) + "</li>"; }).join("");
+  $("grades").innerHTML = GRADES.map(function (g) { return "<li><b>" + esc(SHORT[g]) + "</b>: " + esc(GRULE[g]) + "</li>"; }).join("");
+  rows = exampleRows();
+  ["bar", "allowed", "minnon"].forEach(function (id) { $(id).addEventListener("input", function () { update(false); }); });
+  $("conf").addEventListener("change", function () { update(false); });
+  $("add").addEventListener("click", function () { const last = rows.length ? parseInt(rows[rows.length - 1].no, 10) : 0; rows.push({ no: String(isFinite(last) ? last + 1 : rows.length + 1), type: "", grade: "", q: "" }); update(true); });
+  $("clear").addEventListener("click", function () { rows = []; update(true); });
+  $("reset").addEventListener("click", function () { rows = exampleRows(); $("bar").value = 80; $("conf").value = "0.9"; $("allowed").value = 0; $("minnon").value = 10; $("csvmsg").innerHTML = ""; update(true); });
+  const useCSV = function (text, from) {
+    const p = parseCSV(text);
+    if (!p.rows.length) { $("csvmsg").innerHTML = '<div class="errs">' + esc(p.errors.join(" ") || "No rows found.") + "</div>"; return; }
+    rows = p.rows; update(true);
+    $("csvmsg").innerHTML = p.errors.length ? '<div class="errs">' + p.errors.slice(0, 6).map(esc).join("<br>") + (p.errors.length > 6 ? "<br>…" : "") + "</div>" : '<div class="note-ok">' + plural(p.rows.length, "row", "rows") + " read from " + esc(from) + ".</div>";
+  };
+  $("paste").addEventListener("click", function () { useCSV($("csv").value, "the pasted text"); });
+  $("file").addEventListener("change", function () { const f = this.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = function () { useCSV(rd.result, f.name); }; rd.readAsText(f); this.value = ""; });
+  update(true);
+  showChecks();
+  if (window.PROBE) {
+    document.body.setAttribute("data-width", document.documentElement.scrollWidth + "/" + window.innerWidth);
+    const a = $("verdict").getBoundingClientRect().top + window.scrollY, b = $("find-c").getBoundingClientRect().bottom + window.scrollY;
+    document.body.setAttribute("data-finds", Math.round(a) + "/" + Math.round(b));
+  }
+})();
+</script>
+</body>
+</html>
